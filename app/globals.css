@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
 :root {
+  /* Core colors (light) */
   --background: #ffffff;
-  --foreground: #171717;
+  --surface: #f6f7f9;
+  --surface-2: #f0f2f5;
+  --foreground: #0b0d12;
+  --muted: #5b616b;
+  --border: rgba(11, 13, 18, 0.12);
+  --accent: #d1121f;
+
+  /* Pattern */
+  --pattern-opacity: 0.04;
+  --pattern-invert: 0;
+
+  /* Flag stripe */
+  --flag-green: #009e49;
+  --flag-red: #ce1126;
+  --flag-yellow: #fcd116;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+
+  --color-flag-green: var(--flag-green);
+  --color-flag-red: var(--flag-red);
+  --color-flag-yellow: var(--flag-yellow);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark theme values (controlled by next-themes) */
+html[data-theme="dark"],
+html.dark {
+  --background: #07080a;
+  --surface: #101216;
+  --surface-2: #0c0e12;
+  --foreground: #f2f4f8;
+  --muted: #a1a7b2;
+  --border: rgba(242, 244, 248, 0.14);
+  --accent: #ff2f3f;
+
+  --pattern-opacity: 0.06;
+  --pattern-invert: 1;
+}
+
+html[data-theme="light"],
+html.light {
+  color-scheme: light;
+}
+
+html[data-theme="dark"],
+html.dark {
+  color-scheme: dark;
+}
+
+/* Fallback if next-themes hasn't mounted yet */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme]) {
+    --background: #07080a;
+    --surface: #101216;
+    --surface-2: #0c0e12;
+    --foreground: #f2f4f8;
+    --muted: #a1a7b2;
+    --border: rgba(242, 244, 248, 0.14);
+    --accent: #ff2f3f;
+
+    --pattern-opacity: 0.06;
+    --pattern-invert: 1;
   }
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji";
+}
+
+/* Smooth page entrance (used for central content transitions) */
+@keyframes crtvFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.crtv-page-enter {
+  animation: crtvFadeUp 260ms ease-out both;
+}
+
+@keyframes crtvWave {
+  0% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 }

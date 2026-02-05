@@ -1,0 +1,334 @@
+/**
+ * TypeScript type definitions for CRTV API responses
+ */
+
+// App Configuration Types
+export interface AppDetails {
+    ACAN_API: AppConfig[];
+}
+
+export interface AppConfig {
+    app_name: string;
+    app_logo: string;
+    app_data_toload: string;
+    app_data_url: string;
+    app_youtube_url: string;
+    app_youtube_uid: string;
+    app_google_apikey: string;
+    app_news_url: string;
+    app_fb_url: string;
+    app_twitter_url: string;
+    app_version: string;
+    app_author: string;
+    app_contact: string;
+    app_email: string;
+    app_website: string;
+    app_info: string;
+    app_description: string;
+    app_developed_by: string;
+    app_privacy_policy: string;
+    publisher_id: string | null;
+    android_app_id: string;
+    ios_app_id: string;
+    active_interstital_ad: string;
+    android_interstital_ad_id: string | null;
+    ios_interstital_ad_id: string | null;
+    interstital_ad_click: string;
+    active_banner_ad: string;
+    android_banner_ad_id: string | null;
+    ios_banner_ad_id: string | null;
+}
+
+// Main App Data Types
+export interface AppData {
+    allitems: AppDataItem[];
+}
+
+export interface AppDataItem {
+    title: string;
+    desc: string;
+    sdimage: string;
+    type: 'LIVE' | 'RADIO' | 'VOD' | 'slider' | 'news' | 'AOD' | 'EPG' | 'CINEMA' | 'LASTESTCINEMA' | 'presentateurs' | 'affiches' | 'FLASH' | 'ADS';
+    feed_url: string;
+    stream_url: string;
+}
+
+// Live Channel Types
+export interface LiveChannelsResponse {
+    allitems: LiveChannel[];
+}
+
+export interface LiveChannel {
+    id: string;
+    title: string;
+    desc: string;
+    logo: string;
+    logo_url: string;
+    type: 'TV' | 'RADIO';
+    feed_url: string;
+    alaune_feed: string;
+    vod_feed: string;
+    slug: string;
+    guidetvnow: string;
+    stream_url: string;
+    affiche_url: string;
+    list_channels_by_category: string;
+    list_pubs: string;
+    // Radio specific fields
+    sd_logo?: string;
+    hd_logo?: string;
+    emissions?: string;
+}
+
+// Direct Playback Types
+export interface DirectPlayback {
+    direct_url: string;
+    android_url: string;
+    web_url: string;
+}
+
+// VOD Types
+export interface VODChannelsResponse {
+    allitems: VODChannel[];
+}
+
+export interface VODChannel {
+    id: string;
+    title: string;
+    desc: string;
+    logo: string;
+    logo_url: string;
+    type: string;
+    feed_url: string;
+    slug: string;
+    stream_url: string;
+}
+
+export interface VODItemsResponse {
+    allitems: VODItem[];
+}
+
+export interface VODItem {
+    id: string;
+    title: string;
+    desc: string;
+    image: string;
+    image_url: string;
+    video_url: string;
+    duration: string;
+    published_at: string;
+    category: string;
+    slug: string;
+}
+
+// Slider Types
+export interface SlidersResponse {
+    allitems: SliderItem[];
+}
+
+export interface SliderItem {
+    id: string;
+    title: string;
+    desc: string;
+    image: string;
+    image_url: string;
+    link_url: string;
+    type: string;
+    video_url?: string;
+}
+
+// Slider Video Types (from alaunesliders endpoint)
+export interface SliderVideosResponse {
+    allitems: SliderVideoItem[];
+}
+
+export interface SliderVideoItem {
+    title: string;
+    desc: string;
+    type: string;
+    views: string;
+    logo: string;
+    logo_url: string;
+    video_url: string;
+    relatedItems: string;
+    feed_url: string;
+    date: string;
+    time: string;
+    slug: string;
+}
+
+// Featured Content Types
+export interface AlauneResponse {
+    allitems: AlauneItem[];
+}
+
+export interface AlauneItem {
+    id: string;
+    title: string;
+    desc: string;
+    image: string;
+    image_url: string;
+    video_url: string;
+    duration: string;
+    published_at: string;
+    category: string;
+    slug: string;
+    channel_id: string;
+    channel_name: string;
+}
+
+// News Types
+export interface NewsCategoriesResponse {
+    allitems: NewsCategory[];
+}
+
+export interface NewsCategory {
+    id: string;
+    title: string;
+    desc: string;
+    slug: string;
+    feed_url: string;
+}
+
+export interface NewsItemsResponse {
+    allitems: NewsItem[];
+}
+
+export interface NewsItem {
+    id: string;
+    title: string;
+    desc: string;
+    content: string;
+    image: string;
+    image_url: string;
+    published_at: string;
+    category: string;
+    slug: string;
+    author: string;
+}
+
+// EPG Types
+export interface EPGResponse {
+    allitems: EPGItem[];
+}
+
+export interface EPGItem {
+    id: string;
+    channel_id: string;
+    channel_name: string;
+    channel_logo: string;
+    program_title: string;
+    program_desc: string;
+    start_time: string;
+    end_time: string;
+    duration: string;
+    is_current: boolean;
+}
+
+// Cinema Types
+export interface CinemaCategoriesResponse {
+    allitems: CinemaCategory[];
+}
+
+export interface CinemaCategory {
+    id: string;
+    title: string;
+    desc: string;
+    slug: string;
+    feed_url: string;
+    type: 'movie' | 'series';
+}
+
+export interface CinemaItemsResponse {
+    allitems: CinemaItem[];
+}
+
+export interface CinemaItem {
+    id: string;
+    title: string;
+    desc: string;
+    image: string;
+    image_url: string;
+    video_url: string;
+    duration: string;
+    year: string;
+    rating: string;
+    genre: string;
+    slug: string;
+    type: 'movie' | 'series';
+    season?: string;
+    episode?: string;
+}
+
+// Podcast/AOD Types
+export interface AODItemsResponse {
+    allitems: AODItem[];
+}
+
+export interface AODItem {
+    id: string;
+    title: string;
+    desc: string;
+    image: string;
+    image_url: string;
+    audio_url: string;
+    duration: string;
+    published_at: string;
+    category: string;
+    slug: string;
+}
+
+// Presenters Types
+export interface PresentersResponse {
+    allitems: Presenter[];
+}
+
+export interface Presenter {
+    id: string;
+    name: string;
+    bio: string;
+    photo: string;
+    photo_url: string;
+    slug: string;
+}
+
+// Ads/Banners Types
+export interface AdsResponse {
+    allitems: AdItem[];
+}
+
+export interface AdItem {
+    id: string;
+    title: string;
+    image: string;
+    image_url: string;
+    link_url: string;
+    position: string;
+    type: string;
+}
+
+// Flash News Types
+export interface FlashNewsResponse {
+    allitems: FlashNewsItem[];
+}
+
+export interface FlashNewsItem {
+    id: string;
+    title: string;
+    content: string;
+    published_at: string;
+}
+
+// Affiche Types
+export interface AffichesResponse {
+    allitems: AfficheItem[];
+}
+
+export interface AfficheItem {
+    id: string;
+    title: string;
+    image: string;
+    image_url: string;
+    link_url: string;
+    channel_id: string;
+}

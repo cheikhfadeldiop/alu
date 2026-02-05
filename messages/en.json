@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Home",
+    "news": "News",
+    "replay": "Replay TV",
+    "radio": "Radio FM",
+    "live": "Live TV",
+    "playback": "Playback",
+    "contact": "Contact"
+  },
+  "header": {
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "footer": {
+    "about": "About",
+    "resources": "Resources",
+    "commitments": "Our commitments",
+    "other": "Other",
+    "description": "Cameroon Radio Television is Cameroon’s public radio and television broadcaster.",
+    "links": {
+      "about": "About",
+      "crtvCameroon": "CRTV Cameroon",
+      "helpCenters": "Help centers",
+      "contact": "Contact",
+      "tv": "TV",
+      "news": "News",
+      "radio": "Radio",
+      "replay": "Replay TV",
+      "quality": "Quality & commitments",
+      "terms": "Terms of use",
+      "data": "Data availability",
+      "legal": "Legal notice",
+      "ads": "Advertising"
+    },
+    "strip": {
+      "crtv": "CRTV",
+      "crtvSport": "CRTV SPORT",
+      "posteNational": "POSTE NATIONAL",
+      "crtvReligion": "CRTV RELIGION",
+      "crtvNews": "CRTV NEWS"
+    },
+    "copyright": "© 2026 CRTV — Design: iCAN GROUP"
+  },
+  "common": {
+    "seeAll": "See all",
+    "live": "LIVE",
+    "send": "Send"
+  },
+  "pages": {
+    "home": {
+      "hero": "Top story",
+      "liveChannels": "Live channels",
+      "latestEditions": "Latest editions",
+      "editorChoice": "Editor’s choice",
+      "categories": "Categories",
+      "regionalNews": "Regional news",
+      "shorts": "Shorts / Highlights",
+      "corporate": "Corporate news"
+    },
+    "radio": {
+      "title": "Radio FM",
+      "upNext": "Up next"
+    },
+    "replay": {
+      "title": "Replay TV"
+    },
+    "news": {
+      "title": "News",
+      "trending": "Trending"
+    },
+    "contact": {
+      "title": "Contact",
+      "intro": "Contact our team to learn more, share your project, or explore partnership opportunities.",
+      "address": "Address",
+      "phone": "Phone",
+      "formTitle": "Please fill in the fields below",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "subject": "Subject",
+      "message": "Message",
+      "requiredHint": "Fields marked with an asterisk are required.",
+      "placeholders": {
+        "firstName": "Your first name",
+        "lastName": "Your last name",
+        "email": "Your email address",
+        "phone": "Your phone number",
+        "subject": "Subject",
+        "message": "What is your message?"
+      }
+    }
+  }
+}
+

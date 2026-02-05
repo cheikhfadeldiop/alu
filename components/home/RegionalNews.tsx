@@ -1,0 +1,56 @@
+import Link from "next/link";
+import Image from "next/image";
+import { SectionTitle } from "../ui/SectionTitle";
+import { AlauneItem } from "../../types/api";
+
+interface RegionalNewsProps {
+    items: AlauneItem[];
+    title: string;
+    actionLabel: string;
+}
+
+export function RegionalNews({ items, title, actionLabel }: RegionalNewsProps) {
+    return (
+        <section className="space-y-4">
+            <SectionTitle title={title} actionLabel={actionLabel} actionHref="/news?category=regional" />
+            <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+                {/* Articles List */}
+                <div className="space-y-3">
+                    {items.map((item) => (
+                        <Link
+                            key={item.id}
+                            href={`/playback/${item.id}`}
+                            className="group flex gap-3 hover:bg-[color:var(--surface)] p-2 rounded-lg transition-colors"
+                        >
+                            <div className="relative w-28 h-20 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                                <Image
+                                    src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
+                                    alt={item.title}
+                                    fill
+                                    sizes="112px"
+                                    className="object-cover"
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-semibold line-clamp-2 group-hover:underline mb-1">
+                                    {item.title}
+                                </h3>
+                                <p className="text-xs text-[color:var(--muted)] uppercase">
+                                    {(item as any).category || "ACTUALITÉS RÉGIONALES"} •{" "}
+                                    {new Date((item as any).published_at || Date.now()).toLocaleDateString("fr-FR")}
+                                </p>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Right Sidebar Ad */}
+                <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--surface)] p-6 flex flex-col items-center justify-center min-h-[400px]">
+                    <p className="text-[color:var(--muted)] text-sm mb-2">Dimension</p>
+                    <p className="text-2xl font-bold mb-4">1460 X 370</p>
+                    <p className="text-[color:var(--muted)] text-xs text-center">Mettez vos annonces ici !</p>
+                </div>
+            </div>
+        </section>
+    );
+}

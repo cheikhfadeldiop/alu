@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "news": "News",
+    "replay": "Replay TV",
+    "radio": "Radio FM",
+    "live": "Live TV",
+    "playback": "Playback",
+    "contact": "Nous contacter"
+  },
+  "header": {
+    "language": "Langue",
+    "theme": "Thème"
+  },
+  "footer": {
+    "about": "Nous connaître",
+    "resources": "Ressources",
+    "commitments": "Nos engagements",
+    "other": "Autres",
+    "description": "La Cameroon Radio Television est l’organisme public camerounais de radio-télévision.",
+    "links": {
+      "about": "À propos",
+      "crtvCameroon": "CRTV Cameroun",
+      "helpCenters": "Centres d’aide",
+      "contact": "Nous contacter",
+      "tv": "TV",
+      "news": "Actualités",
+      "radio": "Radio",
+      "replay": "Replay TV",
+      "quality": "Engagements et qualité",
+      "terms": "Conditions générales d’utilisation",
+      "data": "Mise à disposition des données",
+      "legal": "Mentions légales",
+      "ads": "Publicité"
+    },
+    "strip": {
+      "crtv": "CRTV",
+      "crtvSport": "CRTV SPORT",
+      "posteNational": "POSTE NATIONAL",
+      "crtvReligion": "CRTV RELIGION",
+      "crtvNews": "CRTV NEWS"
+    },
+    "copyright": "© 2026 CRTV — Conception : iCAN GROUP"
+  },
+  "common": {
+    "seeAll": "Voir tout",
+    "live": "LIVE",
+    "send": "Envoyer"
+  },
+  "pages": {
+    "home": {
+      "hero": "À la une",
+      "liveChannels": "Nos chaînes en direct",
+      "latestEditions": "Dernières éditions",
+      "editorChoice": "Choix de la rédaction",
+      "categories": "Catégories",
+      "regionalNews": "Actualités régionales",
+      "shorts": "Shorts / Résumés",
+      "corporate": "Corporate news"
+    },
+    "radio": {
+      "title": "Radio FM",
+      "upNext": "Programmes à venir"
+    },
+    "replay": {
+      "title": "Replay TV"
+    },
+    "news": {
+      "title": "News",
+      "trending": "Trending"
+    },
+    "contact": {
+      "title": "Contact",
+      "intro": "Contactez notre équipe pour en savoir plus, partager votre projet ou explorer des opportunités de partenariat.",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "formTitle": "Veuillez remplir les champs ci-dessous",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "subject": "Sujet",
+      "message": "Message",
+      "requiredHint": "Les champs marqués d'un astérisque sont obligatoires.",
+      "placeholders": {
+        "firstName": "Votre prénom",
+        "lastName": "Votre nom de famille",
+        "email": "Votre adresse e-mail",
+        "phone": "Votre numéro de téléphone",
+        "subject": "Sujet",
+        "message": "Quel est votre message ?"
+      }
+    }
+  }
+}
+
