@@ -13,7 +13,7 @@ interface ShortsCarouselProps {
 export function ShortsCarousel({ videos, title, actionLabel }: ShortsCarouselProps) {
     return (
         <section className="space-y-4">
-            <SectionTitle title={title} actionLabel={actionLabel} actionHref="/replay" />
+            <SectionTitle title={title} title2="" actionLabel={actionLabel} actionHref="/replay" />
             <Carousel itemClassName="w-[250px]">
                 {videos.map((video, index) => (
                     <Link key={index} href={`/playback/${video.slug}`} className="group block">

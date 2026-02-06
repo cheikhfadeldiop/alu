@@ -14,7 +14,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
             {hero && (
                 <Link
                     href={`/playback/${hero.id}`}
-                    className="group relative block overflow-hidden rounded-lg bg-black"
+                    className="group relative block overflow-hidden rounded-lg bg-white/10 dark:bg-black/30 backdrop-blur-sm border border-white/20 dark:border-white/10"
                 >
                     <div className="relative aspect-[16/10] w-full">
                         <Image
@@ -54,9 +54,9 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                         <Link
                             key={`${item.id}-${index}`}
                             href={`/playback/${item.id}`}
-                            className="group flex gap-3 hover:bg-[color:var(--surface)] p-2 rounded-lg transition-colors"
+                            className="group flex gap-3 hover:bg-white/10 dark:hover:bg-white/5 p-2 rounded-lg transition-colors border border-transparent hover:border-white/10"
                         >
-                            <div className="relative w-24 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                            <div className="relative w-24 h-16 flex-shrink-0 rounded overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10">
                                 <Image
                                     src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
                                     alt={item.title || "Actualité"}

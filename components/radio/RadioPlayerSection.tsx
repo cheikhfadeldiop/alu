@@ -323,7 +323,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
     return (
         <div className="w-full space-y-6">
             {/* Main Player Container */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-black dark:via-gray-900 dark:to-gray-800 p-8 border border-white/10">
+            <div className="relative rounded-2xl p-8 bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
                 {/* Loading Overlay */}
                 {loading && !error && !isStreamDead && (
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -362,9 +362,21 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                     </div>
                 )}
 
+
                 {/* Background Waveform Pattern */}
-                <div className="absolute inset-0 opacity-20 pointer-events-none">
-                    <svg className="w-full h-full" viewBox="0 0 1000 400" preserveAspectRatio="none">
+                <div className="absolute  pointer-events-none inset-0 opacity-00  bg-[url('/images/waveform.png')] bg-cover bg-center">
+                    {/*image de fond sur le player avec opaciter 0.5*/}
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0 pointer-events-none">
+                        <Image
+                            src="/assets/logo/fondd.png"
+                            alt="Background"
+                            fill
+                            className="object-cover opacity-50" // Ajuste l'opacité ici
+                        />
+                    </div>
+
+                    <svg className="w-full h-full " viewBox="0 0 1000 400" preserveAspectRatio="none">
                         <path
                             d="M0,200 Q50,150 100,200 T200,200 T300,200 T400,200 T500,200 T600,200 T700,200 T800,200 T900,200 T1000,200"
                             fill="none"
@@ -397,18 +409,21 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                 </button>
 
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="mb-4">
-                        <Image
-                            src={channel.logo_url || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
-                            alt={channel.title}
-                            width={120}
-                            height={40}
-                            className="object-contain"
-                        />
-                    </div>
+                    <div className=" mb-10 mt-[-35px] flex flex-col items-center bg-white/20 w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
+                        <div className="mb-4">
+                            <Image
+                                src={channel.logo_url || channel.logo || channel.hd_logo || "/assets/placeholders/radio_icon_sur_card.png"}
+                                alt={channel.title}
+                                width={80}
+                                height={80}
+                                className="object-contain"
+                            />
+                        </div>
 
-                    <div className="text-6xl font-bold text-white mb-8 tracking-tight">
-                        {frequency}
+                        <div className="text-4xl font-bold text-white mb-8 tracking-tight">
+                            {frequency}
+                        </div>
+
                     </div>
 
                     {/* Circular Player Control */}
@@ -495,74 +510,105 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                     </div>
 
                     {/* Bottom Metadata */}
-                    <div className="w-full max-w-2xl">
-                        {/* Waveform Visualization */}
-                        <div className="flex items-center justify-center gap-1 h-16 mb-4">
-                            {Array.from({ length: 60 }).map((_, i) => (
+                    {/* Bottom Metadata */}
+                    <div className="w-full max-w-2xl mx-auto flex items-center justify-between gap-4 py-3">
+
+                        {/* Waveform */}
+                        <div className="flex items-center gap-1 w-1/3 h-16">
+                            {Array.from({ length: 20 }).map((_, i) => (
                                 <div
                                     key={i}
                                     className="w-1 rounded-full bg-white/30"
                                     style={{
                                         height: `${isActuallyPlaying ? 10 + ((i * 7) % 40) : 10}px`,
-                                        animation: isActuallyPlaying ? `crtvWave ${900 + (i % 7) * 120}ms ease-in-out ${(i % 9) * 60}ms infinite alternate` : 'none',
+                                        animation: isActuallyPlaying
+                                            ? `crtvWave ${900 + (i % 7) * 120}ms ease-in-out ${(i % 9) * 60}ms infinite alternate`
+                                            : 'none',
                                     }}
                                 />
                             ))}
                         </div>
 
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex-1">
-                                <h3 className="text-white font-bold text-lg">{channel.title}</h3>
-                                <div className="flex items-center gap-2 text-sm text-white/60 mt-1">
-                                    <span className="flex items-center gap-1">
-                                        <span className={`w-2 h-2 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse'
-                                            : isStreamDead ? 'bg-gray-500'
-                                                : loading && isPlaying ? 'bg-yellow-500 animate-pulse'
+                        {/* Track Info */}
+                        <div className="flex-1 flex flex-col justify-center text-center">
+                            <h3 className="text-white font-bold text-lg">{channel.title}</h3>
+                            <div className="flex items-center justify-center gap-2 text-sm text-white/60 mt-1">
+                                <span className="flex items-center gap-1">
+                                    <span
+                                        className={`w-2 h-2 rounded-full ${isActuallyPlaying
+                                            ? 'bg-red-500 animate-pulse'
+                                            : isStreamDead
+                                                ? 'bg-gray-500'
+                                                : loading && isPlaying
+                                                    ? 'bg-yellow-500 animate-pulse'
                                                     : 'bg-gray-500'
-                                            }`} />
-                                        {isActuallyPlaying ? 'En direct'
-                                            : isStreamDead ? 'Hors ligne'
-                                                : loading && isPlaying ? 'Connexion...'
-                                                    : 'Prêt'}
-                                    </span>
-                                    <span>•</span>
-                                    <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex items-center gap-2">
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                    </svg>
-                                </button>
-
-                                <button
-                                    onClick={toggleMute}
-                                    disabled={!isActuallyPlaying}
-                                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {isMuted ? (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clipRule="evenodd" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                        </svg>
-                                    )}
-                                </button>
-
-                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                    </svg>
-                                </button>
+                                            }`}
+                                    />
+                                    {isActuallyPlaying
+                                        ? 'En direct'
+                                        : isStreamDead
+                                            ? 'Hors ligne'
+                                            : loading && isPlaying
+                                                ? 'Connexion...'
+                                                : 'Prêt'}
+                                </span>
+                                <span>•</span>
+                                <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                         </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 w-1/3 justify-end">
+                            {/* Share */}
+                            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                                    />
+                                </svg>
+                            </button>
+
+                            {/* Mute */}
+                            <button
+                                onClick={toggleMute}
+                                disabled={!isActuallyPlaying}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isMuted ? (
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                                            clipRule="evenodd"
+                                        />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                                        />
+                                    </svg>
+                                )}
+                            </button>
+
+                            {/* More */}
+                            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -585,7 +631,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
             )}
 
             {/* Channel Description */}
-            <div className="p-6 bg-white/50 dark:bg-black/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10">
+            <div className="p-6 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/10">
                 <div className="flex items-start gap-4">
                     <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-white/5 p-2 border border-gray-200 dark:border-white/10">
                         <Image

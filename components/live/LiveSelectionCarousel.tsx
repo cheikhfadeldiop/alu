@@ -84,10 +84,10 @@ export function LiveSelectionCarousel({
                             onClick={() => onSelectChannel(channel)}
                             className={`group relative flex flex-col w-[280px] sm:w-[300px] h-[220px] 
                                 overflow-hidden rounded-xl 
-                                bg-white dark:bg-gray-900 text-left transition-all duration-300 
-                                border-2 backdrop-blur-sm
+                                bg-background text-left transition-all duration-300 
+                                border-2 
                             ${isSelected
-                                    ? "border-red-600 shadow-lg shadow-red-600/30 scale-[1.02]"
+                                    ? "border-red-600  scale-[1.02]"
                                     : "border-gray-200 dark:border-white/10 hover:border-red-500 dark:hover:border-red-500"
                                 }`}
 

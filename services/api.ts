@@ -254,3 +254,63 @@ export async function getAffiches(): Promise<AffichesResponse> {
 export async function getAffichesByChannel(channelId: string): Promise<AffichesResponse> {
     return fetchAPI<AffichesResponse>(`/listAffichesByChaine/${APP_ID}/${channelId}/json`);
 }
+
+/**
+ * WordPress API Service Functions
+ */
+const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
+
+/**
+ * Generic fetch wrapper for WordPress API
+ */
+async function fetchWordPressAPI<T>(endpoint: string): Promise<T> {
+    try {
+        const response = await fetch(`${WORDPRESS_API_BASE_URL}${endpoint}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            next: { revalidate: 60 }, // Cache for 60 seconds
+        });
+
+        if (!response.ok) {
+            throw new Error(`WordPress API Error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch WordPress ${endpoint}:`, error);
+        throw error;
+    }
+}
+
+/**
+ * Get all WordPress categories
+ */
+export async function getWordPressCategories(): Promise<import('../types/api').WordPressCategory[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressCategory[]>('/categories');
+}
+
+/**
+ * Get WordPress category by slug
+ * @param slug - The slug of the category (e.g., 'a-la-une')
+ */
+export async function getWordPressCategoryBySlug(slug: string): Promise<import('../types/api').WordPressCategory[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressCategory[]>(`/categories/?slug=${slug}`);
+}
+
+/**
+ * Get WordPress posts by category
+ * @param categoryId - The ID of the category
+ * @param perPage - Number of posts to retrieve (default: 10)
+ */
+export async function getWordPressPosts(categoryId: number, perPage: number = 10): Promise<import('../types/api').WordPressPost[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&categories=${categoryId}`);
+}
+
+/**
+ * Get WordPress posts for "À la une" category
+ */
+export async function getWordPressAlaunePost(): Promise<import('../types/api').WordPressPost[]> {
+    // Category ID 121 is "À LA UNE" - fetch 20 articles for pagination
+    return getWordPressPosts(121, 20);
+}

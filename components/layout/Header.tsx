@@ -169,7 +169,7 @@ export function Header() {
         </div>
 
         {/* Navigation - Fond transparent gris en light, noir en dark */}
-        <nav className="flex items-center gap-1 rounded-full bg-gray-400/30 p-1 backdrop-blur-sm dark:bg-black/30">
+        <nav className="flex items-center gap-1 rounded-full p-1 backdrop-blur-sm ">
           {navItems.map((item) => {
             const active =
               item.href === "/"
@@ -182,10 +182,10 @@ export function Header() {
                 key={item.key}
                 href={item.href}
                 className={[
-                  "relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200",
+                  "relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 text-font",
                   active
                     ? "border-2 border-red-500 bg-white text-gray-900 dark:bg-black dark:text-white"
-                    : "border-2 border-transparent bg-transparent text-gray-700 hover:bg-white/40 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-black/40 dark:hover:text-white",
+                    : "",
                 ].join(" ")}
               >
                 {item.hasIcon && (

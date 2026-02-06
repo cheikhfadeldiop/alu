@@ -59,7 +59,7 @@ export function MediaCard({
   return (
     <Link
       href={href}
-      className="group block overflow-hidden rounded-xl  rounded-full bg-gray-400/30 p-1 backdrop-blur-sm dark:bg-black/30"
+      className="group block overflow-hidden rounded-xl bg-white/10 dark:bg-black/30 p-1 backdrop-blur-sm border border-white/20 dark:border-white/10"
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <Image

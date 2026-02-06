@@ -9,6 +9,7 @@ import {
   EditorialChoice,
   CategorySection,
   RegionalNews,
+  WordPressNewsSection,
 } from "../../components/home";
 
 import {
@@ -17,19 +18,24 @@ import {
   getAlaune,
   getVODChannels,
   getEPGNow,
+  getWordPressAlaunePost,
+  getWordPressPosts,
 } from "../../services/api";
+import { LiveSelectionCarousel } from "@/components/live/LiveSelectionCarousel";
 
 export default async function HomePage() {
   const t = await getTranslations("pages.home");
   const tc = await getTranslations("common");
 
   // Fetch data from API
-  const [sliderVideosData, liveChannelsData, alauneData, vodChannelsData, epgData] = await Promise.all([
+  const [sliderVideosData, liveChannelsData, alauneData, vodChannelsData, epgData, wpAlauneData, wpTrendingData] = await Promise.all([
     getSliderVideos().catch(() => ({ allitems: [] })),
     getLiveChannels().catch(() => ({ allitems: [] })),
     getAlaune().catch(() => ({ allitems: [] })),
     getVODChannels().catch(() => ({ allitems: [] })),
     getEPGNow().catch(() => ({ allitems: [] })),
+    getWordPressAlaunePost().catch(() => []),
+    getWordPressPosts(141, 20).catch(() => []), // Trending news - ACTUELLES category (20 articles)
   ]);
 
   const sliderVideos = sliderVideosData.allitems || [];
@@ -37,6 +43,8 @@ export default async function HomePage() {
   const alauneItems = alauneData.allitems || [];
   const vodChannels = vodChannelsData.allitems || [];
   const epgItems = epgData.allitems || [];
+  const wpAlauneItems = wpAlauneData || [];
+  const wpTrendingItems = wpTrendingData || [];
 
   // Data preparation for components
   const hero = alauneItems[0];
@@ -52,10 +60,14 @@ export default async function HomePage() {
 
   return (
     <div className="crtv-page-enter space-y-8 max-w-[1400px] mx-auto px-4">
-      {/* Hero Section */}
-      <HeroSection hero={hero} trendingNews={trendingNews} />
+      {/* WordPress News Section */}
+      <WordPressNewsSection
+        alauneItems={wpAlauneItems}
+        trendingItems={wpTrendingItems}
+      />
 
-      {/* Live Channels */}
+
+
       <LiveChannelsGrid
         channels={liveChannels}
         epgItems={epgItems}

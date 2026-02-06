@@ -12,7 +12,7 @@ interface RegionalNewsProps {
 export function RegionalNews({ items, title, actionLabel }: RegionalNewsProps) {
     return (
         <section className="space-y-4">
-            <SectionTitle title={title} actionLabel={actionLabel} actionHref="/news?category=regional" />
+            <SectionTitle title={title} title2="" actionLabel={actionLabel} actionHref=" /news?category=regional" />
             <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
                 {/* Articles List */}
                 <div className="space-y-3">
@@ -20,9 +20,9 @@ export function RegionalNews({ items, title, actionLabel }: RegionalNewsProps) {
                         <Link
                             key={item.id}
                             href={`/playback/${item.id}`}
-                            className="group flex gap-3 hover:bg-[color:var(--surface)] p-2 rounded-lg transition-colors"
+                            className="group flex gap-3 hover:bg-white/10 dark:hover:bg-white/5 p-2 rounded-lg transition-colors border border-transparent hover:border-white/10"
                         >
-                            <div className="relative w-28 h-20 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                            <div className="relative w-28 h-20 flex-shrink-0 rounded overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10">
                                 <Image
                                     src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
                                     alt={item.title}

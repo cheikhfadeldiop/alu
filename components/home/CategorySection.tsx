@@ -15,13 +15,14 @@ export function CategorySection({ items, title, category, actionLabel }: Categor
         <div className="space-y-4">
             <SectionTitle
                 title={title}
+                title2=""
                 actionLabel={actionLabel}
                 actionHref={`/news?category=${category.toLowerCase()}`}
             />
             <div className="space-y-3">
                 {items.map((item) => (
                     <Link key={item.id} href={`/playback/${item.id}`} className="group block">
-                        <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-200 mb-2">
+                        <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 mb-2">
                             <Image
                                 src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
                                 alt={item.title}

@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.tve.static.acan.group',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'actu.rts.sn',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'rtsactu.acan.group',
+        pathname: '/**',
+      },
     ],
   },
 };

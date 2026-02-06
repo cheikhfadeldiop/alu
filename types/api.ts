@@ -332,3 +332,75 @@ export interface AfficheItem {
     link_url: string;
     channel_id: string;
 }
+
+// WordPress API Types
+export interface WordPressCategory {
+    id: number;
+    count: number;
+    description: string;
+    link: string;
+    name: string;
+    slug: string;
+    taxonomy: string;
+    parent: number;
+    meta: any[];
+    _links: any;
+}
+
+export interface WordPressCategoriesResponse {
+    categories: WordPressCategory[];
+}
+
+export interface WordPressFeaturedMedia {
+    id: number;
+    source_url: string;
+    alt_text: string;
+    media_details?: {
+        width: number;
+        height: number;
+        sizes?: any;
+    };
+}
+
+export interface WordPressPost {
+    id: number;
+    date: string;
+    date_gmt: string;
+    modified: string;
+    modified_gmt: string;
+    slug: string;
+    status: string;
+    type: string;
+    link: string;
+    title: {
+        rendered: string;
+    };
+    content: {
+        rendered: string;
+        protected: boolean;
+    };
+    excerpt: {
+        rendered: string;
+        protected: boolean;
+    };
+    author: number;
+    featured_media: number;
+    comment_status: string;
+    ping_status: string;
+    sticky: boolean;
+    template: string;
+    format: string;
+    meta: any;
+    categories: number[];
+    tags: number[];
+    acan_image_url?: string;
+    _embedded?: {
+        'wp:featuredmedia'?: WordPressFeaturedMedia[];
+        'wp:term'?: any[][];
+    };
+    _links: any;
+}
+
+export interface WordPressPostsResponse {
+    posts: WordPressPost[];
+}

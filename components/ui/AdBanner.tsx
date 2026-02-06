@@ -1,4 +1,4 @@
-import * as React from "react";
+import Image from "next/image";
 
 /**
  * Bannière pub placeholder : dimension 1460 × 370.
@@ -13,13 +13,8 @@ export function AdBanner({ className }: { className?: string }) {
       }
     >
       <div className="relative aspect-[1460/370] w-full min-h-[140px] bg-[color:var(--surface-2)]">
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
-          <span className="text-xs font-semibold tracking-widest text-[color:var(--muted)]">
-            Dimension 1460 × 370
-          </span>
-          <span className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-            Mettez vos annonces ici !
-          </span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <Image src="/assets/banner/ban1.png" alt="Pub" width={1460} height={370} />
         </div>
       </div>
     </section>

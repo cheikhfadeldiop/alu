@@ -143,7 +143,7 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
             )}
 
             {/* Info Container */}
-            <div className="p-6 bg-white/50 dark:bg-black/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10">
+            <div className="p-6 dark:bg-black/10 rounded-xl border border-gray-200 dark:border-white/10">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-white/5 p-2 border border-gray-200 dark:border-white/10">

@@ -39,7 +39,7 @@ export function SectionTitle({
           className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--muted)] hover:text-foreground"
         >
           {actionLabel}
-          <span className="w-[10px] h-[10px] bg-red-600" aria-hidden>»</span>
+          <span className="w-[20px] h-[20px] bg-red-600" aria-hidden>»</span>
         </Link>
       ) : null}
     </div>

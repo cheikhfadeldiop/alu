@@ -1,3 +1,3 @@
 export default {
-    darkMode: "class", // ✅ OBLIGATOIRE avec next-themes
+    darkMode: ['selector', '[data-theme="dark"]'], // Support data-theme attribute
 }

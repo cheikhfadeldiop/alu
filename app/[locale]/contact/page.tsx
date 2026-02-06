@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { SectionTitle } from "../../../components/ui/SectionTitle";
+import { MapLocation } from "@/components/ui/carte_map";
 
 function IconPin(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -87,12 +88,12 @@ export default function ContactPage() {
 
           <div className="relative overflow-hidden rounded-2xl border border-[color:var(--border)] bg-white/50 dark:bg-black/50 backdrop-blur-md">
             <div className="relative aspect-[4/3] w-full">
-              <Image
-                src="/assets/placeholders/news_wide.png"
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 40vw"
+              <MapLocation
+                latitude={3.866667}
+                longitude={11.516667}
+                zoom={13}
+                title="CRTV"
+                address="Cameroon Radio Television"
               />
             </div>
           </div>
