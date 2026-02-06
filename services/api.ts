@@ -134,8 +134,56 @@ export async function getAlaune(): Promise<AlauneResponse> {
  * Get featured content for a specific channel
  * @param channelId - The ID of the channel
  */
-export async function getAlauneByChannel(channelId: string): Promise<AlauneResponse> {
-    return fetchAPI<AlauneResponse>(`/alauneByChaine/${channelId}/json`);
+export async function getAlauneByChannel(channelId: string): Promise<SliderVideosResponse> {
+    return fetchAPI<SliderVideosResponse>(`/alauneByChaine/${channelId}/json`);
+}
+
+/**
+ * Get aggregated replays from all channels, sorted by date (latest first)
+ */
+export async function getAllChannelReplays(): Promise<import('../types/api').SliderVideoItem[]> {
+    try {
+        // 1. Get all live channels
+        const channelsData = await getLiveChannels();
+        const channels = channelsData.allitems || [];
+
+        // 2. Fetch replays for each channel in parallel
+        const replaysPromises = channels.map(channel =>
+            getAlauneByChannel(channel.id)
+                .then(res => {
+                    const items = res.allitems || [];
+                    return items.map(item => ({
+                        ...item,
+                        channel_logo: channel.logo_url || channel.logo
+                    }));
+                })
+                .catch(() => [])
+        );
+
+        const allReplaysNested = await Promise.all(replaysPromises);
+
+        // 3. Flatten the array
+        const allReplays = allReplaysNested.flat();
+
+        // 4. Sort by date and time descending
+        return allReplays.sort((a, b) => {
+            // Parse date "dd/mm/yyyy"
+            const parseDate = (dateStr: string, timeStr: string) => {
+                const [day, month, year] = dateStr.split('/').map(Number);
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return new Date(year, month - 1, day, hours, minutes).getTime();
+            };
+
+            const timeA = parseDate(a.date, a.time);
+            const timeB = parseDate(b.date, b.time);
+
+            return timeB - timeA;
+        });
+
+    } catch (error) {
+        console.error("Error fetching all channel replays:", error);
+        return [];
+    }
 }
 
 /**

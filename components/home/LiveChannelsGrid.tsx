@@ -13,7 +13,7 @@ interface LiveChannelsGridProps {
 export function LiveChannelsGrid({ channels, epgItems, title, actionLabel }: LiveChannelsGridProps) {
     return (
         <section className="space-y-4">
-            <SectionTitle title={title} actionLabel={actionLabel} actionHref="/live" />
+            <SectionTitle title={title} title2="" actionLabel={actionLabel} actionHref="/live" />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {channels.slice(0, 3).map((channel) => {
                     // Get current program for this channel from EPG

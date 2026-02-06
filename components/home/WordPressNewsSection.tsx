@@ -109,7 +109,14 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                     </div>
 
                     {/* Articles List - Scrollable with visible indicator */}
-                    <div className="h-[440px]  overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-800 dark:scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+                    <div className="h-[440px]  overflow-y-auto pr-2 space-y-2 
+                    scrollbar-thin 
+                        [&::-webkit-scrollbar]:w-1 
+                        [&::-webkit-scrollbar-track]:bg-transparent 
+                        [&::-webkit-scrollbar-thumb]:bg-red-600 
+                        [&::-webkit-scrollbar-thumb]:rounded-full 
+                        hover:[&::-webkit-scrollbar-thumb]:bg-red-400
+                    ">
                         {listItems.map((item) => (
                             <Link
                                 key={item.id}

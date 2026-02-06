@@ -10,6 +10,7 @@ import {
   CategorySection,
   RegionalNews,
   WordPressNewsSection,
+  DernieresEditions,
 } from "../../components/home";
 
 import {
@@ -20,6 +21,7 @@ import {
   getEPGNow,
   getWordPressAlaunePost,
   getWordPressPosts,
+  getAllChannelReplays,
 } from "../../services/api";
 import { LiveSelectionCarousel } from "@/components/live/LiveSelectionCarousel";
 
@@ -28,7 +30,7 @@ export default async function HomePage() {
   const tc = await getTranslations("common");
 
   // Fetch data from API
-  const [sliderVideosData, liveChannelsData, alauneData, vodChannelsData, epgData, wpAlauneData, wpTrendingData] = await Promise.all([
+  const [sliderVideosData, liveChannelsData, alauneData, vodChannelsData, epgData, wpAlauneData, wpTrendingData, allReplaysData] = await Promise.all([
     getSliderVideos().catch(() => ({ allitems: [] })),
     getLiveChannels().catch(() => ({ allitems: [] })),
     getAlaune().catch(() => ({ allitems: [] })),
@@ -36,6 +38,7 @@ export default async function HomePage() {
     getEPGNow().catch(() => ({ allitems: [] })),
     getWordPressAlaunePost().catch(() => []),
     getWordPressPosts(141, 20).catch(() => []), // Trending news - ACTUELLES category (20 articles)
+    getAllChannelReplays().catch(() => []),
   ]);
 
   const sliderVideos = sliderVideosData.allitems || [];
@@ -45,12 +48,17 @@ export default async function HomePage() {
   const epgItems = epgData.allitems || [];
   const wpAlauneItems = wpAlauneData || [];
   const wpTrendingItems = wpTrendingData || [];
+  const allReplays = allReplaysData || [];
 
   // Data preparation for components
   const hero = alauneItems[0];
   const trendingNews = alauneItems.slice(0, 4);
   const latestEditionsItems = alauneItems; // Pass all items, component handles slicing
   const editorialItems = alauneItems.slice(5); // Adjust slice as needed based on API data logic
+
+  // Separate TV and Radio channels for LiveVideosSection
+  const tvChannels = liveChannels.filter(channel => channel.type === 'TV');
+  const radioChannels = liveChannels.filter(channel => channel.type === 'RADIO');
 
   // Simulated category filtering (in real app, use specific API calls or filtering)
   const educationItems = alauneItems.slice(14, 18);
@@ -73,6 +81,11 @@ export default async function HomePage() {
         epgItems={epgItems}
         title="NOS CHAÎNES EN DIRECT"
         actionLabel="Voir tout"
+      />
+
+      {/* Live Videos Section */}
+      <DernieresEditions
+        videos={allReplays}
       />
 
       {/* Latest Editions */}

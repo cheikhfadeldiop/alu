@@ -72,6 +72,9 @@ export interface LiveChannel {
     guidetvnow: string;
     stream_url: string;
     affiche_url: string;
+    start_time: string;
+    end_time: string;
+    duration: string;
     list_channels_by_category: string;
     list_pubs: string;
     // Radio specific fields
@@ -155,6 +158,7 @@ export interface SliderVideoItem {
     date: string;
     time: string;
     slug: string;
+    channel_logo?: string;
 }
 
 // Featured Content Types

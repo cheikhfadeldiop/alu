@@ -1,144 +1,176 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LiveChannel } from "../../types/api";
+import { SliderVideoItem } from "../../types/api";
 
 interface LiveVideosSectionProps {
-    tvChannels: LiveChannel[];
-    radioChannels: LiveChannel[];
+    videos: SliderVideoItem[];
 }
 
-type TabType = "tv" | "radio";
+export function DernieresEditions({ videos }: LiveVideosSectionProps) {
+    // Ensure we have videos
+    if (!videos || videos.length === 0) return null;
 
-export function LiveVideosSection({ tvChannels, radioChannels }: LiveVideosSectionProps) {
-    const [activeTab, setActiveTab] = useState<TabType>("tv");
-
-    const currentItems = activeTab === "tv" ? tvChannels : radioChannels;
-    const featuredItem = currentItems[0];
-    const listItems = currentItems.slice(1); // Display all remaining items
-
-    // Helper function to get image URL from live channel
-    const getImageUrl = (channel: LiveChannel): string => {
-        if (channel.affiche_url) {
-            return channel.affiche_url;
-        }
-        if (channel.logo_url) {
-            return channel.logo_url;
-        }
-        if (channel.logo) {
-            return channel.logo;
-        }
-        return "/assets/placeholders/actu_regional_469x246.png";
-    };
+    const featuredVideo = videos[0];
+    const listVideos = videos.slice(1); // Show all remaining items in the scrollable list
 
     return (
-        <section className="w-full">
+        <section className="w-full max-w-[1400px] mx-auto bg-surface rounded-lg p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold uppercase tracking-wide">
+                        Nos dernières éditions
+                    </h2>
+                    <button className="text-gray-400 flex items-center gap-2">
+                        <Image
+                            src="/assets/placeholders/arrow2.png"
+                            alt=""
+                            width={24}
+                            height={24}
+                        />
+                    </button>
+                </div>
+                <Link
+                    href="/live"
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 underline"
+                >
+                    Voir plus
+                </Link>
+            </div>
+
             {/* Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Featured Channel */}
-                <div className="w-full col-span-2">
-                    {featuredItem && (
+            <div className="flex lg:flex-row flex-col justify-between gap-x-6">
+                {/* Left Side - Featured Video (60%) */}
+                <div className="w-full lg:w-3/5 pb-6">
+                    {featuredVideo && (
                         <Link
-                            href={`/live/${featuredItem.slug}`}
-                            className="group relative block w-full h-[520px] rounded-lg overflow-hidden"
+                            href={featuredVideo.video_url || '#'}
+                            className="group relative block w-full rounded-lg overflow-hidden "
                         >
-                            {/* Image */}
-                            <div className="absolute inset-0">
+                            {/* Image Container */}
+                            <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
                                 <Image
-                                    src={getImageUrl(featuredItem)}
-                                    alt={featuredItem.title}
+                                    src={featuredVideo.logo_url}
+                                    alt={featuredVideo.title}
                                     fill
-                                    sizes="(max-width: 1024px) 100vw, 50vw"
-                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 60vw"
+                                    className="object-cover z-0"
                                 />
+
+                                {/* Play Button Overlay - Center (Design a gauche) */}
+                                <div className="absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110">
+                                    <Image
+                                        src={'/assets/placeholders/play_overlay.png'}
+                                        alt="Play"
+                                        width={64}
+                                        height={64}
+                                        className="object-contain z-10"
+                                    />
+                                </div>
+
+                                {/* Channel Logo - Top Right (Design a gauche) */}
+                                {featuredVideo.channel_logo && (
+                                    <div className="absolute top-3 right-3 z-10">
+                                        <div className="w-12 h-12 rounded-lg p-1.5 ">
+                                            <Image
+                                                src={featuredVideo.channel_logo}
+                                                alt="Channel Logo"
+                                                width={48}
+                                                height={48}
+                                                className="object-contain w-full h-full"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Dark gradient overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                            {/* Live Badge */}
-                            <div className="absolute top-4 left-4">
-                                <div className="flex items-center gap-2 bg-red-600 px-3 py-1.5 rounded-md">
-                                    <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                                    <span className="text-white text-xs font-bold uppercase">En Direct</span>
+                            {/* Description Band - Below Image */}
+                            <div className="relative p-4  bg-background z-10 mt-[-22] ml-20 mr-20 ">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xs text-red-600 font-semibold">{featuredVideo.time}</span>
+                                    <span className="text-xs text-red-600 font-semibold">Regardez maintenant</span>
                                 </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                                <h2 className="text-xl font-bold leading-tight mb-3 group-hover:underline">
-                                    {featuredItem.title}
-                                </h2>
-
-                                <div className="flex items-center gap-3 text-sm text-white/90">
-                                    <span>{activeTab === "tv" ? "Chaîne TV" : "Radio"}</span>
-                                    <span className="w-1 h-1 rounded-full bg-green-500"></span>
-                                    <span>{featuredItem.desc || "En direct"}</span>
-                                </div>
+                                <h3 className="text-base font-bold mb-2 group-hover:underline">
+                                    {featuredVideo.title}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    {featuredVideo.desc || "Regardez les dernières vidéos que vous avez manquées"}
+                                </p>
                             </div>
                         </Link>
                     )}
                 </div>
 
-                {/* Right Side - Tabs + Channels List */}
-                <div className="w-full border rounded-lg p-2 border-muted/20 pl-4">
-                    {/* Tabs Container - Rectangular Frame */}
-                    <div className="bg-surface w-full rounded-lg p-1 justify-between inline-flex mb-4">
-                        <button
-                            onClick={() => setActiveTab("tv")}
-                            className={`px-6 py-2 w-1/2 rounded-md text-xl font-medium transition-all ${activeTab === "tv"
-                                    ? "bg-background dark:bg-background shadow-sm"
-                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                }`}
-                        >
-                            TV
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("radio")}
-                            className={`px-6 py-2 w-1/2 rounded-md text-xl font-medium transition-all ${activeTab === "radio"
-                                    ? "bg-background dark:bg-background shadow-sm"
-                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                }`}
-                        >
-                            Radio
-                        </button>
-                    </div>
-
-                    {/* Channels List - Scrollable with visible indicator */}
-                    <div className="h-[440px] overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-800 dark:scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
-                        {listItems.map((item) => (
+                {/* Right Side - Scrollable List (40%) */}
+                <div className="w-full lg:w-2/5">
+                    <div className="space-y-3 w-full max-h-[500px] pr-2 overflow-y-auto scrollbar-thin 
+                        [&::-webkit-scrollbar]:w-1 
+                        [&::-webkit-scrollbar-track]:bg-transparent 
+                        [&::-webkit-scrollbar-thumb]:bg-red-600 
+                        [&::-webkit-scrollbar-thumb]:rounded-full 
+                        hover:[&::-webkit-scrollbar-thumb]:bg-red-400">
+                        {listVideos.map((video, index) => (
                             <Link
-                                key={item.id}
-                                href={`/live/${item.slug}`}
-                                className="group flex gap-4 items-start hover:bg-muted/10 p-3 rounded-lg transition-colors"
+                                key={`${video.slug}-${index}`}
+                                href={video.video_url || '#'}
+                                className="group flex gap-3 hover:bg-muted/10 p-2 rounded-lg transition-colors w-full"
                             >
-                                {/* Thumbnail */}
-                                <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
+                                {/* Thumbnail with overlays */}
+                                <div className="relative w-32 h-20 flex-shrink-0 rounded overflow-hidden bg-gray-100">
                                     <Image
-                                        src={getImageUrl(item)}
-                                        alt={item.title}
+                                        src={video.logo_url}
+                                        alt={video.title}
                                         fill
-                                        sizes="96px"
+                                        sizes="128px"
                                         className="object-cover"
                                     />
-                                    {/* Live indicator on thumbnail */}
-                                    <div className="absolute top-1 right-1 bg-red-600 px-1.5 py-0.5 rounded text-[10px] font-bold text-white">
-                                        LIVE
+
+                                    {/* Play icon inside thumbnail - Bottom Left */}
+                                    <div className="absolute bottom-1 left-1 z-10">
+                                        <Image
+                                            src={'/assets/placeholders/play_overlay.png'}
+                                            alt="Play"
+                                            width={24}
+                                            height={24}
+                                            className="object-contain"
+                                        />
                                     </div>
+
+                                    {/* Channel logo inside thumbnail - Bottom Right */}
+                                    {video.channel_logo && (
+                                        <div className="absolute bottom-1 right-1 z-10">
+                                            <div className="w-6 h-6 bg-white rounded p-0.5 shadow-sm">
+                                                <Image
+                                                    src={video.channel_logo}
+                                                    alt="Channel"
+                                                    width={20}
+                                                    height={20}
+                                                    className="object-contain w-full h-full"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Content */}
-                                <div className="flex-1 min-w-0 space-x-2">
-                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3 group-hover:underline mb-2">
-                                        {item.title}
-                                    </h3>
+                                {/* Content - Right Side */}
+                                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                    {/* Time */}
+                                    <div className="text-xs text-gray-500 dark:text-red-400 mb-1">
+                                        {video.time}
+                                    </div>
 
-                                    <div className="flex items-center gap-5 text-xs text-gray-500 dark:text-gray-400">
-                                        <span>{activeTab === "tv" ? "Chaîne TV" : "Radio"}</span>
-                                        <span className="w-1 h-1 rounded-full bg-green-500"></span>
-                                        <span>En direct</span>
+                                    {/* Title */}
+                                    <h4 className="text-sm font-semibold leading-tight line-clamp-2 group-hover:underline mb-1">
+                                        {video.title}
+                                    </h4>
+
+                                    {/* Meta Info */}
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span className="text-red-400 font-semibold">Replay</span>
+                                        <span className="text-red-600 ">•</span>
+                                        <span className="text-red-400 dark:text-red-400">{video.date}</span>
                                     </div>
                                 </div>
                             </Link>
