@@ -16,7 +16,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
     const listVideos = videos.slice(1); // Show all remaining items in the scrollable list
 
     return (
-        <section className="w-full max-w-[1400px] mx-auto bg-surface rounded-lg p-6">
+        <section className="w-full max-w-[1400px] mx-auto bg-surface/50 backdrop-blur-sm rounded-lg p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -47,7 +47,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                     {featuredVideo && (
                         <Link
                             href={featuredVideo.video_url || '#'}
-                            className="group relative block w-full rounded-lg overflow-hidden "
+                            className="group relative block w-full overflow-hidden "
                         >
                             {/* Image Container */}
                             <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
@@ -73,12 +73,12 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 {/* Channel Logo - Top Right (Design a gauche) */}
                                 {featuredVideo.channel_logo && (
                                     <div className="absolute top-3 right-3 z-10">
-                                        <div className="w-12 h-12 rounded-lg p-1.5 ">
+                                        <div className="w-20 h-16 rounded-lg p-1.5 ">
                                             <Image
                                                 src={featuredVideo.channel_logo}
                                                 alt="Channel Logo"
-                                                width={48}
-                                                height={48}
+                                                width={58}
+                                                height={58}
                                                 className="object-contain w-full h-full"
                                             />
                                         </div>
@@ -115,10 +115,10 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                             <Link
                                 key={`${video.slug}-${index}`}
                                 href={video.video_url || '#'}
-                                className="group flex gap-3 hover:bg-muted/10 p-2 rounded-lg transition-colors w-full"
+                                className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full"
                             >
                                 {/* Thumbnail with overlays */}
-                                <div className="relative w-32 h-20 flex-shrink-0 rounded overflow-hidden bg-gray-100">
+                                <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-gray-100">
                                     <Image
                                         src={video.logo_url}
                                         alt={video.title}

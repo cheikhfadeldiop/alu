@@ -38,7 +38,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
     return (
         <section className="w-full">
             {/* Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-surface/50 backdrop-blur-sm rounded-lg ">
                 {/* Left Side - Featured Article */}
                 <div className="w-full col-span-2">
                     {featuredItem && (
@@ -116,6 +116,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                         [&::-webkit-scrollbar-thumb]:bg-red-600 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
                         hover:[&::-webkit-scrollbar-thumb]:bg-red-400
+                       
                     ">
                         {listItems.map((item) => (
                             <Link
@@ -123,7 +124,9 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 href={item.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group flex gap-4 items-start hover:bg-muted/10  p-3 rounded-lg transition-colors"
+                                className="group flex gap-4 items-start hover:bg-muted/10  p-3 rounded-lg transition-colors
+                                border-b dark:border-muted/30
+                                "
                             >
                                 {/* Thumbnail */}
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
@@ -154,9 +157,13 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                         <span>La rédaction</span>
                                     </div>
                                 </div>
+                                
                             </Link>
+                            
                         ))}
+                        
                     </div>
+                    
                 </div>
             </div>
         </section>

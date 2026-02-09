@@ -1,22 +1,25 @@
 import * as React from "react";
 
 import { Link } from "../../i18n/navigation";
+import Image from "next/image";
 
 export function SectionTitle({
   title,
   title2,
   actionLabel,
   actionHref,
+  actionIcon = true,
   uppercase = true,
 }: {
   title: string;
-  title2: string;
+  title2?: string;
   actionLabel?: string;
   actionHref?: string;
+  actionIcon?: boolean;
   uppercase?: boolean;
 }) {
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-center gap-3 pb-6">
       <h2
         className={
           uppercase
@@ -33,13 +36,20 @@ export function SectionTitle({
       }
       >
         {title2}</h1>
-      {actionLabel && actionHref ? (
+      {actionIcon && title ? (
         <Link
           href={actionHref}
           className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--muted)] hover:text-foreground"
         >
           {actionLabel}
-          <span className="w-[20px] h-[20px] bg-red-600" aria-hidden>»</span>
+          <div className="text-gray-400">
+            <Image
+              src="/assets/placeholders/arrow2.png"
+              alt=""
+              width={24}
+              height={24}
+            />
+          </div>
         </Link>
       ) : null}
     </div>

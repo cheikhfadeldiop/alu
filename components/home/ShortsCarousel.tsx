@@ -3,21 +3,23 @@ import Image from "next/image";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Carousel } from "../ui/Carousel";
 import { SliderVideoItem } from "../../types/api";
+import dynamic from "next/dynamic";
 
 interface ShortsCarouselProps {
     videos: SliderVideoItem[];
     title: string;
+    title2: string;
     actionLabel: string;
 }
 
-export function ShortsCarousel({ videos, title, actionLabel }: ShortsCarouselProps) {
+export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCarouselProps) {
     return (
-        <section className="space-y-4">
-            <SectionTitle title={title} title2="" actionLabel={actionLabel} actionHref="/replay" />
-            <Carousel itemClassName="w-[250px]">
+        <section className="space-y-4 ">
+            <SectionTitle title={title} title2={title2} actionLabel={actionLabel} actionHref="/replay" />
+            <Carousel itemClassName="w-[250px]" >
                 {videos.map((video, index) => (
                     <Link key={index} href={`/playback/${video.slug}`} className="group block">
-                        <div className="relative w-[250px] h-[298px] rounded-lg overflow-hidden bg-gray-200 mb-2">
+                        <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2">
                             <Image
                                 src={video.logo_url || video.logo}
                                 alt={video.title}
@@ -36,7 +38,7 @@ export function ShortsCarousel({ videos, title, actionLabel }: ShortsCarouselPro
                             {/* Date Badge - Top */}
                             <div className="absolute top-3 left-3 right-3">
                                 <div className="bg-black/70 rounded px-2 py-1">
-                                    <p className="text-white text-[10px] font-semibold">News of December {video.date}</p>
+                                    <p className="text-white text-[10px] font-semibold">News of {video.date}</p>
                                 </div>
                             </div>
                         </div>

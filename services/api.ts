@@ -25,6 +25,7 @@ import type {
 } from '../types/api';
 
 const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
+const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
 const APP_ID = 'lacrtv';
 
 /**
@@ -306,7 +307,7 @@ export async function getAffichesByChannel(channelId: string): Promise<AffichesR
 /**
  * WordPress API Service Functions
  */
-const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
+
 
 /**
  * Generic fetch wrapper for WordPress API
@@ -335,7 +336,7 @@ async function fetchWordPressAPI<T>(endpoint: string): Promise<T> {
  * Get all WordPress categories
  */
 export async function getWordPressCategories(): Promise<import('../types/api').WordPressCategory[]> {
-    return fetchWordPressAPI<import('../types/api').WordPressCategory[]>('/categories');
+    return fetchWordPressAPI<import('../types/api').WordPressCategory[]>('/categories?per_page=100');
 }
 
 /**
@@ -348,12 +349,27 @@ export async function getWordPressCategoryBySlug(slug: string): Promise<import('
 
 /**
  * Get WordPress posts by category
- * @param categoryId - The ID of the category
+ * @param categoryId - The ID or IDs of the category (can be comma-separated string)
  * @param perPage - Number of posts to retrieve (default: 10)
  */
-export async function getWordPressPosts(categoryId: number, perPage: number = 10): Promise<import('../types/api').WordPressPost[]> {
-    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&categories=${categoryId}`);
+export async function getWordPressPosts(
+    categoryId: number | string,
+    perPage: number = 10,
+    page: number = 1
+): Promise<import('../types/api').WordPressPost[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(
+        `/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}&categories=${categoryId}`
+    );
 }
+
+/**
+ * Get latest WordPress posts (all categories)
+ * @param perPage - Number of posts to retrieve (default: 10)
+ */
+export async function getWordPressLatestPosts(perPage: number = 10): Promise<import('../types/api').WordPressPost[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}`);
+}
+
 
 /**
  * Get WordPress posts for "À la une" category

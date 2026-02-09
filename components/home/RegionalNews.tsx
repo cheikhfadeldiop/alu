@@ -6,13 +6,14 @@ import { AlauneItem } from "../../types/api";
 interface RegionalNewsProps {
     items: AlauneItem[];
     title: string;
+    title2: string;
     actionLabel: string;
 }
 
-export function RegionalNews({ items, title, actionLabel }: RegionalNewsProps) {
+export function RegionalNews({ items, title, title2, actionLabel }: RegionalNewsProps) {
     return (
         <section className="space-y-4">
-            <SectionTitle title={title} title2="" actionLabel={actionLabel} actionHref=" /news?category=regional" />
+            <SectionTitle title={title} title2={title2} actionLabel={actionLabel} actionHref="/news?category=regional" />
             <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
                 {/* Articles List */}
                 <div className="space-y-3">

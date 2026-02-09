@@ -59,7 +59,7 @@ export function MediaCard({
   return (
     <Link
       href={href}
-      className="group block overflow-hidden rounded-xl bg-white/10 dark:bg-black/30 p-1 backdrop-blur-sm border border-white/20 dark:border-white/10"
+      className="group block overflow-hidden  bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 "
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <Image
@@ -67,7 +67,7 @@ export function MediaCard({
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover"
+          className="object-cover "
         />
 
         {live ? (
@@ -82,13 +82,17 @@ export function MediaCard({
         ) : null}
       </div>
 
-      <div className="space-y-1 p-4">
-        <div className="line-clamp-2 text-sm font-semibold leading-6 text-foreground ">
+      <div className="space-y-1 p-4 justify-between">
+        <div className="line-clamp-1 text-sm font-semibold leading-6 text-foreground ">
           {title}
         </div>
         {meta ? (
-          <div className="text-xs text-[color:var(--muted)]">{meta}</div>
-        ) : null}
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-[color:var(--muted)]">{meta}</div>
+            <span className="w-1 h-1 bg-[color:green] rounded-full"></span>
+            <span className="text-xs text-[color:var(--muted)]">la rédaction</span>
+          </div>
+                  ) : null}
       </div>
     </Link>
   );

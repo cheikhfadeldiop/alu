@@ -1,118 +1,133 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SectionTitle } from "../ui/SectionTitle";
-import { AlauneItem } from "../../types/api";
+import { WordPressPost } from "../../types/api";
 
 interface EditorialChoiceProps {
-    items: AlauneItem[];
+    items: WordPressPost[];
     title: string;
-    actionLabel: string;
+    title2?: string;
+    actionLabel?: string;
 }
 
-export function EditorialChoice({ items, title, actionLabel }: EditorialChoiceProps) {
-    const featuredItem = items[0];
-    const listItems = items.slice(1, 5);
-    const gridItems = items.slice(5, 9);
+export function EditorialChoice({ items, title, title2, actionLabel }: EditorialChoiceProps) {
+    if (!items || items.length === 0) return null;
+
+    // Use only the latest 7 items as requested
+    const displayItems = items.slice(0, 7);
+    const featuredItem = displayItems[0];
+    const sideItems = displayItems.slice(1, 3);
+    const gridItems = displayItems.slice(3, 7);
+
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString("fr-FR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+    };
 
     return (
-        <section className="space-y-4">
-            <SectionTitle title={title} actionLabel={actionLabel} actionHref="/news" />
-            <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-                {/* Featured Article */}
-                {featuredItem && (
-                    <Link
-                        href={`/playback/${featuredItem.id}`}
-                        className="group relative block overflow-hidden rounded-lg bg-black"
-                    >
-                        <div className="relative aspect-[16/10] w-full">
+        <section className="space-y-6 pb-10">
+            <div className="flex items-center justify-between">
+                <SectionTitle title={title} title2={title2} actionHref={'/news'} />
+                <Link href="/news" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 underline decoration-gray-300 underline-offset-4">
+                    Voir plus
+                </Link>
+            </div>
+
+            {/* Row 1: Layout 30% / 40% / 30% */}
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 items-center">
+                {/* 30% Left: Metadata of Item 0 */}
+                <div className="lg:col-span-3 space-y-4">
+                    {featuredItem && (
+                        <Link href={`/news/${featuredItem.id}`} className="group block">
+                            <h2 className="text-xl lg:text-2xl font-bold leading-tight group-hover:underline mb-4">
+                                {featuredItem.title.rendered}
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-6">
+                                {featuredItem.excerpt?.rendered.replace(/<[^>]*>/g, '').slice(0, 150)}...
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <span>{formatDate(featuredItem.date)}</span>
+                                <span className="w-1 h-1 bg-green-500 rounded-full" />
+                                <span>La rédaction</span>
+                            </div>
+                        </Link>
+                    )}
+                </div>
+
+                {/* 40% Middle: Image of Item 0 */}
+                <div className="lg:col-span-4 relative group">
+                    {featuredItem && (
+                        <Link href={`/news/${featuredItem.id}`} className="block relative aspect-video  overflow-hidden bg-gray-100">
                             <Image
-                                src={featuredItem.image_url || featuredItem.image || "/assets/placeholders/news_wide.png"}
-                                alt={featuredItem.title}
+                                src={featuredItem.acan_image_url || "/assets/placeholders/news_wide.png"}
+                                alt={featuredItem.title.rendered}
                                 fill
-                                sizes="(max-width: 1024px) 100vw, 58vw"
-                                className="object-cover"
+                                sizes="(max-width: 1024px) 100vw, 40vw"
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
                             />
-                            {/* Play Icon */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                                    </svg>
+
+                            {/* Logo Overlay - Top Right */}
+                            <div className="absolute top-4 right-4 z-10">
+                                {/* <Image src={featuredItem.acan_image_url || "/assets/placeholders/news_wide.png"} alt="CRTV" width={40} height={20} className="object-contain brightness-0 invert" /> */}
+                            </div>
+                        </Link>
+                    )}
+                </div>
+
+                {/* 30% Right: Side Items 1 & 2 */}
+                <div className="lg:col-span-3 space-y-6">
+                    {sideItems.map((item) => (
+                        <Link key={item.id} href={`/news/${item.id}`} className="group flex gap-4 items-start">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-bold leading-tight group-hover:underline mb-2 line-clamp-3">
+                                    {item.title.rendered}
+                                </h3>
+                                <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span>{formatDate(item.date)}</span>
+                                    <span className="w-1 h-1 bg-green-500 rounded-full" />
+                                    <span>La rédaction</span>
                                 </div>
                             </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                            <div className="absolute bottom-0 left-0 right-0 p-5">
-                                <h3 className="text-white font-bold text-lg leading-tight group-hover:underline">
-                                    {featuredItem.title}
-                                </h3>
-                                <p className="text-white/80 text-xs mt-2">
-                                    {new Date((featuredItem as any).published_at || Date.now()).toLocaleDateString("fr-FR")}{" "}
-                                    • {(featuredItem as any).category || "Actualités"}
-                                </p>
-                            </div>
-                        </div>
-                    </Link>
-                )}
-
-                {/* Articles List */}
-                <div className="space-y-3">
-                    {listItems.map((item) => (
-                        <Link
-                            key={item.id}
-                            href={`/playback/${item.id}`}
-                            className="group flex gap-3 hover:bg-[color:var(--surface)] p-2 rounded-lg transition-colors"
-                        >
-                            <div className="relative w-24 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+                            <div className="relative w-24 h-24 flex-shrink-0  overflow-hidden bg-gray-100">
                                 <Image
-                                    src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
-                                    alt={item.title}
+                                    src={item.acan_image_url || "/assets/placeholders/article_list.png"}
+                                    alt={item.title.rendered}
                                     fill
                                     sizes="96px"
-                                    className="object-cover"
+                                    className="object-cover group-hover:scale-110 transition-transform"
                                 />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-xs font-semibold line-clamp-2 group-hover:underline mb-1">
-                                    {item.title}
-                                </h3>
-                                <p className="text-[10px] text-[color:var(--muted)] uppercase">
-                                    {(item as any).category || "Actualités"} •{" "}
-                                    {new Date((item as any).published_at || Date.now()).toLocaleDateString("fr-FR")}
-                                </p>
                             </div>
                         </Link>
                     ))}
                 </div>
             </div>
 
-            {/* 4-Card Grid Below */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Row 2: Grid of 4 Items (3, 4, 5, 6) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 
+            pt-8
+            ">
                 {gridItems.map((item) => (
-                    <Link key={item.id} href={`/playback/${item.id}`} className="group block">
-                        <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-200 mb-2">
+                    <Link key={item.id} href={`/news/${item.id}`} className="group block space-y-3">
+                        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                             <Image
-                                src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
-                                alt={item.title}
+                                src={item.acan_image_url || "/assets/placeholders/article_list.png"}
+                                alt={item.title.rendered}
                                 fill
-                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            {/* Play Icon */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                                    <svg className="w-5 h-5 text-black ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                                    </svg>
-                                </div>
-                            </div>
                         </div>
-                        <h3 className="font-semibold text-xs line-clamp-2 group-hover:underline mb-1">
-                            {item.title}
-                        </h3>
-                        <p className="text-[10px] text-[color:var(--muted)]">
-                            {new Date((item as any).published_at || Date.now()).toLocaleDateString("fr-FR")} •{" "}
-                            {(item as any).category || "Actualités"}
-                        </p>
+                        <h4 className="text-sm font-bold leading-tight line-clamp-2 group-hover:underline">
+                            {item.title.rendered}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                            <span>{formatDate(item.date)}</span>
+                            <span className="w-1 h-1 bg-green-500 rounded-full" />
+                            <span>La rédaction</span>
+                        </div>
                     </Link>
                 ))}
             </div>
