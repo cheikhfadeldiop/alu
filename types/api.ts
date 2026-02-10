@@ -122,6 +122,12 @@ export interface VODItem {
     published_at: string;
     category: string;
     slug: string;
+    relatedItems?: string;
+    android_url?: string;
+    web_url?: string;
+    stream_url?: string;
+    feed_url?: string;
+    webdetail_url?: string;
 }
 
 // Slider Types
@@ -161,6 +167,10 @@ export interface SliderVideoItem {
     channel_logo?: string;
     chaine_logo?: string;
     chaine_name?: string;
+    stream_url?: string;
+    android_url?: string;
+    web_url?: string;
+    webdetail_url?: string;
 }
 
 // Featured Content Types

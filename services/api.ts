@@ -25,9 +25,17 @@ import type {
     SliderVideoItem,
 } from '../types/api';
 
+export type { SliderVideoItem } from '../types/api';
+
 const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
 const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
-const APP_ID = 'lacrtv';
+const APP_ID = 'larts';
+
+export function ensureAbsoluteUrl(url: string | undefined): string {
+    if (!url || url === "null") return "";
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+}
 
 /**
  * Generic fetch wrapper with error handling
@@ -149,14 +157,18 @@ export async function getAggregateReplaysByChannel(chaineId: string, limit: numb
                     desc: item.desc,
                     logo: item.image,
                     logo_url: item.image_url,
-                    video_url: item.video_url,
-                    feed_url: item.video_url, // Use video_url as feed_url for playback
+                    video_url: ensureAbsoluteUrl(item.video_url),
+                    feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
+                    stream_url: ensureAbsoluteUrl(item.stream_url),
+                    android_url: ensureAbsoluteUrl(item.android_url),
+                    web_url: ensureAbsoluteUrl(item.web_url),
+                    webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
                     date: item.published_at,
                     time: "",
                     slug: item.slug,
                     type: "vod",
                     views: "0",
-                    relatedItems: "",
+                    relatedItems: item.relatedItems || "",
                     channel_logo: show.chaine_logo
                 } as SliderVideoItem));
             } catch (err) {
@@ -283,6 +295,79 @@ export async function getLatestAggregateReplays(): Promise<SliderVideoItem[]> {
 }
 
 /**
+ * Fallback search for a specific replay by slug
+ */
+export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | null> {
+    try {
+        // 1. Try initial aggregate list (Latest)
+        const initial = await getLatestAggregateReplays();
+        let found = initial.find(v => v.slug === slug);
+        if (found) return found;
+
+        // 2. Try matching a SHOW (Category) directly
+        // This is important for the EmissionsSlider where items are categories
+        const showsRes = await getVODShows();
+        const shows = showsRes.allitems || [];
+        const showMatch = shows.find(s => s.slug === slug);
+        if (showMatch) return showMatch;
+
+        // 3. Try searching through ALL channels
+        const channelsRes = await getLiveChannels();
+        const allChannels = channelsRes.allitems || [];
+
+        for (const channel of allChannels) {
+            try {
+                const replays = await getAlauneByChannel(channel.id);
+                found = (replays.allitems || []).find(v => v.slug === slug);
+                if (found) {
+                    return {
+                        ...found,
+                        channel_logo: channel.logo_url || channel.logo
+                    };
+                }
+            } catch { continue; }
+        }
+
+        // 4. ULTIMATE FALLBACK: Search through items INSIDE shows
+        // Search top 40 shows (aggressive)
+        for (const show of shows.slice(0, 40)) {
+            if (show.feed_url && show.feed_url !== "null") {
+                try {
+                    const showItems = await getVODItems(show.feed_url.split('/').slice(-2, -1)[0] || "");
+                    const item = (showItems.allitems || []).find(v => v.slug === slug);
+                    if (item) {
+                        return {
+                            title: item.title,
+                            desc: item.desc,
+                            logo_url: item.image_url,
+                            logo: item.image,
+                            video_url: ensureAbsoluteUrl(item.video_url),
+                            feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
+                            stream_url: ensureAbsoluteUrl(item.stream_url),
+                            android_url: ensureAbsoluteUrl(item.android_url),
+                            web_url: ensureAbsoluteUrl(item.web_url),
+                            webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
+                            date: item.published_at,
+                            time: "",
+                            slug: item.slug,
+                            type: "vod",
+                            views: "0",
+                            channel_logo: show.chaine_logo,
+                            relatedItems: item.relatedItems || ""
+                        } as SliderVideoItem;
+                    }
+                } catch { continue; }
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error("Error finding replay by slug:", error);
+        return null;
+    }
+}
+
+/**
  * Get replays for a specific list of channels
  * Used for progressive loading on the client
  */
@@ -290,11 +375,8 @@ export async function getReplaysForChannels(channels: import('../types/api').Liv
     try {
         const replaysPromises = channels.map(async (channel) => {
             try {
-                // console.log(`Fetching replays for channel ID: ${channel.id}`);
                 const res = await getAlauneByChannel(channel.id);
                 const items = res.allitems || [];
-                // console.log(`Channel ${channel.title} (${channel.id}) returned ${items.length} items`);
-
                 return items.map(item => ({
                     ...item,
                     channel_logo: channel.logo_url || channel.logo
@@ -307,7 +389,6 @@ export async function getReplaysForChannels(channels: import('../types/api').Liv
 
         const allReplaysNested = await Promise.all(replaysPromises);
         const flattened = allReplaysNested.flat();
-        console.log(`Total replays fetched from batch: ${flattened.length}`);
         return flattened;
     } catch (error) {
         console.error("Error fetching replays for channels:", error);
@@ -321,8 +402,6 @@ export async function getReplaysForChannels(channels: import('../types/api').Liv
  */
 export async function getRelatedItems(url: string): Promise<SliderVideoItem[]> {
     try {
-        // Since url is full, we need to extract the part after API_BASE_URL if we want to use fetchAPI
-        // Or just fetch it directly if it's external (but it seems to be internal)
         const response = await fetch(url, {
             headers: {
                 'Content-Type': 'application/json',
