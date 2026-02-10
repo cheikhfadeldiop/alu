@@ -22,6 +22,7 @@ import type {
     AdsResponse,
     FlashNewsResponse,
     AffichesResponse,
+    SliderVideoItem,
 } from '../types/api';
 
 const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
@@ -88,18 +89,92 @@ export async function getDirectPlayback(channelId: string): Promise<DirectPlayba
 }
 
 /**
- * Get VOD channels/categories
+ * Get VOD channels (broadcast channels that have shows)
  */
 export async function getVODChannels(): Promise<VODChannelsResponse> {
     return fetchAPI<VODChannelsResponse>(`/listChannels/${APP_ID}/json`);
 }
 
 /**
- * Get VOD items for a specific channel
- * @param channelId - The ID of the channel
+ * Get all VOD shows (emissions) grouped by app id
  */
-export async function getVODItems(channelId: string): Promise<VODItemsResponse> {
-    return fetchAPI<VODItemsResponse>(`/listChannelsByChaine/${APP_ID}/${channelId}/json`);
+export async function getVODShows(): Promise<SliderVideosResponse> {
+    return fetchAPI<SliderVideosResponse>(`/listChannelsbygroup/${APP_ID}/json`);
+}
+
+/**
+ * Get VOD items for a specific show
+ * @param showId - The ID of the show
+ */
+export async function getVODItems(showId: string): Promise<VODItemsResponse> {
+    return fetchAPI<VODItemsResponse>(`/listItemsByChannel/${APP_ID}/${showId}/json`);
+}
+
+/**
+ * Get shows for a specific channel
+ * @param chaineId - The ID of the channel (e.g. 50004)
+ */
+export async function getShowsByChaine(chaineId: string): Promise<SliderVideosResponse> {
+    return fetchAPI<SliderVideosResponse>(`/listChannelsByChaine/${APP_ID}/${chaineId}/json`);
+}
+
+/**
+ * Get aggregated replays for a channel by exploring its shows.
+ * This is more thorough than getAlauneByChannel as per user feedback.
+ */
+export async function getAggregateReplaysByChannel(chaineId: string, limit: number = 10): Promise<SliderVideoItem[]> {
+    try {
+        // 1. Get all shows for this channel
+        const showsRes = await getShowsByChaine(chaineId);
+        const shows = showsRes.allitems || [];
+
+        // 2. Filter shows that have a valid feed_url and are not null
+        const validShows = shows.filter(show =>
+            show.feed_url &&
+            show.feed_url !== "null" &&
+            show.feed_url.includes("listItemsByChannel")
+        );
+
+        if (validShows.length === 0) return [];
+
+        // 3. Fetch replays from the top 5 shows (to avoid too many requests)
+        // Usually shows are sorted by importance/recency
+        const replaysPromises = validShows.slice(0, 5).map(async (show) => {
+            try {
+                const res = await getVODItems(show.feed_url.split('/').slice(-2, -1)[0] || "");
+                const items = res.allitems || [];
+                // Map VODItem to SliderVideoItem
+                return items.map(item => ({
+                    title: item.title,
+                    desc: item.desc,
+                    logo: item.image,
+                    logo_url: item.image_url,
+                    video_url: item.video_url,
+                    feed_url: item.video_url, // Use video_url as feed_url for playback
+                    date: item.published_at,
+                    time: "",
+                    slug: item.slug,
+                    type: "vod",
+                    views: "0",
+                    relatedItems: "",
+                    channel_logo: show.chaine_logo
+                } as SliderVideoItem));
+            } catch (err) {
+                return [];
+            }
+        });
+
+        const allReplays = (await Promise.all(replaysPromises)).flat();
+
+        // Sort by date (descending)
+        return allReplays
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, limit);
+
+    } catch (error) {
+        console.error(`Error aggregating replays for channel ${chaineId}:`, error);
+        return [];
+    }
 }
 
 /**
@@ -139,52 +214,139 @@ export async function getAlauneByChannel(channelId: string): Promise<SliderVideo
     return fetchAPI<SliderVideosResponse>(`/alauneByChaine/${channelId}/json`);
 }
 
+export interface ShowReplayGroup {
+    title: string;
+    logo: string;
+    videos: SliderVideoItem[];
+    nextBatchUrl?: string;
+}
+
 /**
- * Get aggregated replays from all channels, sorted by date (latest first)
+ * Get aggregated replays by Show (Emission) instead of Channel.
+ * 1. Fetches latest shows from alaunesliders.
+ * 2. For each show, fetches its last 10 replays via relatedItems.
  */
-export async function getAllChannelReplays(): Promise<import('../types/api').SliderVideoItem[]> {
+export async function getReplaysByShowAggregated(limitShows: number = 8, limitReplays: number = 10): Promise<ShowReplayGroup[]> {
     try {
-        // 1. Get all live channels
-        const channelsData = await getLiveChannels();
-        const channels = channelsData.allitems || [];
+        // 1. Get latest highlight for each show
+        const sliderRes = await getSliderVideos();
+        const shows = sliderRes.allitems || [];
 
-        // 2. Fetch replays for each channel in parallel
-        const replaysPromises = channels.map(channel =>
-            getAlauneByChannel(channel.id)
-                .then(res => {
-                    const items = res.allitems || [];
-                    return items.map(item => ({
-                        ...item,
-                        channel_logo: channel.logo_url || channel.logo
-                    }));
-                })
-                .catch(() => [])
-        );
+        // 2. Fetch archives for each show
+        const aggregatedPromises = shows.slice(0, limitShows).map(async (show) => {
+            try {
+                let videos: SliderVideoItem[] = [];
+                if (show.relatedItems && show.relatedItems !== "null") {
+                    videos = await getRelatedItems(show.relatedItems);
+                }
 
-        const allReplaysNested = await Promise.all(replaysPromises);
+                // Ensure the current (latest) show is also included if archive is small
+                // and deduplicate
+                const allVideos = [...videos];
+                const seenSlugs = new Set(videos.map(v => v.slug));
+                if (!seenSlugs.has(show.slug)) {
+                    allVideos.unshift(show);
+                }
 
-        // 3. Flatten the array
-        const allReplays = allReplaysNested.flat();
-
-        // 4. Sort by date and time descending
-        return allReplays.sort((a, b) => {
-            // Parse date "dd/mm/yyyy"
-            const parseDate = (dateStr: string, timeStr: string) => {
-                const [day, month, year] = dateStr.split('/').map(Number);
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return new Date(year, month - 1, day, hours, minutes).getTime();
-            };
-
-            const timeA = parseDate(a.date, a.time);
-            const timeB = parseDate(b.date, b.time);
-
-            return timeB - timeA;
+                return {
+                    title: show.title.split(' du ')[0] || show.title, // Clean "JT 20H du 08/02/2026" to "JT 20H"
+                    logo: show.logo_url || show.logo,
+                    videos: allVideos.slice(0, limitReplays),
+                    nextBatchUrl: show.relatedItems
+                } as ShowReplayGroup;
+            } catch (err) {
+                console.error(`Error fetching archive for show ${show.title}:`, err);
+                return null;
+            }
         });
 
+        const results = await Promise.all(aggregatedPromises);
+        return results.filter((r): r is ShowReplayGroup => r !== null && r.videos.length > 0);
     } catch (error) {
-        console.error("Error fetching all channel replays:", error);
+        console.error("Error in getReplaysByShowAggregated:", error);
         return [];
     }
+}
+
+/**
+ * Get aggregated replays from all channels using the alaunesliders endpoint
+ * This is much faster than fetching from each channel individually.
+ */
+export async function getLatestAggregateReplays(): Promise<SliderVideoItem[]> {
+    try {
+        const data = await getSliderVideos();
+        return data.allitems || [];
+    } catch (error) {
+        console.error("Error fetching latest aggregate replays:", error);
+        return [];
+    }
+}
+
+/**
+ * Get replays for a specific list of channels
+ * Used for progressive loading on the client
+ */
+export async function getReplaysForChannels(channels: import('../types/api').LiveChannel[]): Promise<SliderVideoItem[]> {
+    try {
+        const replaysPromises = channels.map(async (channel) => {
+            try {
+                // console.log(`Fetching replays for channel ID: ${channel.id}`);
+                const res = await getAlauneByChannel(channel.id);
+                const items = res.allitems || [];
+                // console.log(`Channel ${channel.title} (${channel.id}) returned ${items.length} items`);
+
+                return items.map(item => ({
+                    ...item,
+                    channel_logo: channel.logo_url || channel.logo
+                }));
+            } catch (err) {
+                console.error(`Failed to fetch replays for channel ${channel.id}:`, err);
+                return [];
+            }
+        });
+
+        const allReplaysNested = await Promise.all(replaysPromises);
+        const flattened = allReplaysNested.flat();
+        console.log(`Total replays fetched from batch: ${flattened.length}`);
+        return flattened;
+    } catch (error) {
+        console.error("Error fetching replays for channels:", error);
+        return [];
+    }
+}
+
+/**
+ * Get related VOD items (used for pagination/load more)
+ * @param url - The relatedItems URL provided in the video object
+ */
+export async function getRelatedItems(url: string): Promise<SliderVideoItem[]> {
+    try {
+        // Since url is full, we need to extract the part after API_BASE_URL if we want to use fetchAPI
+        // Or just fetch it directly if it's external (but it seems to be internal)
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            next: { revalidate: 60 },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Related Items API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.allitems || [];
+    } catch (error) {
+        console.error("Error fetching related items:", error);
+        return [];
+    }
+}
+
+/**
+ * Legacy wrapper for aggregated replays
+ */
+export async function getAllChannelReplays(): Promise<import('../types/api').SliderVideoItem[]> {
+    return getLatestAggregateReplays();
 }
 
 /**

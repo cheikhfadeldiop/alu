@@ -12,6 +12,7 @@ export type MediaCardProps = {
   live?: boolean;
   showPlayIcon?: boolean;
   aspect?: "16/9" | "4/3" | "1/1" | "469/246";
+  channelLogo?: string;
 };
 
 function aspectClass(aspect: MediaCardProps["aspect"]) {
@@ -37,8 +38,8 @@ function PlayOverlay() {
       <Image
         src="/assets/placeholders/play_overlay.png"
         alt="CRTV"
-        width={32}
-        height={32}
+        width={40}
+        height={40}
         className="h-12 w-12"
         priority
         objectFit="contain"
@@ -55,6 +56,7 @@ export function MediaCard({
   live,
   showPlayIcon = false,
   aspect = "16/9",
+  channelLogo,
 }: MediaCardProps) {
   return (
     <Link
@@ -80,6 +82,18 @@ export function MediaCard({
             <PlayOverlay />
           </div>
         ) : null}
+
+        {channelLogo && (
+          <div className="absolute bottom-2 right-2 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
+            <Image
+              src={channelLogo}
+              alt="Channel"
+              width={42}
+              height={42}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-1 p-4 justify-between">
@@ -92,7 +106,7 @@ export function MediaCard({
             <span className="w-1 h-1 bg-[color:green] rounded-full"></span>
             <span className="text-xs text-[color:var(--muted)]">la rédaction</span>
           </div>
-                  ) : null}
+        ) : null}
       </div>
     </Link>
   );

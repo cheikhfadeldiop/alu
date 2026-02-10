@@ -19,7 +19,7 @@ export function SectionTitle({
   uppercase?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 pb-6">
+    <div className="flex items-center gap-3 pb-6 ">
       <h2
         className={
           uppercase

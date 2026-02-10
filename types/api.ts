@@ -159,6 +159,8 @@ export interface SliderVideoItem {
     time: string;
     slug: string;
     channel_logo?: string;
+    chaine_logo?: string;
+    chaine_name?: string;
 }
 
 // Featured Content Types

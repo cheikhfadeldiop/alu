@@ -52,7 +52,7 @@ export function NewsGrid({
                     <button
                         onClick={onLoadMore}
                         disabled={loadingMore}
-                        className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-white dark:bg-transparent shadow-sm hover:shadow-md disabled:opacity-50"
+                        className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
                     >
                         <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-red-600 transition-colors">
                             {loadingMore ? "Chargement..." : "Charger +"}
