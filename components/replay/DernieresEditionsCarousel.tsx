@@ -125,7 +125,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                             style={{ scrollSnapAlign: "start" }}
                         >
                             <MediaCard
-                                href={video.video_url || '#'}
+                                href={`/replay/${video.slug}`}
                                 title={video.title}
                                 imageSrc={video.logo_url}
                                 meta={`${video.date} • ${video.time || 'Replay'}`}

@@ -91,7 +91,7 @@ export function useReplayFetcher(
                     const channelReplays = await getReplaysForChannels(channelsToFetch);
 
                     // Add new pagination URLs to pool
-                    channelReplays.forEach(item => {
+                    channelReplays.forEach((item: { relatedItems: string; }) => {
                         if (item.relatedItems && !seenUrls.current.has(item.relatedItems)) {
                             paginationPool.current.add(item.relatedItems);
                         }

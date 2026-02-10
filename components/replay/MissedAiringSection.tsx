@@ -152,14 +152,23 @@ function PlayIconCustom({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 }
 
 function BigCard({ video }: { video: SliderVideoItem }) {
+    const [imgSrc, setImgSrc] = React.useState(video.logo_url);
+    const [channelLogoSrc, setChannelLogoSrc] = React.useState(video.channel_logo);
+
+    React.useEffect(() => {
+        setImgSrc(video.logo_url);
+        setChannelLogoSrc(video.channel_logo);
+    }, [video.logo_url, video.channel_logo]);
+
     return (
-        <Link href={video.video_url || "#"} className="group relative block aspect-video overflow-hidden rounded-sm hover:scale-105 transition-transform hover:z-10 ">
+        <Link href={`/replay/${video.slug}`} className="group relative block aspect-video overflow-hidden rounded-sm hover:scale-105 transition-transform hover:z-10 ">
             <Image
-                src={video.logo_url}
+                src={imgSrc || "/assets/logo/logo.png"}
                 alt={video.title}
                 fill
                 className="object-cover transition-transform duration-700 "
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                onError={() => setImgSrc("/assets/logo/logo.png")}
             />
             {/* Content Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
@@ -170,14 +179,15 @@ function BigCard({ video }: { video: SliderVideoItem }) {
             </div>
 
             {/* Channel Logo Bottom Right */}
-            {video.channel_logo && (
+            {channelLogoSrc && (
                 <div className="absolute bottom-6 right-6 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
                     <Image
-                        src={video.channel_logo}
+                        src={channelLogoSrc}
                         alt="Channel"
                         width={40}
                         height={40}
                         className="w-full h-full object-contain"
+                        onError={() => setChannelLogoSrc(undefined)}
                     />
                 </div>
             )}
@@ -205,15 +215,24 @@ function BigCard({ video }: { video: SliderVideoItem }) {
 }
 
 function SmallCard({ video }: { video: SliderVideoItem }) {
+    const [imgSrc, setImgSrc] = React.useState(video.logo_url);
+    const [channelLogoSrc, setChannelLogoSrc] = React.useState(video.channel_logo);
+
+    React.useEffect(() => {
+        setImgSrc(video.logo_url);
+        setChannelLogoSrc(video.channel_logo);
+    }, [video.logo_url, video.channel_logo]);
+
     return (
-        <Link href={video.video_url || "#"} className="group block space-y-4 hover:scale-105 transition-transform hover:z-10 ">
+        <Link href={`/replay/${video.slug}`} className="group block space-y-4 hover:scale-105 transition-transform hover:z-10 ">
             <div className="relative aspect-video overflow-hidden rounded-sm bg-white/5">
                 <Image
-                    src={video.logo_url}
+                    src={imgSrc || "/assets/logo/logo.png"}
                     alt={video.title}
                     fill
                     className="object-cover transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    onError={() => setImgSrc("/assets/logo/logo.png")}
                 />
                 {/* Play Icon Bottom Left */}
                 <div className="absolute bottom-3 left-3">
@@ -221,14 +240,15 @@ function SmallCard({ video }: { video: SliderVideoItem }) {
                 </div>
 
                 {/* Channel Logo Bottom Right */}
-                {video.channel_logo && (
+                {channelLogoSrc && (
                     <div className="absolute bottom-2 right-2 z-20 w-12 h-10 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
                         <Image
-                            src={video.channel_logo}
+                            src={channelLogoSrc}
                             alt="Channel"
                             width={38}
                             height={38}
                             className="w-full h-full object-contain"
+                            onError={() => setChannelLogoSrc(undefined)}
                         />
                     </div>
                 )}

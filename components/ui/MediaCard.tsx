@@ -58,6 +58,12 @@ export function MediaCard({
   aspect = "16/9",
   channelLogo,
 }: MediaCardProps) {
+  const [imgSrc, setImgSrc] = React.useState(imageSrc);
+
+  React.useEffect(() => {
+    setImgSrc(imageSrc);
+  }, [imageSrc]);
+
   return (
     <Link
       href={href}
@@ -65,11 +71,12 @@ export function MediaCard({
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <Image
-          src={imageSrc}
+          src={imgSrc || "/assets/logo/logo.png"}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover "
+          onError={() => setImgSrc("/assets/logo/logo.png")}
         />
 
         {live ? (
@@ -91,6 +98,10 @@ export function MediaCard({
               width={42}
               height={42}
               className="w-full h-full object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
             />
           </div>
         )}

@@ -38,8 +38,8 @@ export function EmissionsSlider({ shows }: EmissionsSliderProps) {
         <section className="w-full max-w-[1400px] mx-auto px-4  space-y-8">
             {/* Header with Title and Custom Navigation */}
             <div className="flex items-center justify-between">
-               <SectionTitle title="Nos Émissions de" 
-               title2="Télévision"/>
+                <SectionTitle title="Nos Émissions de"
+                    title2="Télévision" />
 
                 {/* Top Right Navigation Buttons */}
                 <div className="flex gap-2">
@@ -79,30 +79,40 @@ export function EmissionsSlider({ shows }: EmissionsSliderProps) {
 }
 
 function ShowCard({ show }: { show: SliderVideoItem }) {
+    const [logoSrc, setLogoSrc] = React.useState(show.logo_url);
+    const [channelLogoSrc, setChannelLogoSrc] = React.useState(show.chaine_logo);
+
+    React.useEffect(() => {
+        setLogoSrc(show.logo_url);
+        setChannelLogoSrc(show.chaine_logo);
+    }, [show.logo_url, show.chaine_logo]);
+
     return (
         <Link
-            href={`/replay/show/${show.slug || show.title.toLowerCase().replace(/\s+/g, '-')}`}
+            href={`/replay/${show.slug || show.title.toLowerCase().replace(/\s+/g, '-')}`}
             className="shrink-0 w-[240px] sm:w-[280px] group block space-y-4 hover:scale-105 transition-transform"
         >
             {/* Square Image Container */}
             <div className="relative aspect-square overflow-hidden rounded-sm bg-white/5 border-b-4 border-red-600">
                 <Image
-                    src={show.logo_url}
+                    src={logoSrc || "/assets/logo/logo.png"}
                     alt={show.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, 300px"
+                    onError={() => setLogoSrc("/assets/logo/logo.png")}
                 />
 
                 {/* Channel Overlay Badge if available */}
-                {show.chaine_logo && (
+                {channelLogoSrc && (
                     <div className="absolute top-2 right-2 z-10 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
                         <Image
-                            src={show.chaine_logo}
+                            src={channelLogoSrc}
                             alt={show.chaine_name || "Channel"}
                             width={42}
                             height={42}
                             className="w-full h-full object-contain"
+                            onError={() => setChannelLogoSrc(undefined)}
                         />
                     </div>
                 )}
