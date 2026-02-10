@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LiveChannel, EPGItem } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
+import { LiveCarousel } from "../shared/LiveCarousel";
 
 interface LiveDirectSectionProps {
     channels: LiveChannel[];
@@ -15,19 +16,23 @@ export function LiveDirectSection({ channels, epgItems }: LiveDirectSectionProps
     if (!channels || channels.length === 0) return null;
 
     return (
-        <section className="">
+        <section className="py-8">
             <SectionTitle title="Directs"
                 title2="à l'antenne"
                 actionIcon={true}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                {channels.slice(0, 3).map((channel) => {
+            <LiveCarousel>
+                {channels.map((channel) => {
                     const currentProgram = epgItems.find(
                         (epg) => epg.channel_id === channel.id && epg.is_current
                     );
-                    return <LiveChannelCard key={channel.id} channel={channel} currentProgram={currentProgram} />;
+                    return (
+                        <div key={channel.id} className="w-[340px] md:w-[400px]">
+                            <LiveChannelCard channel={channel} currentProgram={currentProgram} />
+                        </div>
+                    );
                 })}
-            </div>
+            </LiveCarousel>
         </section>
     );
 }
@@ -40,15 +45,16 @@ function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, cu
     }, [channel.logo_url, channel.logo]);
 
     return (
+
         <Link
             href={`/live?channel=${channel.id}`}
-            className="group flex items-center backdrop-blur-xl bg-background/30 
+            className="group flex items-center backdrop-blur-xl bg-background/5 
             hover:scale-105 transition-transform hover:z-10
             p-5 transition-colors rounded-sm overflow-hidden  h-[140px]
             "
         >
             {/* Left: Thumbnail/Logo */}
-            <div className="relative w-[180px] h-full object-contain">
+            <div className="relative w-[35%] h-full object-contain">
                 <Image
                     src={imgSrc || "/assets/placeholders/live_tv_frame.png"}
                     alt={channel.title}
@@ -74,7 +80,7 @@ function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, cu
                         {currentProgram?.channel_name || "En cours"}
                     </h3>
 
-                    <div className="flex items-center  pl-2">
+                    <div className="flex items-center  pl-2 ">
                         {/* logence en rouge */}
                         <span className="  w-2 h-2 bg-red-600  rotate-45 animate-pulse" />
                         <span className="w-1 h-1  rounded-full" />

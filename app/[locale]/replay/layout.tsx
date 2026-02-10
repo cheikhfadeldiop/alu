@@ -1,6 +1,6 @@
 import {
     getLiveChannels,
-    getEPGAll,
+    getEPGNow,
     getLatestAggregateReplays,
     getVODShows,
     getReplaysByShowAggregated
@@ -20,7 +20,7 @@ export default async function ReplayLayout({
     // Next.js layout will preserve this part of the DOM during [slug] changes
     const [liveChannelsData, epgData, replays, showsData, crossedData] = await Promise.all([
         getLiveChannels().catch(() => ({ allitems: [] })),
-        getEPGAll().catch(() => ({ allitems: [] })),
+        getEPGNow().catch(() => ({ allitems: [] })),
         getLatestAggregateReplays().catch(() => []),
         getVODShows().catch(() => ({ allitems: [] })),
         getReplaysByShowAggregated(10, 10).catch(() => []),
