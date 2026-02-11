@@ -37,7 +37,6 @@ export default async function RadioPage() {
         epgData={epgNowItems}
         fullEpgData={fullEpg}
       />
-      <AdBanner />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { LiveSelectionCarousel } from "../live/LiveSelectionCarousel";
 import { RadioPlayerSection } from "./RadioPlayerSection";
 import { UpcomingProgramsTimeline } from "./UpcomingProgramsTimeline";
 import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
+import { AdBanner } from "../ui/AdBanner";
 
 interface RadioPageClientProps {
     initialRadios: LiveChannel[];
@@ -83,9 +84,12 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
 
             {/* 2. Radio Player Section - Only plays radios */}
             <RadioPlayerSection channel={selectedRadio} currentProgram={currentRadioProgram} />
+            <AdBanner />
 
             {/* 3. Upcoming Programs Timeline */}
             <UpcomingProgramsTimeline epgData={fullEpgData} />
+
+
         </div>
     );
 }

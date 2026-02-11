@@ -75,7 +75,7 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
 
                 flattened.push({
                     ...prog,
-                    channelLogo: channel.logo || channel.logo_url,
+                    channelLogo: channel.logo || "/assets/logo/logo.png",
                     channelName: channel.titre,
                     startSec,
                     endSec
@@ -141,16 +141,18 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
     if (allPrograms.length === 0) return null;
 
     return (
-        <div className="w-full space-y-8 py-12 relative overflow-hidden">
+        <div className="w-full space-y-8 relative overflow-hidden">
             <div className="flex items-center justify-between px-6">
                 <div className="flex items-center gap-4">
                     <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">
                         PROGRAMMES À VENIR
                     </h2>
-                    <div className="flex text-red-600 animate-pulse">
-                        <ChevronRightIcon />
-                        <ChevronRightIcon />
-                    </div>
+                    <Image
+                        src="/assets/placeholders/arrow2.png"
+                        alt=""
+                        width={24}
+                        height={24}
+                    />
                 </div>
 
                 <div className="flex gap-2">
@@ -193,20 +195,20 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                             const isLive = nowSec >= program.startSec && nowSec < program.endSec;
 
                             return (
-                                <div key={`${program.slug}-${index}`} className="flex-shrink-0 w-100 h-100 flex flex-col px-4 group">
+                                <div key={`${program.slug}-${index}`} className="flex-shrink-0 w-100 h-100 flex flex-col px-1 group">
                                     <div className="flex flex-col items-center mb-6">
-                                        <span className={`text-sm font-bold transition-colors ${isLive ? 'text-white' : 'text-white/20'}`}>
+                                        <span className={`text-sm font-bold transition-colors `}>
                                             {program.startTime}
                                         </span>
-                                        <div className={`w-px h-6 bg-gradient-to-b ${isLive ? 'from-white/40' : 'from-white/10'} to-transparent`} />
+                                        <div className={`w-px h-6 bg-foreground/50`} />
                                     </div>
 
-                                    <div className={`relative w-full rounded-2xl p-4 flex gap-4 transition-all duration-300 border backdrop-blur-sm
-                                        ${isLive ? 'bg-red-600/10 border-red-600/30 shadow-[0_0_40px_rgba(220,38,38,0.15)]' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'}`}>
+                                    <div className={`relative w-full  p-4 flex gap-4 transition-all duration-300 border backdrop-blur-sm
+                                        ${isLive ? 'bg-red-600/10 border-red-600/30 shadow-[0_0_40px_rgba(220,38,38,0.15)]' : 'bg-foreground/20 border-white/5 hover:bg-red-600/10'}`}>
 
-                                        <div className="relative w-34 h-30 rounded-xl overflow-hidden shadow-2xl shrink-0">
+                                        <div className="relative w-34 h-30  overflow-hidden shadow-2xl shrink-0">
                                             <Image src={program.logo || "/assets/placeholders/radio_icon_sur_card.png"} alt={program.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" unoptimized />
-                                            <div className="absolute bottom-1 left-1 w-8 h-8 rounded bg-black/60 backdrop-blur-md p-1 border border-white/10">
+                                            <div className="absolute bottom-1 left-1 w-10 h-10 rounded bg-black/60 backdrop-blur-md p-1 border border-white/10">
                                                 <img src={program.channelLogo} alt={program.channelName} className="w-full h-full object-contain" />
                                             </div>
                                         </div>
@@ -218,11 +220,11 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                                                         <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
                                                         <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">LIVE</span>
                                                     </div>
-                                                ) : <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">NEXT</span>}
+                                                ) : <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">NEXT</span>}
                                             </div>
-                                            <h3 className="text-sm font-bold text-white truncate leading-tight mb-1">{program.title}</h3>
-                                            <h3 className="text-sm font-bold text-white truncate leading-tight mb-1">{program.startTime} - {program.endTime}</h3>
-                                            <div className="text-[11px] font-medium text-white/40 uppercase tracking-tighter">{program.channelName}</div>
+                                            <h3 className="text-sm font-bold text-foreground truncate leading-tight mb-1">{program.title}</h3>
+                                            <h3 className="text-sm font-bold text-foreground truncate leading-tight mb-1">{program.startTime} - {program.endTime}</h3>
+                                            <div className="text-[11px] font-medium text-foreground/40 uppercase tracking-tighter">{program.channelName}</div>
                                         </div>
                                     </div>
                                 </div>

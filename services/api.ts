@@ -29,7 +29,7 @@ export type { SliderVideoItem } from '../types/api';
 
 const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
 const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
-const APP_ID = 'lacrtv';
+const APP_ID = 'larts';
 
 export function ensureAbsoluteUrl(url: string | undefined): string {
     if (!url || url === "null") return "";
