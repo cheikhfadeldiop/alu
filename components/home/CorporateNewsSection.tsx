@@ -8,13 +8,19 @@ interface CorporateNewsSectionProps {
     title2?: string;
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
+import { useTranslations } from "next-intl";
+
 export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSectionProps) {
+    const t = useTranslations("common");
+
     if (!posts || posts.length === 0) return null;
 
     return (
         <section className="space-y-8 ">
             <div className="flex items-center justify-between">
-                <SectionTitle title={title} title2={title2} actionLabel="VOIR PLUS" actionHref="/news" />
+                <SectionTitle title={title} title2={title2} actionLabel={t("seeMore")} actionHref="/news" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -22,15 +28,15 @@ export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSect
                     <Link
                         key={post.id}
                         href={post.link}
-                        className="group   backdrop-blur-sm bg-background/30 border border-gray-100 dark:border-muted/30 rounded-2xl p-8 flex flex-col h-full hover:shadow-xl hover:border-red-600/20 transition-all duration-300"
+                        className="group   backdrop-blur-sm bg-background/30 border border-gray-100 dark:border-muted/30 rounded-2xl p-8 flex flex-col h-full hover:shadow-xl hover:border-[color:var(--accent)]/20 transition-all duration-300"
                     >
                         {/* Communiqué Label */}
-                        <div className="text-red-600 text-xs font-black uppercase tracking-widest mb-4">
-                            COMMUNIQUÉ
+                        <div className="text-[color:var(--accent)] text-xs font-black uppercase tracking-widest mb-4">
+                            {t("pressRelease")}
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-xl font-bold leading-tight mb-4 group-hover:text-red-600 transition-colors line-clamp-2">
+                        <h3 className="text-xl font-bold leading-tight mb-4 group-hover:text-[color:var(--accent)] transition-colors line-clamp-2">
                             {post.title.rendered}
                         </h3>
 
@@ -42,8 +48,8 @@ export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSect
 
                         {/* Link */}
                         <div className="mt-auto flex items-center gap-2 text-sm font-bold text-foreground group-hover:gap-3 transition-all">
-                            <span>Lire le communiqué</span>
-                            <span className="text-red-600">→</span>
+                            <span>{t("readRelease")}</span>
+                            <span className="text-[color:var(--accent)]">→</span>
                         </div>
                     </Link>
                 ))}

@@ -7,6 +7,10 @@ import { SectionTitle } from "../ui/SectionTitle";
 import { LiveChannel, EPGItem } from "../../types/api";
 import { LiveCarousel } from "../shared/LiveCarousel";
 
+import { useTranslations } from "next-intl";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { time } from "console";
+
 interface LiveChannelsGridProps {
     channels: LiveChannel[];
     epgItems: EPGItem[];
@@ -16,6 +20,7 @@ interface LiveChannelsGridProps {
 }
 
 export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabel }: LiveChannelsGridProps) {
+    const t = useTranslations("common");
     if (!channels || channels.length === 0) return null;
 
     return (
@@ -60,7 +65,7 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                         >
                             <div className="relative h-[65%] w-full">
                                 <Image
-                                    src={channel.logo_url || channel.logo || "/assets/placeholders/live_tv_frame.png"}
+                                    src={channel.logo_url || channel.logo || SITE_CONFIG.theme.placeholders.video}
                                     alt={channel.title}
                                     fill
                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -70,8 +75,8 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
 
                                 <div className="absolute top-3 right-3">
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-grey/90 backdrop-blur-sm text-white text-xs font-bold shadow-lg">
-                                        <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
-                                        Direct
+                                        <span className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse" />
+                                        {t("direct")}
                                     </span>
                                 </div>
 
@@ -90,7 +95,7 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                                 <div className="absolute bottom-3 left-3">
                                     <div className="w-8 h-8 relative drop-shadow-lg">
                                         <Image
-                                            src="/assets/placeholders/live_tv_frame.png"
+                                            src={SITE_CONFIG.theme.placeholders.video}
                                             alt="Live TV"
                                             width={32}
                                             height={32}
@@ -106,22 +111,24 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                                     </h3>
                                     <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden min-w-[40px]">
                                         <div
-                                            className="h-full bg-red-600 rounded-full transition-all"
+                                            className="h-full bg-[color:var(--accent)] rounded-full transition-all"
                                             style={{ width: `${progressPercentage}%` }}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400">
+                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400  ">
+                                    {/* Calendar Icon */}
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time || "00:00"}</span>
-                                    <span className="text-gray-400 dark:text-white/90 text-xs">-</span>
+                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                                    <span className="text-gray-400 dark:text-white/90  text-xs">-</span>
+                                    {/* Clock Icon */}
                                     <svg className="w-5 h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.end_time || "00:00"}</span>
+                                    <span className="text-gray-500 text-sm">{currentProgram?.end_time || new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                             </div>
                         </Link>

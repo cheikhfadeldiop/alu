@@ -18,6 +18,9 @@
   --flag-green: #009e49;
   --flag-red: #ce1126;
   --flag-yellow: #fcd116;
+
+  /* Status */
+  --success: #22c55e;
 }
 
 @theme inline {
@@ -32,6 +35,7 @@
   --color-flag-green: var(--flag-green);
   --color-flag-red: var(--flag-red);
   --color-flag-yellow: var(--flag-yellow);
+  --color-success: var(--success);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -119,11 +123,13 @@ body {
     opacity: 1;
   }
 }
+
 /* Scrollbar utilities */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

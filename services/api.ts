@@ -27,9 +27,11 @@ import type {
 
 export type { SliderVideoItem } from '../types/api';
 
-const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
-const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
-const APP_ID = 'larts';
+import { SITE_CONFIG } from '../constants/site-config';
+
+const API_BASE_URL = SITE_CONFIG.api.baseUrl;
+const WORDPRESS_API_BASE_URL = SITE_CONFIG.api.wordpressBaseUrl;
+const APP_ID = SITE_CONFIG.api.appId;
 
 export function ensureAbsoluteUrl(url: string | undefined): string {
     if (!url || url === "null") return "";
@@ -612,10 +614,7 @@ export async function getWordPressLatestPosts(perPage: number = 10): Promise<imp
 }
 
 
-/**
- * Get WordPress posts for "À la une" category
- */
 export async function getWordPressAlaunePost(): Promise<import('../types/api').WordPressPost[]> {
-    // Category ID 121 is "À LA UNE" - fetch 20 articles for pagination
-    return getWordPressPosts(121, 20);
+    // Category ID from config
+    return getWordPressPosts(SITE_CONFIG.categories.news.alaune, 20);
 }

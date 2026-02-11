@@ -48,6 +48,8 @@ function PlayOverlay() {
   );
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function MediaCard({
   href,
   title,
@@ -71,12 +73,12 @@ export function MediaCard({
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <Image
-          src={imgSrc || "/assets/logo/logo.png"}
+          src={imgSrc || SITE_CONFIG.theme.placeholders.logo}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover "
-          onError={() => setImgSrc("/assets/logo/logo.png")}
+          onError={() => setImgSrc(SITE_CONFIG.theme.placeholders.logo)}
         />
 
         {live ? (
@@ -114,7 +116,7 @@ export function MediaCard({
         {meta ? (
           <div className="flex items-center gap-2">
             <div className="text-xs text-[color:var(--muted)]">{meta}</div>
-            <span className="w-1 h-1 bg-[color:green] rounded-full"></span>
+            <span className="w-1 h-1 bg-[color:var(--secondary)] rounded-full"></span>
             <span className="text-xs text-[color:var(--muted)]">la rédaction</span>
           </div>
         ) : null}

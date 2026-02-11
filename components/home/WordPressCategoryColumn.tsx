@@ -11,6 +11,8 @@ interface WordPressCategoryColumnProps {
     categorySlug: string;
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function WordPressCategoryColumn({ title, title2, items, enter, categorySlug }: WordPressCategoryColumnProps) {
     if (!items || items.length === 0) return null;
 
@@ -33,9 +35,9 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
             {/* Featured Item */}
             {featuredItem && !enter && (
                 <Link href={featuredItem.link} className="group block space-y-3 border-b dark:border-muted/30">
-                    <div className="relative aspect-video overflow-hidden bg-gray-100">
+                    <div className="relative aspect-video overflow-hidden bg-white/5">
                         <Image
-                            src={featuredItem.acan_image_url || "/assets/placeholders/news_wide.png"}
+                            src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                             alt={featuredItem.title.rendered}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -47,8 +49,8 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                     </h4>
                     <div className="flex items-center gap-2 text-[11px] text-gray-500 pb-5">
                         <span>{formatDate(featuredItem.date)}</span>
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                        <span className="font-medium">La rédaction</span>
+                        <span className="w-1.5 h-1.5 bg-[color:var(--success)] rounded-full" />
+                        <span className="font-medium">{SITE_CONFIG.strings.editorialTeam}</span>
                     </div>
                 </Link>
             )}
@@ -57,9 +59,9 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
             <div className="space-y-5 pt-2 ">
                 {listItems.map((item) => (
                     <Link key={item.id} href={item.link} className="group flex gap-4 items-start">
-                        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-gray-100">
+                        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-white/5">
                             <Image
-                                src={item.acan_image_url || "/assets/placeholders/article_list.png"}
+                                src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={item.title.rendered}
                                 fill
                                 sizes="80px"
@@ -72,8 +74,8 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                             </h5>
                             <div className="flex items-center gap-2 text-[10px] text-gray-500">
                                 <span>{formatDate(item.date)}</span>
-                                <span className="w-1 h-1 bg-green-500 rounded-full" />
-                                <span>La rédaction</span>
+                                <span className="w-1 h-1 bg-[color:var(--success)] rounded-full" />
+                                <span>{SITE_CONFIG.strings.editorialTeam}</span>
                             </div>
                         </div>
                     </Link>

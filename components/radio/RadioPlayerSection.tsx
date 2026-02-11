@@ -5,28 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { LiveChannel, EPGItem } from "../../types/api";
 
-const RADIO_FALLBACK_DATA: Record<string, { desc: string, presenter: string, program: string }> = {
-    'poste-national': {
-        desc: "La Poste Nationale est le cœur battant de la radio publique camerounaise, diffusant l'information, la culture et l'éducation sur l'ensemble du territoire national depuis Yaoundé.",
-        presenter: "EUGÈNE SIAKA",
-        program: "JOURNAL PARLÉ"
-    },
-    'fm-94': {
-        desc: "CRTV FM 94 est la radio urbaine de Yaoundé, centrée sur l'actualité de la capitale, la musique contemporaine et les débats citoyens pour un public jeune et dynamique.",
-        presenter: "ÉQUIPE FM 94",
-        program: "YAOUNDÉ BY NIGHT"
-    },
-    'fm-105': {
-        desc: "CRTV FM 105 Suelaba est la voix vibrante de Douala, mêlant musiques locales, informations économiques et divertissements pour la métropole économique du Cameroun.",
-        presenter: "ANTONY PAYSAN",
-        program: "SUELABA MATIN"
-    },
-    'mount-cameroon-fm': {
-        desc: "Basée à Buea, Mount Cameroon FM est la référence pour les régions anglophones, offrant des programmes bilingues riches en culture et actualités locales.",
-        presenter: "PETER MBE",
-        program: "MOUNTAIN SHOW"
-    }
-};
+import { useTranslations } from "next-intl";
 
 interface RadioPlayerSectionProps {
     channel: LiveChannel;
@@ -34,6 +13,31 @@ interface RadioPlayerSectionProps {
 }
 
 export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSectionProps) {
+    const t = useTranslations("radioPlayer");
+    const tCommon = useTranslations("common");
+
+    const RADIO_FALLBACK_DATA: Record<string, { desc: string, presenter: string, program: string }> = {
+        'poste-national': {
+            desc: t('channels.poste-national.desc'),
+            presenter: "EUGÈNE SIAKA",
+            program: t('channels.poste-national.program')
+        },
+        'fm-94': {
+            desc: t('channels.fm-94.desc'),
+            presenter: "ÉQUIPE FM 94",
+            program: t('channels.fm-94.program')
+        },
+        'fm-105': {
+            desc: t('channels.fm-105.desc'),
+            presenter: "ANTONY PAYSAN",
+            program: t('channels.fm-105.program')
+        },
+        'mount-cameroon-fm': {
+            desc: t('channels.mount-cameroon-fm.desc'),
+            presenter: "PETER MBE",
+            program: t('channels.mount-cameroon-fm.program')
+        }
+    };
     const audioRef = useRef<HTMLAudioElement>(null);
     const [streamUrl, setStreamUrl] = useState<string>("");
     const [loading, setLoading] = useState(true);
@@ -59,7 +63,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
 
             try {
                 if (!channel.stream_url) {
-                    throw new Error("Aucune source de flux disponible");
+                    throw new Error(t('errors.noStream'));
                 }
 
                 if (mounted) {
@@ -85,7 +89,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                                     // Don't hide loader immediately, let handleError event handle it with the 5s check
                                     // OR force error if we want immediate feedback
                                     // Let's set error immediately if it's clearly not an autoplay block
-                                    const errorMsg = "La radio semble être hors ligne (Erreur de lecture)";
+                                    const errorMsg = t('errors.offline');
                                     setError(errorMsg);
                                     setLoading(false);
                                     setIsStreamDead(true);
@@ -97,7 +101,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
             } catch (err) {
                 console.error("[RadioPlayer] Failed to fetch stream", err);
                 if (mounted) {
-                    const errorMsg = err instanceof Error ? err.message : "Erreur de chargement du flux";
+                    const errorMsg = err instanceof Error ? err.message : t('errors.playError');
                     setError(errorMsg);
                     setLoading(false);
                     setIsStreamDead(true);
@@ -148,7 +152,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
             playingTimeout = setTimeout(() => {
                 if (!isActuallyPlaying) {
                     console.error(`[RadioPlayer] Stream never started playing after 45s`);
-                    setError("Le flux ne répond pas - la radio est hors ligne");
+                    setError(t('errors.notResponding'));
                     setLoading(false);
                     setIsPlaying(false);
                     setIsStreamDead(true);
@@ -173,24 +177,24 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
             // Wait 5 seconds to see if it's a temporary glitch
             clearTimeout(errorTimeout);
             errorTimeout = setTimeout(() => {
-                let errorMessage = "Impossible de lire ce flux radio";
+                let errorMessage = t('errors.playError');
                 let shouldMarkDead = true;
 
                 if (audioElement.error) {
                     switch (audioElement.error.code) {
                         case MediaError.MEDIA_ERR_NETWORK:
-                            errorMessage = "Erreur réseau - la radio semble hors ligne";
+                            errorMessage = t('errors.networkError');
                             break;
                         case MediaError.MEDIA_ERR_DECODE:
-                            errorMessage = "Format audio non supporté";
+                            errorMessage = t('errors.formatError');
                             break;
                         case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMessage = "La radio est hors ligne ou le flux est indisponible";
+                            errorMessage = t('errors.unavailable');
                             break;
                         case MediaError.MEDIA_ERR_ABORTED:
                             // Don't show error for aborted - user might have clicked pause
                             if (isPlaying) {
-                                errorMessage = "Chargement interrompu";
+                                errorMessage = t('errors.aborted');
                             } else {
                                 shouldMarkDead = false;
                                 return; // Don't set error
@@ -310,7 +314,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
             setIsStreamDead(false);
             audioRef.current.play().catch((err) => {
                 console.error("[RadioPlayer] Playback failed:", err);
-                setError("Impossible de lire le flux audio");
+                setError(t('errors.playFailed'));
                 setLoading(false);
                 setIsActuallyPlaying(false);
                 setIsStreamDead(true);
@@ -348,15 +352,15 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
     return (
         <div className="w-full space-y-6 ">
             {/* Main Player Container */}
-            <div className="relative rounded-2xl p-8 bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
+            <div className="relative rounded-sm p-8 bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
                 {/* Loading Overlay */}
                 {loading && !error && !isStreamDead && (
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
                         <div className="text-center">
                             <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
-                            <p className="text-white text-lg font-semibold">Chargement de la radio...</p>
+                            <p className="text-white text-lg font-semibold">{t('status.loading')}</p>
                             <p className="text-white/60 text-sm mt-2">{channel.title}</p>
-                            <p className="text-white/40 text-xs mt-2">Cela peut prendre jusqu'à 45 secondes...</p>
+                            <p className="text-white/40 text-xs mt-2">{t('status.longLoad')}</p>
                         </div>
                     </div>
                 )}
@@ -370,9 +374,9 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                 </svg>
                             </div>
-                            <h3 className="text-white text-xl font-bold mb-3">Radio Hors Ligne</h3>
+                            <h3 className="text-white text-xl font-bold mb-3">{t('status.offlineTitle')}</h3>
                             <p className="text-white/70 text-sm mb-6">
-                                {error || "La radio est actuellement indisponible. Le flux pourrait être temporairement hors ligne."}
+                                {error || t('status.offlineMessage')}
                             </p>
                             <button
                                 onClick={handleRetry}
@@ -381,7 +385,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
-                                Réessayer
+                                {t('player.retry')}
                             </button>
                         </div>
                     </div>
@@ -570,12 +574,12 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                                             }`}
                                     />
                                     {isActuallyPlaying
-                                        ? 'En direct'
+                                        ? t('player.live')
                                         : isStreamDead
-                                            ? 'Hors ligne'
+                                            ? t('status.offline')
                                             : loading && isPlaying
-                                                ? 'Connexion...'
-                                                : 'Prêt'}
+                                                ? t('status.connecting')
+                                                : t('status.ready')}
                                 </span>
                                 <span>•</span>
                                 <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -650,7 +654,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                         onClick={handleRetry}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap"
                     >
-                        Réessayer
+                        {t('player.retry')}
                     </button>
                 </div>
             )}
@@ -706,7 +710,7 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                         {channel.desc || (
                             Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
                                 channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
-                            )?.[1].desc || "Votre radio nationale, au cœur de l'actualité et de la culture camerounaise. Restez à l'écoute pour nos programmes variés."
+                            )?.[1].desc || t('fallback.desc')
                         )}
                     </p>
                 </div>
@@ -718,18 +722,18 @@ export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSecti
                             {currentProgram?.program_title || (
                                 Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
                                     channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
-                                )?.[1].program || "JOURNAL EN DIRECT"
+                                )?.[1].program || t('fallback.program')
                             )}
                         </span>
                     </div>
                     <div className="hidden md:block w-px h-4 bg-white/10" />
                     <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ PAR :</span>
+                        <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">{t('player.presentedBy')}</span>
                         <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                             {currentProgram?.program_desc?.split('|')[1]?.trim() || (
                                 Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
                                     channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
-                                )?.[1].presenter || "LA RÉDACTION CRTV"
+                                )?.[1].presenter || t('fallback.presenter')
                             )}
                         </span>
                     </div>

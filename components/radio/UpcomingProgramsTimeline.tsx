@@ -13,7 +13,7 @@ const ChevronRightIcon = () => (
 );
 
 const LocationPinIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-red-600 shadow-xl">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[color:var(--accent)] shadow-xl">
         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
     </svg>
 );
@@ -24,7 +24,12 @@ interface UpcomingProgramsTimelineProps {
     epgData: FullEPGChannel[];
 }
 
+import { useTranslations } from "next-intl";
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelineProps) {
+    const t = useTranslations("pages.radio");
+    const tCommon = useTranslations("common");
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [scrollLeft, setScrollLeft] = useState(0);
@@ -75,7 +80,7 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
 
                 flattened.push({
                     ...prog,
-                    channelLogo: channel.logo || "/assets/logo/logo.png",
+                    channelLogo: channel.logo || SITE_CONFIG.theme.placeholders.logo,
                     channelName: channel.titre,
                     startSec,
                     endSec
@@ -144,11 +149,11 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
         <div className="w-full space-y-8 relative overflow-hidden">
             <div className="flex items-center justify-between px-6">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">
-                        PROGRAMMES À VENIR
+                    <h2 className="text-2xl font-black tracking-tighter  uppercase italic">
+                        {t("upNext")}
                     </h2>
                     <Image
-                        src="/assets/placeholders/arrow2.png"
+                        src={SITE_CONFIG.theme.placeholders.arrow}
                         alt=""
                         width={24}
                         height={24}
@@ -156,10 +161,10 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                 </div>
 
                 <div className="flex gap-2">
-                    <button onClick={() => scroll("left")} className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all transform active:scale-95">
+                    <button onClick={() => scroll("left")} className="p-2 rounded-xl bg-foreground/5 border border-white/10 text-gray-400 hover:text-[color:var(--accent)] transition-all transform active:scale-95">
                         <ChevronLeftIcon />
                     </button>
-                    <button onClick={() => scroll("right")} className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all transform active:scale-95">
+                    <button onClick={() => scroll("right")} className="p-2 rounded-xl bg-foreground/5 border border-white/10 text-gray-400 hover:text-[color:var(--accent)] transition-all transform active:scale-95">
                         <ChevronRightIcon />
                     </button>
                 </div>
@@ -175,12 +180,12 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                     }}
                 >
                     <div className="relative mb-2">
-                        <div className="absolute inset-0 bg-red-600/40 rounded-full animate-ping scale-110" />
-                        <div className="relative z-10 filter drop-shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+                        <div className="absolute inset-0 bg-[color:var(--accent)]/40 rounded-full animate-ping scale-110" />
+                        <div className="relative z-10 filter drop-shadow-[0_0_8px_rgba(209,18,31,0.8)]">
                             <LocationPinIcon />
                         </div>
                     </div>
-                    <div className="w-0.5 h-[230px] bg-gradient-to-b from-red-600 via-red-600/30 to-transparent" />
+                    <div className="w-0.5 h-[230px] bg-gradient-to-b from-[color:var(--accent)] via-[color:var(--accent)]/30 to-transparent" />
                 </div>
 
                 {/* Scrollable Container (No padding-X anymore) */}
@@ -204,10 +209,10 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                                     </div>
 
                                     <div className={`relative w-full  p-4 flex gap-4 transition-all duration-300 border backdrop-blur-sm
-                                        ${isLive ? 'bg-red-600/10 border-red-600/30 shadow-[0_0_40px_rgba(220,38,38,0.15)]' : 'bg-foreground/20 border-white/5 hover:bg-red-600/10'}`}>
+                                        ${isLive ? 'bg-[color:var(--accent)]/10 border-[color:var(--accent)]/30 shadow-[0_0_40px_rgba(209,18,31,0.15)]' : 'bg-foreground/20 border-white/5 hover:bg-[color:var(--accent)]/10'}`}>
 
                                         <div className="relative w-34 h-30  overflow-hidden shadow-2xl shrink-0">
-                                            <Image src={program.logo || "/assets/placeholders/radio_icon_sur_card.png"} alt={program.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" unoptimized />
+                                            <Image src={program.logo || SITE_CONFIG.theme.placeholders.radio} alt={program.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" unoptimized />
                                             <div className="absolute bottom-1 left-1 w-10 h-10 rounded bg-black/60 backdrop-blur-md p-1 border border-white/10">
                                                 <img src={program.channelLogo} alt={program.channelName} className="w-full h-full object-contain" />
                                             </div>
@@ -217,10 +222,10 @@ export function UpcomingProgramsTimeline({ epgData }: UpcomingProgramsTimelinePr
                                             <div className="flex items-center gap-2 mb-1">
                                                 {isLive ? (
                                                     <div className="flex items-center gap-1.5">
-                                                        <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
-                                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">LIVE</span>
+                                                        <span className="w-1.5 h-1.5 bg-[color:var(--accent)] rounded-full animate-pulse" />
+                                                        <span className="text-[10px] font-black text-[color:var(--accent)] uppercase tracking-widest">{tCommon("live")}</span>
                                                     </div>
-                                                ) : <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">NEXT</span>}
+                                                ) : <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">{tCommon("upNext")}</span>}
                                             </div>
                                             <h3 className="text-sm font-bold text-foreground truncate leading-tight mb-1">{program.title}</h3>
                                             <h3 className="text-sm font-bold text-foreground truncate leading-tight mb-1">{program.startTime} - {program.endTime}</h3>

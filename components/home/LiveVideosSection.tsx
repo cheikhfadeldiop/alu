@@ -3,12 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SliderVideoItem } from "../../types/api";
+import { useTranslations } from "next-intl";
 
 interface LiveVideosSectionProps {
     videos: SliderVideoItem[];
 }
 
 export function DernieresEditions({ videos }: LiveVideosSectionProps) {
+    const t = useTranslations("pages.home");
+    const tc = useTranslations("common");
+
     // Ensure we have videos
     if (!videos || videos.length === 0) return null;
 
@@ -21,7 +25,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <h2 className="text-xl font-bold uppercase tracking-wide">
-                        Nos dernières éditions
+                        {t("latestEditions")}
                     </h2>
                     <button className="text-gray-400 flex items-center gap-2">
                         <Image
@@ -36,7 +40,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                     href="/live"
                     className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 underline"
                 >
-                    Voir plus
+                    {tc("seeMore")}
                 </Link>
             </div>
 
@@ -89,14 +93,14 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                             {/* Description Band - Below Image */}
                             <div className="relative p-4  bg-background z-10 mt-[-22] ml-20 mr-20 ">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xs text-red-600 font-semibold">{featuredVideo.time}</span>
-                                    <span className="text-xs text-red-600 font-semibold">Regardez maintenant</span>
+                                    <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time}</span>
+                                    <span className="text-xs text-[color:var(--accent)] font-semibold">{tc("toWatchNow")}</span>
                                 </div>
                                 <h3 className="text-base font-bold mb-2 group-hover:underline">
                                     {featuredVideo.title}
                                 </h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                    {featuredVideo.desc || "Regardez les dernières vidéos que vous avez manquées"}
+                                    {featuredVideo.desc || tc("watchMissedFallback")}
                                 </p>
                             </div>
                         </Link>
@@ -108,9 +112,9 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                     <div className="space-y-3 w-full max-h-[500px] pr-2 overflow-y-auto scrollbar-thin 
                         [&::-webkit-scrollbar]:w-1 
                         [&::-webkit-scrollbar-track]:bg-transparent 
-                        [&::-webkit-scrollbar-thumb]:bg-red-600 
+                        [&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)] 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
-                        hover:[&::-webkit-scrollbar-thumb]:bg-red-400">
+                        hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]">
                         {listVideos.map((video, index) => (
                             <Link
                                 key={`${video.slug}-${index}`}
@@ -118,7 +122,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full"
                             >
                                 {/* Thumbnail with overlays */}
-                                <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-gray-100">
+                                <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-white/5">
                                     <Image
                                         src={video.logo_url}
                                         alt={video.title}
@@ -157,7 +161,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 {/* Content - Right Side */}
                                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                                     {/* Time */}
-                                    <div className="text-xs text-gray-500 dark:text-red-400 mb-1">
+                                    <div className="text-xs text-gray-500 dark:text-[color:var(--accent)] mb-1">
                                         {video.time}
                                     </div>
 
@@ -168,9 +172,9 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
 
                                     {/* Meta Info */}
                                     <div className="flex items-center gap-2 text-xs">
-                                        <span className="text-red-400 font-semibold">Replay</span>
-                                        <span className="text-red-600 ">•</span>
-                                        <span className="text-red-400 dark:text-red-400">{video.date}</span>
+                                        <span className="text-[color:var(--accent)] font-semibold">{tc("replayTag")}</span>
+                                        <span className="text-[color:var(--accent)] ">•</span>
+                                        <span className="text-[color:var(--accent)] dark:text-[color:var(--accent)]">{video.date}</span>
                                     </div>
                                 </div>
                             </Link>

@@ -5,14 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { LiveSelectionCarousel } from "./LiveSelectionCarousel";
 import { LivePlayerSection } from "./LivePlayerSection";
 import { EPGScheduleView } from "./EPGScheduleView";
-import { LiveChannel, EPGItem } from "../../types/api";
+import { UpcomingProgramsTimeline } from "../radio/UpcomingProgramsTimeline";
+import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
+import { AdBanner } from "../ui/AdBanner";
 
 interface LivePageClientProps {
     initialChannels: LiveChannel[];
     epgData: EPGItem[];
+    fullEpg: FullEPGChannel[];
 }
 
-export function LivePageClient({ initialChannels, epgData }: LivePageClientProps) {
+export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageClientProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
@@ -84,9 +87,12 @@ export function LivePageClient({ initialChannels, epgData }: LivePageClientProps
             )}
 
             {/* 3. Info & EPG Schedule - Only for TV */}
-            {selectedChannel.type === 'TV' && (
-                <EPGScheduleView epgItems={activeChannelEPG} />
-            )}
+           
+
+            <AdBanner />
+
+            {/* 4. Upcoming Programs Timeline */}
+            {fullEpg.length > 0 && <UpcomingProgramsTimeline epgData={fullEpg} />}
         </div>
     );
 }

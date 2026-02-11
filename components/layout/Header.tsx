@@ -106,6 +106,8 @@ function IconList(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -132,9 +134,9 @@ export function Header() {
   ];
 
   const themeOptions = [
-    { value: "system", label: "System", icon: IconMonitor },
-    { value: "light", label: "Light", icon: IconSun },
-    { value: "dark", label: "Dark", icon: IconMoon },
+    { value: "system", label: t("header.themes.system"), icon: IconMonitor },
+    { value: "light", label: t("header.themes.light"), icon: IconSun },
+    { value: "dark", label: t("header.themes.dark"), icon: IconMoon },
   ];
 
   const languageOptions = [
@@ -154,14 +156,14 @@ export function Header() {
 
       <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-8">
         {/* Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center ">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/assets/logo/logo.png"
+              src={SITE_CONFIG.theme.placeholders.logo}
               alt="CRTV"
-              width={32}
-              height={32}
-              className="h-6 w-16"
+              width={72}
+              height={72}
+              className="h-10 w-20"
               priority
               objectFit="contain"
             />
@@ -184,7 +186,7 @@ export function Header() {
                 className={[
                   "relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 text-font",
                   active
-                    ? "border-2 border-red-500 bg-white text-gray-900 dark:bg-black dark:text-white"
+                    ? "border-2 border-[color:var(--accent)] bg-white text-gray-900 dark:bg-black dark:text-white"
                     : "",
                 ].join(" ")}
               >
@@ -192,7 +194,7 @@ export function Header() {
                   <IconList className="h-3.5 w-3.5" />
                 )}
                 {isLive && (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-hidden />
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]" aria-hidden />
                 )}
                 {item.label}
               </Link>
@@ -272,15 +274,16 @@ export function Header() {
                   type="button"
                   suppressHydrationWarning
                   className={[
+
                     "relative z-10 flex h-full items-center justify-center px-2.5 text-[11px] font-medium transition-colors duration-200",
                     isActive
-                      ? "text-gray-900 dark:text-gray-100"
-                      : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100",
+                      ? "text-white bg-[color:var(--accent)]"
+                      : "text-white hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100",
                   ].join(" ")}
                   onClick={() => setTheme(option.value)}
                   aria-label={option.label}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className={`h-4.5 w-4.5 `} />
                 </button>
               );
             })}

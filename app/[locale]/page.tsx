@@ -28,6 +28,7 @@ import {
   getAllChannelReplays,
 } from "../../services/api";
 import { LiveSelectionCarousel } from "@/components/live/LiveSelectionCarousel";
+import { SITE_CONFIG } from "@/constants/site-config";
 
 export default async function HomePage() {
   const t = await getTranslations("pages.home");
@@ -55,11 +56,11 @@ export default async function HomePage() {
     getVODChannels().catch(() => ({ allitems: [] })),
     getEPGNow().catch(() => ({ allitems: [] })),
     getWordPressAlaunePost().catch(() => []),
-    getWordPressPosts(141, 10).catch(() => []), // Trending news
+    getWordPressPosts(SITE_CONFIG.categories.news.trending, 10).catch(() => []), // Trending news
     getAllChannelReplays().catch(() => []),
-    getWordPressPosts(145, 4).catch(() => []), // Regional news
-    getWordPressPosts(133, 4).catch(() => []), // Matam news
-    getWordPressPosts(153, 4).catch(() => []), // Agriculture news
+    getWordPressPosts(SITE_CONFIG.categories.news.regional, 4).catch(() => []), // Regional news
+    getWordPressPosts(SITE_CONFIG.categories.news.matam, 4).catch(() => []), // Matam news
+    getWordPressPosts(SITE_CONFIG.categories.news.agriculture, 4).catch(() => []), // Agriculture news
     getWordPressLatestPosts(8).catch(() => []), // Actu RTS 1 (Generic latest for now as placeholder)
     getWordPressLatestPosts(3).catch(() => []), // Corporate News
   ]);
@@ -110,9 +111,9 @@ export default async function HomePage() {
       <LiveChannelsGrid
         channels={liveChannels}
         epgItems={epgItems}
-        title="NOS CHAÎNES"
-        title2="EN DIRECT"
-        actionLabel=""
+        title={t("liveChannels")}
+        title2={t("liveChannelsSuffix")}
+        actionLabel={tc("seeAll")}
       />
 
       {/* dernier edition*/}
@@ -125,9 +126,9 @@ export default async function HomePage() {
 
       <EditorialChoice
         items={wpTrendingItems}
-        title="CHOIX DE LA"
-        title2="RÉDACTION"
-        actionLabel=""
+        title={t("editorChoice")}
+        title2={t("editorChoiceSuffix")}
+        actionLabel={tc("seeAll")}
       />
 
       <RegionalCategoriesSection
@@ -139,21 +140,21 @@ export default async function HomePage() {
 
       {/* Regional News with Ad */}
       <CategoryWithAdSection
-        title="ACTUALITÉS"
-        title2="RÉGIONALES"
+        title={t("regionalNews")}
+        title2={t("regionalNewsSuffix")}
         posts={wpRTS1Posts}
         categorySlug="rts-1"
       />
 
       <ShortsCarousel
         videos={sliderVideos}
-        title="L'actu en Resumé"
-        title2="#CrtvShorts"
-        actionLabel="VOIR PLUS"
+        title={t("shorts")}
+        title2={t("shortsSuffix")}
+        actionLabel={tc("seeMore")}
       />
 
       <CorporateNewsSection
-        title="Corporate"
+        title={t("corporate")}
         title2="News"
         posts={wpCorporatePosts}
       />

@@ -15,7 +15,10 @@ interface RadioPageClientProps {
     fullEpgData: FullEPGChannel[];
 }
 
+import { useTranslations } from "next-intl";
+
 export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgData }: RadioPageClientProps) {
+    const t = useTranslations("pages.radio");
     const router = useRouter();
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
@@ -69,7 +72,7 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
     }, [selectedRadio, currentPrograms]);
 
     if (!selectedRadio) {
-        return <div className="text-center text-foreground py-20">Aucune radio disponible</div>;
+        return <div className="text-center text-foreground py-20">{t("noRadioAvailable")}</div>;
     }
 
     return (

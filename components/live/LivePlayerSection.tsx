@@ -246,7 +246,7 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
 
     return (
         <div ref={containerRef} className="w-full space-y-4">
-            <div className="w-full overflow-hidden group/player rounded-xl border border-white/5 bg-black shadow-2xl">
+            <div className="w-full overflow-hidden group/player rounded-sm bg-black shadow-2xl">
                 <div className="relative aspect-video flex items-center justify-center bg-black overflow-hidden group/screen">
 
                     {/* Video Canvas */}
@@ -368,31 +368,73 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
             </div>
 
             {/* Info Container */}
-            <div className="p-6 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/10">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-white/5 p-2 border border-gray-200 dark:border-white/10">
-                            <Image
-                                src={channel.logo_url || channel.logo || channel.hd_logo || channel.sd_logo || "/assets/placeholders/live_tv_frame.png"}
-                                alt={channel.title}
-                                width={64}
-                                height={64}
-                                className="object-contain w-full h-full"
-                            />
+             <div className="relative p-8 md:p-10  backdrop-blur-3xl bg-background/85   border border-white/5 overflow-hidden group/info">
+                            {/* Decoration Background */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+            
+                            <div className="relative z-10 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                                {/* Channel Logo */}
+                                <div className="w-30 h-20 md:w-34 md:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                                    <Image
+                                        src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
+                                        alt={channel.title}
+                                        width={120}
+                                        height={100}
+                                        className=" object-contain w-full h-full brightness-110 drop-shadow-md "
+                                    />
+                                </div>
+            
+                                {/* Content */}
+                                <div className="flex-1 text-center md:text-left justify-center items-center space-y-4">
+                                    {/* Header: Status + Title */}
+                                    <div className="flex items-center justify-center md:justify-start gap-3">
+                                        <div className="flex items-center gap-2 px-3 py-1">
+                                            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
+                                            <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                        </div>
+                                        <h2 className="text-2xl md:text-3xl font-black  uppercase tracking-tighter drop-shadow-sm">
+                                            {channel.title}
+                                        </h2>
+                                    </div>
+            
+            
+                                </div>
+            
+            
+                                {/* Share Button (Top Right Desktop) */}
+                                <div className="absolute top-0 right-0 p-4 shrink-0">
+                                    <button className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300  group/share">
+                                        <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            {/* Description */}
+                            <div className="max-w-3xl pt-4 pb-8">
+                                <p className="text-sm md:text-base text-foreground/50 leading-relaxed font-medium">
+                                    {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
+                                </p>
+                            </div>
+            
+                            {/* Program Info (New addition matching image) */}
+                            <div className="pt-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border-t border-white/5">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                                        {"JOURNAL EN DIRECT"}
+                                    </span>
+                                </div>
+                                <div className="hidden md:block w-px h-4 bg-white/10" />
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
+                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                        { channel.title || "JOURNAL EN DIRECT"}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{channel.title}</h1>
-                            <p className="text-sm text-gray-600 dark:text-white/60">{channel.desc || "En direct du Cameroun"}</p>
-                        </div>
-                    </div>
-                    <div className="hidden sm:block">
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600/10 text-red-500 border border-red-600/20 text-sm font-semibold">
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                            LIVE
-                        </span>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

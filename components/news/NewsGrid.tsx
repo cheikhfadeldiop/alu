@@ -13,6 +13,8 @@ interface NewsGridProps {
     title2?: string;
 }
 
+import { useTranslations } from "next-intl";
+
 export function NewsGrid({
     items,
     loadingMore,
@@ -21,6 +23,7 @@ export function NewsGrid({
     title = "plus d'",
     title2 = "ACTUELLES",
 }: NewsGridProps) {
+    const t = useTranslations("common");
     // Helper to get image URL (duplicated from page for autonomy, or could be moved to utils)
     const getImageUrl = (post: WordPressPost) => {
         return post.acan_image_url ||
@@ -52,13 +55,13 @@ export function NewsGrid({
                     <button
                         onClick={onLoadMore}
                         disabled={loadingMore}
-                        className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
+                        className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-[color:var(--accent)] transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
                     >
-                        <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-red-600 transition-colors">
-                            {loadingMore ? "Chargement..." : "Charger +"}
+                        <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
+                            {loadingMore ? t("loading") : t("loadMore")}
                         </span>
                         {!loadingMore && (
-                            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse group-hover:scale-125 transition-transform" />
+                            <div className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse group-hover:scale-125 transition-transform" />
                         )}
                     </button>
                 </div>

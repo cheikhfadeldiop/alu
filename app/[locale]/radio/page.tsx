@@ -28,7 +28,7 @@ export default async function RadioPage() {
   return (
     <div className="crtv-page-enter space-y-10">
       <div className="flex items-center justify-between mb-2">
-        <SectionTitle title="NOS RADIOS" title2="EN DIRECT" />
+        <SectionTitle title={t("title")} title2={t("titleSuffix")} />
       </div>
 
       <RadioPageClient

@@ -5,12 +5,15 @@ import Image from "next/image";
 import Hls from "hls.js";
 import { SliderVideoItem, getRelatedItems, ensureAbsoluteUrl } from "../../services/api";
 import { Link } from "../../i18n/navigation";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { useTranslations } from "next-intl";
 
 interface ReplayPlayerProps {
     video: SliderVideoItem;
 }
 
 export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
+    const t = useTranslations("common");
     // Local copy of current video to allow internal selection if feed returns multiple items
     const [video, setVideo] = React.useState<SliderVideoItem>(initialVideo);
     const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -481,7 +484,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
     const youtubeId = resolvedUrl ? getYoutubeId(resolvedUrl) : null;
 
     return (
-        <div ref={containerRef} className="w-full overflow-hidden group/player mb-12">
+        <div ref={containerRef} className=" rounded-sm w-full overflow-hidden group/player mb-12">
             <div className="flex flex-col lg:flex-row h-auto lg:h-[720px]">
 
                 {/* Left: Video Area (75%) */}
@@ -512,33 +515,33 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
 
                         {error && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 text-center px-12 z-10 bg-black">
-                                <div className="w-20 h-20 rounded-full bg-red-600/10 flex items-center justify-center border border-red-600/20">
-                                    <svg className="w-10 h-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <div className="w-20 h-20 rounded-full bg-[color:var(--accent)]/10 flex items-center justify-center border border-[color:var(--accent)]/20">
+                                    <svg className="w-10 h-10 text-[color:var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Flux indisponible</h3>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">{t("previewUnavailable")}</h3>
                                     <p className="text-sm text-white/40 max-w-sm mx-auto leading-relaxed">
-                                        {error || "Nous ne parvenons pas à charger cette vidéo. Vérifiez votre connexion ou réessayez l'émission."}
+                                        {error || SITE_CONFIG.strings.unavailabilityMsg}
                                     </p>
                                 </div>
-                                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20">Réessayer</button>
+                                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[color:var(--accent)] hover:brightness-90 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[color:var(--accent)]/20">{t("retry")}</button>
                             </div>
                         )}
 
                         {isResolving && !error && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 z-20 bg-black">
                                 <div className="relative">
-                                    <div className="w-16 h-16 border-4 border-red-600/20 rounded-full" />
-                                    <div className="absolute inset-0 w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                    <div className="w-16 h-16 border-4 border-[color:var(--accent)]/20 rounded-full" />
+                                    <div className="absolute inset-0 w-16 h-16 border-4 border-[color:var(--accent)] border-t-transparent rounded-full animate-spin" />
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-red-600 animate-pulse">Chargement en cours...</span>
+                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[color:var(--accent)] animate-pulse">{t("loading")}</span>
                             </div>
                         )}
 
                         {/* Center Play Overlay - Hidden for YouTube */}
                         {!isPlaying && !error && !isResolving && !youtubeId && (
                             <button onClick={togglePlay} className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/20 transition-all group/play z-20">
-                                <div className="w-20 h-20 rounded-full bg-white/5 backdrop-blur-3xl border border-white/20 flex items-center justify-center group-hover/play:scale-110 group-hover/play:bg-red-600 group-hover/play:border-red-500 transition-all duration-700 shadow-[0_0_50px_rgba(220,38,38,0.3)]">
+                                <div className="w-20 h-20 rounded-full bg-white/5 backdrop-blur-3xl border border-white/20 flex items-center justify-center group-hover/play:scale-110 group-hover/play:bg-[color:var(--accent)] group-hover/play:border-[color:var(--accent)] transition-all duration-700 shadow-[0_0_50px_rgba(209,18,31,0.3)]">
                                     <svg className="w-12 h-12 text-white ml-2 drop-shadow-2xl" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                 </div>
                             </button>
@@ -572,7 +575,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         className="absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer"
                                     />
                                     <div
-                                        className="h-full bg-red-600 relative transition-all duration-150 z-10"
+                                        className="h-full bg-[color:var(--accent)] relative transition-all duration-150 z-10"
                                         style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
                                     >
                                         <div className="absolute right-0 top-0 h-full w-10 bg-white/20 blur-sm animate-pulse" />

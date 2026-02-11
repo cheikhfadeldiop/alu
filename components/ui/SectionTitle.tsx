@@ -1,7 +1,7 @@
 import * as React from "react";
-
 import { Link } from "../../i18n/navigation";
 import Image from "next/image";
+import { SITE_CONFIG } from "@/constants/site-config";
 
 export function SectionTitle({
   title,
@@ -10,6 +10,7 @@ export function SectionTitle({
   actionHref,
   actionIcon = true,
   uppercase = true,
+  className,
 }: {
   title: string;
   title2?: string;
@@ -17,34 +18,35 @@ export function SectionTitle({
   actionHref?: string;
   actionIcon?: boolean;
   uppercase?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 pb-6 ">
+    <div className={`flex items-center gap-3 pb-6 ${className}`}>
       <h2
         className={
           uppercase
-            ? "text-sm tracking-widest text-foreground sm:text-base"
-            : "text-base font-semibold tracking-wide text-foreground"
+            ? "text-sm tracking-widest text-foreground sm:text-base " + className
+            : "text-base font-semibold tracking-wide text-foreground " + className
         }
       >
         {uppercase ? title.toUpperCase() : title}
       </h2>
       <h1 className={
         uppercase
-          ? "text-sm font-bold tracking-widest text-red-600 sm:text-base"
+          ? "text-sm font-bold tracking-widest text-[color:var(--accent)] sm:text-base"
           : "text-base font-semibold tracking-wide text-foreground"
       }
       >
         {title2}</h1>
       {actionIcon && title ? (
         <Link
-          href={actionHref}
+          href={actionHref || "#"}
           className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--muted)] hover:text-foreground"
         >
           {actionLabel}
           <div className="text-gray-400">
             <Image
-              src="/assets/placeholders/arrow2.png"
+              src={SITE_CONFIG.theme.placeholders.arrow}
               alt=""
               width={24}
               height={24}

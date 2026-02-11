@@ -10,7 +10,11 @@ interface EditorialChoiceProps {
     actionLabel?: string;
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+import { useTranslations } from "next-intl";
+
 export function EditorialChoice({ items, title, title2, actionLabel }: EditorialChoiceProps) {
+    const t = useTranslations("common");
     if (!items || items.length === 0) return null;
 
     // Use only the latest 7 items as requested
@@ -32,7 +36,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
             <div className="flex items-center justify-between">
                 <SectionTitle title={title} title2={title2} actionHref={'/news'} />
                 <Link href="/news" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 underline decoration-gray-300 underline-offset-4">
-                    Voir plus
+                    {t("seeMore")}
                 </Link>
             </div>
 
@@ -50,8 +54,8 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                             </p>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
                                 <span>{formatDate(featuredItem.date)}</span>
-                                <span className="w-1 h-1 bg-green-500 rounded-full" />
-                                <span>La rédaction</span>
+                                <span className="w-1 h-1 bg-[color:var(--success)] rounded-full" />
+                                <span>{SITE_CONFIG.strings.editorialTeam}</span>
                             </div>
                         </Link>
                     )}
@@ -60,9 +64,9 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                 {/* 40% Middle: Image of Item 0 */}
                 <div className="lg:col-span-4 relative group">
                     {featuredItem && (
-                        <Link href={`/news/${featuredItem.id}`} className="block relative aspect-video  overflow-hidden bg-gray-100">
+                        <Link href={`/news/${featuredItem.id}`} className="block relative aspect-video  overflow-hidden bg-white/5">
                             <Image
-                                src={featuredItem.acan_image_url || "/assets/placeholders/news_wide.png"}
+                                src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={featuredItem.title.rendered}
                                 fill
                                 sizes="(max-width: 1024px) 100vw, 40vw"
@@ -87,13 +91,13 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                                 </h3>
                                 <div className="flex items-center gap-2 text-[10px] text-gray-500">
                                     <span>{formatDate(item.date)}</span>
-                                    <span className="w-1 h-1 bg-green-500 rounded-full" />
-                                    <span>La rédaction</span>
+                                    <span className="w-1 h-1 bg-[color:var(--success)] rounded-full" />
+                                    <span>{SITE_CONFIG.strings.editorialTeam}</span>
                                 </div>
                             </div>
-                            <div className="relative w-24 h-24 flex-shrink-0  overflow-hidden bg-gray-100">
+                            <div className="relative w-24 h-24 flex-shrink-0  overflow-hidden bg-white/5">
                                 <Image
-                                    src={item.acan_image_url || "/assets/placeholders/article_list.png"}
+                                    src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                     alt={item.title.rendered}
                                     fill
                                     sizes="96px"
@@ -111,9 +115,9 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
             ">
                 {gridItems.map((item) => (
                     <Link key={item.id} href={`/news/${item.id}`} className="group block space-y-3">
-                        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                        <div className="relative aspect-[16/10] overflow-hidden bg-white/5">
                             <Image
-                                src={item.acan_image_url || "/assets/placeholders/article_list.png"}
+                                src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={item.title.rendered}
                                 fill
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -125,8 +129,8 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                         </h4>
                         <div className="flex items-center gap-2 text-[10px] text-gray-500">
                             <span>{formatDate(item.date)}</span>
-                            <span className="w-1 h-1 bg-green-500 rounded-full" />
-                            <span>La rédaction</span>
+                            <span className="w-1 h-1 bg-[color:var(--success)] rounded-full" />
+                            <span>{SITE_CONFIG.strings.editorialTeam}</span>
                         </div>
                     </Link>
                 ))}

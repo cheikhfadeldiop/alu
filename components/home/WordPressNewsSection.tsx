@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
 
 interface WordPressNewsSectionProps {
@@ -12,34 +13,32 @@ interface WordPressNewsSectionProps {
 
 type TabType = "alaune" | "trending";
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNewsSectionProps) {
+    const t = useTranslations("pages.home");
+    const tn = useTranslations("pages.news");
     const [activeTab, setActiveTab] = useState<TabType>("alaune");
 
     const currentItems = activeTab === "alaune" ? alauneItems : trendingItems;
     const featuredItem = currentItems[0];
-    const listItems = currentItems.slice(1); // Display all remaining articles (up to 19)
+    const listItems = currentItems.slice(1);
 
-    // Helper function to get image URL from WordPress post
     const getImageUrl = (post: WordPressPost): string => {
-        if (post.acan_image_url) {
-            return post.acan_image_url;
-        }
+        if (post.acan_image_url) return post.acan_image_url;
         if (post._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
             return post._embedded['wp:featuredmedia'][0].source_url;
         }
-        return "/assets/placeholders/actu_regional_469x246.png";
+        return SITE_CONFIG.theme.placeholders.news;
     };
 
-    // Helper function to strip HTML tags from excerpt
     const stripHtml = (html: string): string => {
         return html.replace(/<[^>]*>/g, '').replace(/&hellip;/g, '...');
     };
 
     return (
         <section className="w-full">
-            {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-surface/50 backdrop-blur-sm rounded-lg ">
-                {/* Left Side - Featured Article */}
                 <div className="w-full col-span-2">
                     {featuredItem && (
                         <Link
@@ -48,7 +47,6 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                             rel="noopener noreferrer"
                             className="group relative block w-full h-[520px] rounded-lg overflow-hidden"
                         >
-                            {/* Image */}
                             <div className="absolute inset-0">
                                 <Image
                                     src={getImageUrl(featuredItem)}
@@ -58,16 +56,11 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                     className="object-cover"
                                 />
                             </div>
-
-                            {/* Dark gradient overlay */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                            {/* Content */}
                             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                                 <h2 className="text-xl font-bold leading-tight mb-3 group-hover:underline">
                                     {featuredItem.title.rendered}
                                 </h2>
-
                                 <div className="flex items-center gap-3 text-sm text-white/90">
                                     <span>
                                         {new Date(featuredItem.date).toLocaleDateString("fr-FR", {
@@ -76,17 +69,15 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                             year: "numeric"
                                         })}
                                     </span>
-                                    <span className="w-1 h-1 rounded-full bg-green-500"></span>
-                                    <span>La rédaction</span>
+                                    <span className="w-1 h-1 rounded-full bg-[color:var(--success)]"></span>
+                                    <span>{SITE_CONFIG.strings.editorialTeam}</span>
                                 </div>
                             </div>
                         </Link>
                     )}
                 </div>
 
-                {/* Right Side - Tabs + Articles List */}
                 <div className="w-full border rounded-lg p-2 border-muted/20 pl-4">
-                    {/* Tabs Container - Rectangular Frame */}
                     <div className="bg-surface w-full rounded-lg p-1 justify-between inline-flex mb-4">
                         <button
                             onClick={() => setActiveTab("alaune")}
@@ -95,7 +86,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                                 }`}
                         >
-                            À la une
+                            {t("hero")}
                         </button>
                         <button
                             onClick={() => setActiveTab("trending")}
@@ -104,19 +95,17 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                                 }`}
                         >
-                            Trending news
+                            {tn("trending")}
                         </button>
                     </div>
 
-                    {/* Articles List - Scrollable with visible indicator */}
                     <div className="h-[440px]  overflow-y-auto pr-2 space-y-2 
                     scrollbar-thin 
                         [&::-webkit-scrollbar]:w-1 
                         [&::-webkit-scrollbar-track]:bg-transparent 
-                        [&::-webkit-scrollbar-thumb]:bg-red-600 
+                        [&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)] 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
-                        hover:[&::-webkit-scrollbar-thumb]:bg-red-400
-                       
+                        hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]
                     ">
                         {listItems.map((item) => (
                             <Link
@@ -128,7 +117,6 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 border-b dark:border-muted/30
                                 "
                             >
-                                {/* Thumbnail */}
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
                                     <Image
                                         src={getImageUrl(item)}
@@ -138,13 +126,10 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                         className="object-cover"
                                     />
                                 </div>
-
-                                {/* Content */}
                                 <div className="flex-1 min-w-0 space-x-2">
                                     <h3 className="text-sm font-semibold leading-snug line-clamp-3 group-hover:underline mb-2">
                                         {item.title.rendered}
                                     </h3>
-
                                     <div className="flex items-center gap-5 text-xs text-gray-500 dark:text-gray-400">
                                         <span>
                                             {new Date(item.date).toLocaleDateString("fr-FR", {
@@ -153,17 +138,13 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                                 year: "numeric"
                                             })}
                                         </span>
-                                        <span className="w-1 h-1 rounded-full bg-green-500"></span>
-                                        <span>La rédaction</span>
+                                        <span className="w-1 h-1 rounded-full bg-[color:var(--success)]"></span>
+                                        <span>{SITE_CONFIG.strings.editorialTeam}</span>
                                     </div>
                                 </div>
-                                
                             </Link>
-                            
                         ))}
-                        
                     </div>
-                    
                 </div>
             </div>
         </section>

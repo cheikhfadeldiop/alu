@@ -7,11 +7,14 @@ import { ShowReplayGroup, SliderVideoItem } from "../../services/api";
 import { getRelatedItems } from "../../services/api";
 import { SectionTitle } from "../ui/SectionTitle";
 
+import { useTranslations } from "next-intl";
+
 interface CrossedNavigationSectionProps {
     data: ShowReplayGroup[];
 }
 
 export function CrossedNavigationSection({ data: initialData }: CrossedNavigationSectionProps) {
+    const t = useTranslations("common");
     // Start at a large number to allow infinite scrolling in both directions
     const [virtualIndex, setVirtualIndex] = React.useState(1000);
     const [shows, setShows] = React.useState<ShowReplayGroup[]>(initialData);
@@ -201,7 +204,7 @@ export function CrossedNavigationSection({ data: initialData }: CrossedNavigatio
     return (
         <section className="w-full max-w-[1400px] mx-auto px-4 py-8 overflow-hidden">
             <div className="flex items-center justify-between" style={{ marginBottom: `${32 * scale}px` }}>
-                <SectionTitle title="Archives" title2="des Émissions" />
+                <SectionTitle title={t("archives")} title2={t("shows")} />
             </div>
 
             <div
@@ -253,7 +256,7 @@ export function CrossedNavigationSection({ data: initialData }: CrossedNavigatio
                                                 <div className="rounded-full border-2 border-red-600 border-t-transparent animate-spin"
                                                     style={{ width: `${24 * scale}px`, height: `${24 * scale}px` }} />
                                                 <span className="uppercase font-black tracking-widest text-red-600"
-                                                    style={{ fontSize: `${8 * scale}px` }}>Chargement</span>
+                                                    style={{ fontSize: `${8 * scale}px` }}>{t("loading")}</span>
                                             </div>
                                         )}
                                     </div>
@@ -293,7 +296,7 @@ export function CrossedNavigationSection({ data: initialData }: CrossedNavigatio
                         </div>
 
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-red-600 rounded-full font-black text-white uppercase tracking-widest shadow-lg whitespace-nowrap"
-                            style={{ fontSize: `${8 * scale}px` }}>CONTROLS</div>
+                            style={{ fontSize: `${8 * scale}px` }}>{t("controls")}</div>
                     </div>
 
                     <div className="flex flex-col items-center transition-all duration-700" style={{ gap: `${8 * scale}px` }}>
@@ -337,6 +340,7 @@ function NavButton({ direction, onClick, scale }: { direction: 'up' | 'down' | '
 }
 
 function VideoItem({ video, scale, width }: { video: SliderVideoItem, scale: number, width: string }) {
+    const t = useTranslations("common");
     const initialImage = video.logo_url && video.logo_url !== "null" ? video.logo_url : video.logo;
     const [imgSrc, setImgSrc] = React.useState(initialImage);
 
@@ -362,7 +366,7 @@ function VideoItem({ video, scale, width }: { video: SliderVideoItem, scale: num
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 italic uppercase tracking-widest font-bold text-center"
                         style={{ fontSize: `${8 * scale}px`, padding: `${8 * scale}px` }}>
-                        Aperçu non disponible
+                        {t("previewUnavailable")}
                         <Image src="/assets/logo/logo.png" alt="Fallback" fill className="object-cover opacity-20" />
                     </div>
                 )}
@@ -385,9 +389,9 @@ function VideoItem({ video, scale, width }: { video: SliderVideoItem, scale: num
                 </h4>
                 <div className="flex items-center font-black text-foreground/30 uppercase tracking-widest group-hover:text-foreground/50 transition-colors"
                     style={{ gap: `${6 * scale}px`, fontSize: `${7 * scale}px` }}>
-                    <span className="text-red-600">Replay</span>
+                    <span className="text-red-600">{t("replayTag")}</span>
                     <span className="rounded-full bg-foreground/20" style={{ width: `${3 * scale}px`, height: `${3 * scale}px` }} />
-                    <span className="line-clamp-1">{video.desc || "CRTV Archive"}</span>
+                    <span className="line-clamp-1">{video.desc || `CRTV ${t("archives")}`}</span>
                 </div>
             </div>
         </Link>

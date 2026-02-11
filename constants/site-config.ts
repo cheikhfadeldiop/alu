@@ -1,0 +1,98 @@
+/**
+ * CRTV Site Configuration - MASTER CONFIGURATION FILE
+ * Centralized constants, URLs, colors, strings, and assets for the entire application.
+ * All hardcoded values should be pulled from here.
+ */
+
+export const SITE_CONFIG = {
+    // Brand Basics
+    name: "CRTV",
+    officialName: "Cameroon Radio Television",
+    tagline: "L'organisme public camerounais de radio-télévision",
+    description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun. Elle comprend : 03 chaînes de télévision : CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
+
+    // URL & API Configurations
+    api: {
+        baseUrl: 'https://tveapi.acan.group/myapiv2',
+        wordpressBaseUrl: 'https://actu.rts.sn/wp-json/wp/v2',
+        appId: 'larts',
+        revalidateTime: 60, // Cache revalidation in seconds
+    },
+
+    // Social Media Links (DIRECT)
+    social: {
+        facebook: 'https://www.facebook.com/CRTVweb/?locale=fr_FR',
+        youtube: 'https://www.youtube.com/@Crtvweb',
+        twitter: 'https://x.com/CRTV_web?lang=fr',
+        instagram: 'https://www.instagram.com/crtvweb/?hl=fr',
+        tiktok: 'https://www.tiktok.com/@crtvweb?lang=fr',
+        linkedin: 'https://cm.linkedin.com/company/crtv-cameroon-radio-television',
+    },
+
+    // Store & Application Links
+    apps: {
+        googlePlay: '#',
+        appleStore: '#',
+    },
+
+    // Contact & Logistics
+    contact: {
+        address: 'MBALLA II, Yaoundé, Cameroun.',
+        phones: [
+            '(+237) 222 214 088',
+            '(+237) 222 214 047'
+        ],
+        email: 'contact@crtv.cm',
+        map: {
+            latitude: 3.866667,
+            longitude: 11.516667,
+            zoom: 13
+        }
+    },
+
+    // Design System (Synced with globals.css)
+    theme: {
+        colors: {
+            primary: '#d1121f', // Red-600/Accent
+            secondary: '#009e49', // Green-500 (Flag)
+            tertiary: '#fcd116', // Yellow (Flag)
+            success: '#22c55e',
+            error: '#dc2626',
+            warning: '#f59e0b',
+        },
+        placeholders: {
+            news: "/assets/placeholders/actu_regional_469x246.png",
+            video: "/assets/placeholders/live_tv_frame.png",
+            avatar: "/assets/placeholders/presentateur_336x442.png",
+            arrow: "/assets/placeholders/arrow2.png",
+            radio: "/assets/placeholders/radio_icon_sur_card.png",
+            logo: "/assets/logo/logo.png",
+        }
+    },
+
+    // Content Organization & Logic
+    categories: {
+        news: {
+            alaune: 121,
+            trending: 141,
+            regional: 145,
+            matam: 133,
+            agriculture: 153,
+            groups: [
+                { id: "a-la-une", name: "A LA UNE", matchIds: [121], keywords: ["une", "actualit", "general"] },
+                { id: "regions", name: "RÉGIONS", matchIds: [145], keywords: ["dakar", "matam", "region", "saint-louis", "louga", "tambacounda", "diourbel", "kaolack", "fatick", "kolda", "ziguinchor", "sedhiou", "kedougou", "kaffrine"] },
+                { id: "international", name: "INTERNATIONAL", matchIds: [128], keywords: ["monde", "world", "afrique", "europe", "asie", "amerique"] },
+                { id: "societe-politique", name: "SOCIÉTÉ & POLITIQUE", matchIds: [136, 132, 151, 123, 129], keywords: ["politique", "economie", "sante", "education", "societe", "justice", "gouvernance"] },
+                { id: "loisirs-tech", name: "LOISIRS & TECH", matchIds: [125, 612, 148, 116], keywords: ["sport", "culture", "tech", "musique", "cinema", "loisirs", "variet"] },
+            ]
+        }
+    },
+
+    // Default Fallback Strings (Internationalization should be preferred, but these are system-level)
+    strings: {
+        editorialTeam: "La rédaction",
+        liveLabel: "LIVE",
+        replayLabel: "REPLAY",
+        unavailabilityMsg: "Flux indisponible pour le moment.",
+    }
+};

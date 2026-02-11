@@ -56,7 +56,7 @@ export function LiveCarousel({
                 <button
                     onClick={() => scroll('left')}
                     className="absolute left-0 top-1/2 -translate-y-1/2 z-20 
-                               bg-black/60 hover:bg-red-600 backdrop-blur-xl 
+                               bg-black/60 hover:bg-[color:var(--accent)] backdrop-blur-xl 
                                text-white w-12 h-20 flex items-center justify-center
                                border-y border-r border-white/20 transition-all duration-300
                                opacity-0 group-hover/carousel:opacity-100 shadow-[5px_0_15px_rgba(0,0,0,0.3)]"
@@ -72,7 +72,7 @@ export function LiveCarousel({
                 <button
                     onClick={() => scroll('right')}
                     className="absolute right-0 top-1/2 -translate-y-1/2 z-20 
-                               bg-black/60 hover:bg-red-600 backdrop-blur-xl 
+                               bg-black/60 hover:bg-[color:var(--accent)] backdrop-blur-xl 
                                text-white w-12 h-20 flex items-center justify-center
                                border-y border-l border-white/20 transition-all duration-300
                                opacity-0 group-hover/carousel:opacity-100 shadow-[-5px_0_15px_rgba(0,0,0,0.3)]"

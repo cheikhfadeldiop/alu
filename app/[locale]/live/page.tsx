@@ -4,17 +4,19 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
   getLiveChannels,
   getLiveRadios,
-  getEPGAll
+  getEPGAll,
+  getEPGNow
 } from "@/services/api";
 
 export default async function LivePage() {
   const t = await getTranslations("pages.live");
 
-  // Fetch Data: Live TV, Radios, and Full EPG for today
-  const [liveTVData, liveRadioData, epgAllData] = await Promise.all([
+  // Fetch Data: Live TV, Radios, Full EPG (timeline), and Current EPG (carousel)
+  const [liveTVData, liveRadioData, fullEpgData, epgNowData] = await Promise.all([
     getLiveChannels().catch(() => ({ allitems: [] })),
     getLiveRadios().catch(() => ({ allitems: [] })),
-    getEPGAll().catch(() => ({ allitems: [] })),
+    getEPGAll().catch(() => []),
+    getEPGNow().catch(() => ({ allitems: [] })),
   ]);
 
   const liveTV = liveTVData.allitems || [];
@@ -22,17 +24,19 @@ export default async function LivePage() {
 
   // Combine all channels
   const allChannels = [...liveTV, ...liveRadios];
-  const epgItems = epgAllData.allitems || [];
+  const fullEpg = fullEpgData || [];
+  const epgNowItems = epgNowData.allitems || [];
 
   return (
     <div className="crtv-page-enter space-y-10">
       <div className="flex items-center justify-between mb-2">
-        <SectionTitle title="NOS CHAÎNES" title2="EN DIRECT" />
+        <SectionTitle title={t("title")} title2={t("titleSuffix")} />
       </div>
 
       <LivePageClient
         initialChannels={allChannels}
-        epgData={epgItems}
+        epgData={epgNowItems}
+        fullEpg={fullEpg}
       />
     </div>
   );

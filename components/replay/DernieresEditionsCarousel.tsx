@@ -5,12 +5,14 @@ import { SliderVideoItem } from "../../types/api";
 import { MediaCard } from "../ui/MediaCard";
 import { SectionTitle } from "../ui/SectionTitle";
 import { useReplayFetcher } from "../../hooks/useReplayFetcher";
+import { useTranslations } from "next-intl";
 
 interface DernieresEditionsCarouselProps {
     videos: SliderVideoItem[];
 }
 
 export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels = [] }: { videos: SliderVideoItem[], liveChannels?: import("../../types/api").LiveChannel[] }) {
+    const t = useTranslations();
     const scrollerRef = React.useRef<HTMLDivElement | null>(null);
     const [activeIndex, setActiveIndex] = React.useState(0);
     const [isPaused, setIsPaused] = React.useState(false);
@@ -86,8 +88,8 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
         >
             <div className="max-w-[1400px] mx-auto px-4">
                 <SectionTitle
-                    title="Dernieres"
-                    title2="Editions"
+                    title={t("pages.replay.latest")}
+                    title2={t("pages.replay.editions")}
                     actionIcon={true}
                 />
             </div>
@@ -96,14 +98,14 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                 {/* Navigation Buttons */}
                 <button
                     onClick={() => scrollBy('left')}
-                    className="absolute left-6 top-[35%] -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 hover:scale-110"
+                    className="absolute left-6 top-[35%] -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-[color:var(--accent)] hover:scale-110"
                     aria-label="Previous"
                 >
                     <span className="text-2xl text-white">‹</span>
                 </button>
                 <button
                     onClick={() => scrollBy('right')}
-                    className="absolute right-6 top-[35%] -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 hover:scale-110"
+                    className="absolute right-6 top-[35%] -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-[color:var(--accent)] hover:scale-110"
                     aria-label="Next"
                 >
                     <span className="text-2xl text-white">›</span>
@@ -141,7 +143,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                 <div className="flex justify-center mt-8">
                     <div className="w-1/5 min-w-[150px] h-[2px] bg-foreground/10 relative rounded-full overflow-hidden">
                         <div
-                            className="absolute top-0 left-0 h-full bg-red-600 transition-all duration-150 rounded-full"
+                            className="absolute top-0 left-0 h-full bg-[color:var(--accent)] transition-all duration-150 rounded-full"
                             style={{
                                 left: `${scrollProgress * 80}%`, // Moves within the 80% remaining space
                                 width: '20%'

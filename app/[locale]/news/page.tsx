@@ -11,6 +11,7 @@ import { getWordPressPosts, getAllChannelReplays } from "../../../services/api";
 import { WordPressPost, SliderVideoItem } from "../../../types/api";
 
 export default function NewsPage() {
+  const t = useTranslations("pages.news");
   const [articles, setArticles] = useState<WordPressPost[]>([]);
   const [replays, setReplays] = useState<SliderVideoItem[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | number>("");
@@ -97,7 +98,7 @@ export default function NewsPage() {
             <div className="absolute inset-0 rounded-full border-4 border-red-600 border-t-transparent animate-spin" />
           </div>
           <p className="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">
-            Chargement de l'actualité...
+            {t("loadingNews")}
           </p>
         </div>
       ) : (
@@ -111,8 +112,8 @@ export default function NewsPage() {
             loadingMore={loadingMore}
             hasMore={hasMore}
             onLoadMore={handleLoadMore}
-            title="plus d'"
-            title2="ACTUALITES"
+            title={t("moreOf")}
+            title2={t("newsTitle")}
           />
 
           {/* Replay Section */}
@@ -122,7 +123,7 @@ export default function NewsPage() {
             <div className="py-24 text-center space-y-6">
               <div className="text-6xl opacity-10">📰</div>
               <p className="text-xl font-medium text-gray-400 max-w-md mx-auto">
-                Aucun article trouvé dans cette catégorie pour le moment. Nous revenons bientôt avec plus d'actu !
+                {t("noArticles")}
               </p>
             </div>
           )}
