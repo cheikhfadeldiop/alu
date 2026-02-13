@@ -50,7 +50,10 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
                 {/* 30% Left: Metadata (Larger scale) */}
 
                 <div className="lg:col-span-3  flex flex-col justify-between space-y-8 order-2 lg:order-1 px-2">
-                    <Link href={primaryItem.link} className="group block space-y-5">
+                    <Link href={primaryItem.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block space-y-5">
                         <h1 className="text-2xl lg:text-4xl line-clamp-5  font-black leading-[1.05] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300">
                             {decodeHtmlEntities(primaryItem.title.rendered)}
                         </h1>
@@ -67,7 +70,10 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
 
                 {/* 40% Middle: Hero Image */}
                 <div className="lg:col-span-4 relative order-1 lg:order-2">
-                    <Link href={primaryItem.link} className="block relative h-full min-h-[400px] overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5 rounded-sm">
+                    <Link href={primaryItem.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block relative h-full min-h-[400px] overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5 rounded-sm">
                         <Image
                             src={primaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                             alt={primaryItem.title.rendered}
@@ -83,7 +89,10 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
                 {/* 30% Right: Vertical Feature (Strict 60% Image height) */}
                 <div className="lg:col-span-3 order-3 h-full">
                     {secondaryItem ? (
-                        <Link href={secondaryItem.link} className="group flex flex-col h-full bg-surface-2/50 dark:bg-surface-2/10 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-white/10 rounded-sm">
+                        <Link href={secondaryItem.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex flex-col h-full bg-surface-2/50 dark:bg-surface-2/10 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-white/10 rounded-sm">
                             <div className="relative h-[60%] w-full overflow-hidden">
                                 <Image
                                     src={secondaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}

@@ -61,9 +61,10 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                             className="group relative flex flex-col w-[280px] sm:w-[300px] h-[220px] 
                                 overflow-hidden rounded-xl 
                                 bg-background/30 backdrop-blur-sm text-left transition-all duration-300 
-                               "
+                                hover:scale-[1.02] transition-all                               "
                         >
-                            <div className="relative h-[65%] w-full">
+                            <div className="relative h-[65%] w-full
+                            ">
                                 <Image
                                     src={channel.logo_url || channel.logo || SITE_CONFIG.theme.placeholders.video}
                                     alt={channel.title}

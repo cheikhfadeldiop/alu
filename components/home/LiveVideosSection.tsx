@@ -37,7 +37,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                     </button>
                 </div>
                 <Link
-                    href="/live"
+                    href={`/replay`}
                     className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 underline"
                 >
                     {tc("seeMore")}
@@ -50,8 +50,9 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                 <div className="w-full lg:w-3/5 pb-6">
                     {featuredVideo && (
                         <Link
-                            href={featuredVideo.video_url || '#'}
-                            className="group relative block w-full overflow-hidden "
+                            href={`/replay/${featuredVideo.slug}`}
+                            className="group relative block w-full overflow-hidden 
+                            hover:scale-[1.02] transition-all   "
                         >
                             {/* Image Container */}
                             <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
@@ -114,12 +115,14 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                         [&::-webkit-scrollbar-track]:bg-transparent 
                         [&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)] 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
-                        hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]">
+                        hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]
+                        ">
                         {listVideos.map((video, index) => (
                             <Link
                                 key={`${video.slug}-${index}`}
-                                href={video.video_url || '#'}
-                                className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full"
+                                href={`/replay/${video.slug}`}
+                                className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full
+                                hover:scale-[1.02] transition-all "
                             >
                                 {/* Thumbnail with overlays */}
                                 <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-white/5">
@@ -161,7 +164,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 {/* Content - Right Side */}
                                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                                     {/* Time */}
-                                    <div className="text-xs text-gray-500 dark:text-[color:var(--accent)] mb-1">
+                                    <div className="text-xs text-gray-500  mb-1">
                                         {video.time}
                                     </div>
 

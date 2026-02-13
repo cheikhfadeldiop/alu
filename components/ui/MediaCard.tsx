@@ -13,6 +13,7 @@ export type MediaCardProps = {
   showPlayIcon?: boolean;
   aspect?: "16/9" | "4/3" | "1/1" | "469/246";
   channelLogo?: string;
+  target?: boolean;
 };
 
 function aspectClass(aspect: MediaCardProps["aspect"]) {
@@ -59,6 +60,7 @@ export function MediaCard({
   showPlayIcon = false,
   aspect = "16/9",
   channelLogo,
+  target = true,
 }: MediaCardProps) {
   const [imgSrc, setImgSrc] = React.useState(imageSrc);
 
@@ -69,6 +71,8 @@ export function MediaCard({
   return (
     <Link
       href={href}
+      target={target ? "_blank" : "_self"}
+      rel="noopener noreferrer"
       className="group block overflow-hidden  bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 "
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>

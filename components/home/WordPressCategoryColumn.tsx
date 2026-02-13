@@ -30,7 +30,8 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
     return (
         <div className="space-y-2">
             {/* Header */}
-            <SectionTitle title={title} title2={title2} actionHref={`/news/${categorySlug}`} />
+            <SectionTitle title={title} title2={title2} actionHref={`/news`}
+            />
 
             {/* Featured Item */}
             {featuredItem && !enter && (

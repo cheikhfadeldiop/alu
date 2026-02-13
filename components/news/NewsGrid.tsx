@@ -41,6 +41,7 @@ export function NewsGrid({
                     <MediaCard
                         key={a.id}
                         href={a.link}
+                        target={true}
                         title={decodeHtmlEntities(a.title.rendered)}
                         imageSrc={getImageUrl(a)}
                         meta={`${new Date(a.date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })}`}

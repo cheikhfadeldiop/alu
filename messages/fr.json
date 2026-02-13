@@ -22,7 +22,7 @@
     "resources": "Ressources",
     "commitments": "Nos engagements",
     "other": "Autres",
-    "description": "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun. Elle comprend 03 chaînes de télévision : CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
+    "description": "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
     "links": {
       "about": "À propos",
       "crtvCameroon": "CRTV Cameroun",
@@ -213,6 +213,25 @@
         "subject": "Sujet",
         "message": "Quel est votre message ?"
       }
+    },
+    "info": {
+      "dataProtection": "Protection des données",
+      "privacyHero": "Respect de la Vie Privée",
+      "dataQuestion": "Une question sur vos données ?",
+      "dataDPO": "Notre délégué à la protection des données vous répond.",
+      "termsHero": "Conditions Générales d'Utilisation",
+      "termsRules": "Règles de plateforme",
+      "legalHero": "Mentions Légales",
+      "legalTransparency": "Transparence",
+      "legalEditor": "Éditeur du site",
+      "legalHosting": "Hébergement"
+    },
+    "about": {
+      "titlePart1": "Notre",
+      "titlePart2": "Histoire",
+      "intro": "Découvrez le parcours de la Cameroon Radio Television, pilier de l'audiovisuel au Cameroun.",
+      "commitmentTitle": "Engagement Public",
+      "commitmentDesc": "Depuis 1963, nous œuvrons pour l'éducation, l'information et le divertissement de tous les citoyens."
     }
   }
 }

@@ -72,6 +72,8 @@ function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
 }
 
 import { SITE_CONFIG } from "@/constants/site-config";
+import { Link } from "@/i18n/navigation";
+
 
 export function Footer() {
   const t = useTranslations();
@@ -190,25 +192,26 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.about")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/about" className="hover:text-foreground">
                   {t("footer.links.about")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/about" className="hover:text-foreground">
                   {t("footer.links.crtvCameroon")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/contact" className="hover:text-foreground">
                   {t("footer.links.helpCenters")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/contact" className="hover:text-foreground">
                   {t("footer.links.contact")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -216,25 +219,26 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.resources")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/live" className="hover:text-foreground">
                   {t("footer.links.tv")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/news" className="hover:text-foreground">
                   {t("footer.links.news")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/radio" className="hover:text-foreground">
                   {t("footer.links.radio")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/replay" className="hover:text-foreground">
                   {t("footer.links.replay")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -244,20 +248,22 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/commitments" className="hover:text-foreground">
                   {t("footer.links.quality")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/terms" className="hover:text-foreground">
                   {t("footer.links.terms")}
-                </a>
+                </Link>
               </li>
+
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/privacy" className="hover:text-foreground">
                   {t("footer.links.data")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -265,15 +271,16 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.other")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/legal" className="hover:text-foreground">
                   {t("footer.links.legal")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/advertising" className="hover:text-foreground">
                   {t("footer.links.ads")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
         </div>

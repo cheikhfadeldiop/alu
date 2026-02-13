@@ -129,6 +129,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                             <MediaCard
                                 href={`/replay/${video.slug}`}
                                 title={video.title}
+                                target={false}
                                 imageSrc={video.logo_url}
                                 meta={`${video.date} • ${video.time || 'Replay'}`}
                                 aspect="16/9"

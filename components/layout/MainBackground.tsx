@@ -19,9 +19,10 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
       {showPattern ? (
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-0"
+          className="pointer-events-none fixed inset-0 z-0
+          "
           style={{
-            backgroundImage: "url('/assets/rouleau.png')",
+            backgroundImage: "url('/assets/flags/b0.png')",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "top center",
             backgroundSize: "100% auto",
@@ -29,7 +30,7 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
         />
       ) : null}
 
-      <main className="relative z-10 py-10">
+      <main className="relative z-10 py-10 bg-background/5 backdrop-blur-xs">
         <PageContainer>{children}</PageContainer>
       </main>
     </div>

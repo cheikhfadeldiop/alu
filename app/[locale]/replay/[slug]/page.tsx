@@ -1,16 +1,23 @@
-import { findReplayBySlug } from "../../../../services/api";
-import { ReplayPlayerWrapper } from "../../../../components/replay/ReplayPlayerWrapper";
+import { Suspense } from "react";
+import { findReplayBySlug } from "@/services/api";
+import { ReplayPlayerWrapper } from "@/components/replay/ReplayPlayerWrapper";
+import { ReplayPlayerShimmer } from "@/components/ui/shimmer/ReplayShimmers";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
+async function ReplayContent({ slug }: { slug: string }) {
+    const selectedVideo = (await findReplayBySlug(slug)) || undefined;
+    return <ReplayPlayerWrapper video={selectedVideo} />;
+}
+
 export default async function ReplaySlugPage({ params }: PageProps) {
     const { slug } = await params;
 
-    // We fetch the video data. Since it's likely cached in fetch(), 
-    // it will be extremely fast if already visited or pre-fetched.
-    const selectedVideo = (await findReplayBySlug(slug)) || undefined;
-
-    return <ReplayPlayerWrapper video={selectedVideo} />;
+    return (
+        <Suspense fallback={<ReplayPlayerShimmer />}>
+            <ReplayContent slug={slug} />
+        </Suspense>
+    );
 }

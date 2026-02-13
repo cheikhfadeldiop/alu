@@ -213,6 +213,25 @@
         "subject": "Subject",
         "message": "What is your message?"
       }
+    },
+    "info": {
+      "dataProtection": "Data protection",
+      "privacyHero": "Respect for Privacy",
+      "dataQuestion": "Any questions about your data?",
+      "dataDPO": "Our data protection officer is here to help.",
+      "termsHero": "Terms of Use",
+      "termsRules": "Platform rules",
+      "legalHero": "Legal Notice",
+      "legalTransparency": "Transparency",
+      "legalEditor": "Site Editor",
+      "legalHosting": "Hosting"
+    },
+    "about": {
+      "titlePart1": "Our",
+      "titlePart2": "History",
+      "intro": "Discover the journey of Cameroon Radio Television, a pillar of broadcasting in Cameroon.",
+      "commitmentTitle": "Public Commitment",
+      "commitmentDesc": "Since 1963, we have been working for the education, information and entertainment of all citizens."
     }
   }
 }

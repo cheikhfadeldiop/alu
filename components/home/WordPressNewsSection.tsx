@@ -45,7 +45,8 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                             href={featuredItem.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative block w-full h-[520px] rounded-lg overflow-hidden"
+                            className="group relative block w-full h-[520px] rounded-lg overflow-hidden
+                            hover:scale-[1.02] transition-all"
                         >
                             <div className="absolute inset-0">
                                 <Image
@@ -58,7 +59,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                             </div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                                <h2 className="text-xl font-bold leading-tight mb-3 group-hover:underline">
+                                <h2 className="text-xl font-bold leading-tight mb-3 ">
                                     {featuredItem.title.rendered}
                                 </h2>
                                 <div className="flex items-center gap-3 text-sm text-white/90">
@@ -99,13 +100,14 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                         </button>
                     </div>
 
-                    <div className="h-[440px]  overflow-y-auto pr-2 space-y-2 
+                    <div className="h-[440px]  overflow-y-auto pr-2 space-y-2 px-2
                     scrollbar-thin 
                         [&::-webkit-scrollbar]:w-1 
                         [&::-webkit-scrollbar-track]:bg-transparent 
                         [&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)] 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
                         hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]
+                        
                     ">
                         {listItems.map((item) => (
                             <Link
@@ -113,8 +115,10 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 href={item.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group flex gap-4 items-start hover:bg-muted/10  p-3 rounded-lg transition-colors
+                                className="group flex gap-4 items-start hover:bg-muted/10  p-3  transition-colors
                                 border-b dark:border-muted/30
+                                hover:scale-[1.01] transition-all
+                                
                                 "
                             >
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">

@@ -275,10 +275,10 @@ export function Header() {
                   suppressHydrationWarning
                   className={[
 
-                    "relative z-10 flex h-full items-center justify-center px-2.5 text-[11px] font-medium transition-colors duration-200",
+                    "relative z-10 rounded-sm flex h-full items-center justify-center px-2.5 text-[11px] font-medium transition-colors duration-200",
                     isActive
-                      ? "text-white bg-[color:var(--accent)]"
-                      : "text-white hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100",
+                      ? "text-background bg-foreground  "
+                      : "text-white hover:bg-foreground dark:text-gray-300 dark:hover:text-background",
                   ].join(" ")}
                   onClick={() => setTheme(option.value)}
                   aria-label={option.label}

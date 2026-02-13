@@ -11,12 +11,12 @@ export const SITE_CONFIG = {
     tagline: "L'organisme public camerounais de radio-télévision",
     description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun. Elle comprend : 03 chaînes de télévision : CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
 
-    // URL & API Configurations
+    // URL & API Configurations de teste celui de larts
     api: {
         baseUrl: 'https://tveapi.acan.group/myapiv2',
         wordpressBaseUrl: 'https://actu.rts.sn/wp-json/wp/v2',
         appId: 'larts',
-        revalidateTime: 60, // Cache revalidation in seconds
+        revalidateTime: 60 * 30, // Cache revalidation 30min
     },
 
     // Social Media Links (DIRECT)

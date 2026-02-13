@@ -48,7 +48,7 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 }, // Cache for 60 seconds
+            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
         });
 
         if (!response.ok) {
@@ -68,6 +68,42 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
 export async function getAppDetails(): Promise<AppDetails> {
     return fetchAPI<AppDetails>(`/appdetails/${APP_ID}/json`);
 }
+
+export interface AppInfoResponse {
+    app_description: string;
+    app_privacy: string;
+}
+
+/**
+ * Get application info (contains both description and privacy)
+ */
+export async function getAppInfo(): Promise<AppInfoResponse> {
+    return fetchAPI<AppInfoResponse>(`/appinfo/${APP_ID}/json`);
+}
+
+/**
+ * Get application description specifically
+ */
+export async function getAppDescription(): Promise<{ app_description: string }> {
+    return fetchAPI<{ app_description: string }>(`/appinfo/${APP_ID}/description/json`);
+}
+
+/**
+ * Get application privacy policy specifically
+ */
+export async function getAppPrivacy(): Promise<{ app_privacy: string }> {
+    return fetchAPI<{ app_privacy: string }>(`/appinfo/${APP_ID}/privacy/json`);
+}
+
+/**
+ * Get application terms of use specifically
+ */
+export async function getAppTerms(): Promise<{ app_description: string }> {
+    return fetchAPI<{ app_description: string }>(`/appinfo/${APP_ID}/terms/json`);
+}
+
+
+
 
 /**
  * Get main application data structure (navigation items)
@@ -408,7 +444,7 @@ export async function getRelatedItems(url: string): Promise<SliderVideoItem[]> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 },
+            next: { revalidate: SITE_CONFIG.api.revalidateTime },
         });
 
         if (!response.ok) {
@@ -561,7 +597,7 @@ async function fetchWordPressAPI<T>(endpoint: string): Promise<T> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 }, // Cache for 60 seconds
+            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
         });
 
         if (!response.ok) {

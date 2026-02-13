@@ -3,6 +3,7 @@ import { getWordPressCategories } from "../../services/api";
 import { WordPressCategory } from "../../types/api";
 import { decodeHtmlEntities } from "../../utils/text";
 import { SITE_CONFIG } from "@/constants/site-config";
+import { TabsShimmer } from "../ui/shimmer/CommonShimmers";
 
 interface NewsTabsProps {
     onFilterChange: (categoryIds: string, categoryName: string) => void;
@@ -133,7 +134,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
     };
 
 
-    if (loading) return <div className="h-28 animate-pulse bg-muted/10 rounded-lg w-full mb-6"></div>;
+    if (loading) return <TabsShimmer />;
 
     return (
         <div className="w-full space-y-4 py-6">
