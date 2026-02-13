@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
+import { useWordPressNews } from "@/hooks/useData";
 
 interface WordPressNewsSectionProps {
     alauneItems: WordPressPost[];
@@ -14,10 +15,22 @@ interface WordPressNewsSectionProps {
 
 type TabType = "alaune" | "trending";
 
-export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNewsSectionProps) {
+export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems: initialTrending }: WordPressNewsSectionProps) {
     const t = useTranslations("pages.home");
     const tn = useTranslations("pages.news");
     const [activeTab, setActiveTab] = useState<TabType>("alaune");
+
+    // Use SWR for robust background refresh and instant cache delivery with fallback data
+    const { data: alauneItems = initialAlaune } = useWordPressNews(
+        SITE_CONFIG.categories.news.alaune,
+        20,
+        initialAlaune
+    );
+    const { data: trendingItems = initialTrending } = useWordPressNews(
+        SITE_CONFIG.categories.news.trending,
+        10,
+        initialTrending
+    );
 
     const currentItems = activeTab === "alaune" ? alauneItems : trendingItems;
     const featuredItem = currentItems[0];
@@ -33,7 +46,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
 
     return (
         <section className="w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-surface/50 backdrop-blur-sm rounded-lg ">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 rounded-lg">
                 <div className="w-full col-span-2">
                     {featuredItem && (
                         <Link

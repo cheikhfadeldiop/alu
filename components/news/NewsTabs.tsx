@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { getWordPressCategories } from "../../services/api";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { WordPressCategory } from "../../types/api";
 import { decodeHtmlEntities } from "../../utils/text";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { TabsShimmer } from "../ui/shimmer/CommonShimmers";
+import { useWordPressCategories } from "@/hooks/useData";
 
 interface NewsTabsProps {
     onFilterChange: (categoryIds: string, categoryName: string) => void;
@@ -19,10 +19,9 @@ interface VirtualParent {
 }
 
 export function NewsTabs({ onFilterChange }: NewsTabsProps) {
-    const [categories, setCategories] = useState<WordPressCategory[]>([]);
+    // Categories fetched via SWR below
     const [activeGroupId, setActiveGroupId] = useState<string>(VIRTUAL_PARENTS[0].id);
     const [activeSubId, setActiveSubId] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -61,41 +60,31 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
         return "a-la-une";
     };
 
+    // 1. Fetch Categories via SWR (Cached)
+    const { data: rawCategories = [], isLoading } = useWordPressCategories();
+
+    // 2. Filter valid categories
+    const categories = useMemo(() => {
+        return rawCategories.filter(c =>
+            c.count > 0 &&
+            c._links &&
+            c._links["wp:post_type"]
+        );
+    }, [rawCategories]);
+
     useEffect(() => {
-        const fetchAllCategories = async () => {
-            try {
-                const data = await getWordPressCategories();
-                // 1. Filter out categories with zero posts (count: 0)
-                // 2. Ensure they have post_type links as requested for validity
-                const activeData = data.filter(c =>
-                    c.count > 0 &&
-                    c._links &&
-                    c._links["wp:post_type"]
-                );
-                setCategories(activeData);
+        // Only run initial setup when categories are loaded and valid
+        if (categories.length > 0 && activeGroupId === VIRTUAL_PARENTS[0].id && !activeSubId) {
+            const firstGroup = VIRTUAL_PARENTS[0];
+            const members = categories.filter(c => getGroupForCategory(c) === firstGroup.id);
 
-                // Initial Selection: A LA UNE
-                const firstGroup = VIRTUAL_PARENTS[0];
-                const members = activeData.filter(c => getGroupForCategory(c) === firstGroup.id);
-
-                if (members.length > 0) {
-                    const firstId = members[0].id;
-                    const firstName = members[0].name;
-                    setActiveSubId(firstId);
-                    // Initial load: Only show the first specific subcategory for precision
-                    onFilterChange(`${firstId}`, firstName);
-                } else {
-                    onFilterChange(`${firstGroup.matchIds.join(",")}`, firstGroup.name);
-                }
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            } finally {
-                setLoading(false);
+            if (members.length > 0) {
+                const firstId = members[0].id;
+                setActiveSubId(firstId);
             }
-        };
-
-        fetchAllCategories();
-    }, []);
+            // No need to call onFilterChange here as NewsPage defaults to A La Une
+        }
+    }, [categories, activeGroupId, activeSubId]);
 
     const currentSubCategories = useMemo(() => {
         const group = VIRTUAL_PARENTS.find(g => g.id === activeGroupId);
@@ -134,7 +123,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
     };
 
 
-    if (loading) return <TabsShimmer />;
+    if (isLoading && categories.length === 0) return <TabsShimmer />;
 
     return (
         <div className="w-full space-y-4 py-6">

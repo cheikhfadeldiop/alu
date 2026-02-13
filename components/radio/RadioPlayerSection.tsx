@@ -13,7 +13,7 @@ interface RadioPlayerSectionProps {
 }
 
 export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSectionProps) {
-    const t = useTranslations("radioPlayer");
+    const t = useTranslations("pages.radioPlayer");
     const tCommon = useTranslations("common");
 
     const RADIO_FALLBACK_DATA: Record<string, { desc: string, presenter: string, program: string }> = {

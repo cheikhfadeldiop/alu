@@ -16,7 +16,17 @@ export const SITE_CONFIG = {
         baseUrl: 'https://tveapi.acan.group/myapiv2',
         wordpressBaseUrl: 'https://actu.rts.sn/wp-json/wp/v2',
         appId: 'larts',
-        revalidateTime: 60 * 30, // Cache revalidation 30min
+        revalidateTime: 60 * 30, // Default server-side revalidation (30min)
+
+        // Refresh Controller (Client-side cache management)
+        cache: {
+            ttl: {
+                static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
+                standard: 1000 * 60 * 10,    // 10 min (News, Replays)
+                dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
+                realtime: 1000 * 30,         // 30 sec (Live status)
+            }
+        }
     },
 
     // Social Media Links (DIRECT)

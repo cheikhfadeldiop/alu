@@ -39,7 +39,7 @@ export default function ContactPage() {
     <div className="crtv-page-enter space-y-10">
 
       {/* Hero: Header Gradient Premium */}
-      <section className="relative  overflow-hidden rounded-3xl border border-white/5 bg-background/35  backdrop-blur-3xl p-10 md:p-14 text-center group">
+      <section className="relative overflow-hidden p-10 md:p-14 text-center group">
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/5 blur-[120px] pointer-events-none group-hover:bg-red-600/10 transition-colors duration-1000" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 blur-[120px] pointer-events-none group-hover:bg-blue-600/10 transition-colors duration-1000" />
 
@@ -56,7 +56,7 @@ export default function ContactPage() {
         {/* Left Column: Coordinates & Map */}
         <section className="space-y-6">
           {/* Coordinates Card */}
-          <div className="rounded-xl border border-foreground/5 bg-background/20 backdrop-blur-2xl p-6 ">
+          <div className="p-6">
             <h3 className="text-sm font-black uppercase tracking-widest text-foreground/40 mb-6">Nos Coordonnées</h3>
 
             <div className="space-y-6">
@@ -115,7 +115,7 @@ export default function ContactPage() {
         </section>
 
         {/* Right Column: Contact Form */}
-        <section className="relative rounded-sm border border-white/5 bg-background/20 backdrop-blur-2xl p-8 md:p-10 overflow-hidden">
+        <section className="relative p-8 md:p-10 overflow-hidden border-l border-border">
           {/* Decorative corner */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 

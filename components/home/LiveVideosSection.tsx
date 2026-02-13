@@ -5,14 +5,19 @@ import Image from "next/image";
 import { SliderVideoItem } from "../../types/api";
 import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
+import { useSliderVideos } from "@/hooks/useData";
 
 interface LiveVideosSectionProps {
     videos: SliderVideoItem[];
 }
 
-export function DernieresEditions({ videos }: LiveVideosSectionProps) {
+export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionProps) {
     const t = useTranslations("pages.home");
     const tc = useTranslations("common");
+
+    // SWR Cache sync for robust management with fallback data
+    const { data: sliderRes } = useSliderVideos({ allitems: initialVideos } as any);
+    const videos = sliderRes?.allitems || initialVideos;
 
     // Ensure we have videos
     if (!videos || videos.length === 0) return null;
@@ -21,7 +26,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
     const listVideos = videos.slice(1); // Show all remaining items in the scrollable list
 
     return (
-        <section className="w-full max-w-[1400px] mx-auto bg-surface/50 backdrop-blur-sm rounded-lg p-6">
+        <section className="w-full max-w-[1400px] mx-auto p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">

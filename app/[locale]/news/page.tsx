@@ -7,84 +7,41 @@ import { NewsTabs } from "../../../components/news/NewsTabs";
 import { NewsHero } from "../../../components/news/NewsHero";
 import { NewsGrid } from "../../../components/news/NewsGrid";
 import { ReplaySection } from "../../../components/news/ReplaySection";
-import { getWordPressPosts, getAllChannelReplays } from "../../../services/api";
-import { WordPressPost, SliderVideoItem } from "../../../types/api";
+import { SliderVideoItem } from "../../../types/api";
 import { NewsHeroShimmer, NewsGridShimmer, ReplaySectionShimmer } from "@/components/ui/shimmer/NewsShimmers";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { useData, useWordPressNews } from "@/hooks/useData";
 
 export default function NewsPage() {
   const t = useTranslations("pages.news");
-  const [articles, setArticles] = useState<WordPressPost[]>([]);
-  const [replays, setReplays] = useState<SliderVideoItem[]>([]);
-  const [activeCategoryId, setActiveCategoryId] = useState<string | number>("");
+  const [activeCategoryId, setActiveCategoryId] = useState<string | number>(SITE_CONFIG.categories.news.alaune);
   const [activeCategoryName, setActiveCategoryName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(9);
+  const [visibleCount, setVisibleCount] = useState(18);
 
-  const fetchNews = async (categoryId: number | string, categoryName: string) => {
-    setLoading(true);
+  // Use SWR for primary articles - shared cache with NewsHero
+  const { data: articles = [], isLoading, isValidating } = useWordPressNews(
+    activeCategoryId,
+    visibleCount + 2 // 2 hero + grid
+  );
+
+  // Use generic useData for allchannel replays
+  const { data: replaysData, isLoading: replaysLoading } = useData<{ allitems: SliderVideoItem[] }>("sliderVideos", "standard");
+  const replays = replaysData?.allitems || [];
+
+  const fetchNews = (categoryId: number | string, categoryName: string) => {
     setActiveCategoryId(categoryId);
     setActiveCategoryName(categoryName);
-    setPage(1);
-    setVisibleCount(9);
-    try {
-      // Fetch 20 items initially (2 hero + 6 grid + 12 buffer)
-      const data = await getWordPressPosts(categoryId, 20, 1);
-      setArticles(data);
-      setHasMore(data.length === 20);
-    } catch (error) {
-      console.error("Failed to fetch news:", error);
-    } finally {
-      setLoading(false);
-    }
+    setVisibleCount(9); // Reset count on tab change
   };
 
-  const handleLoadMore = async () => {
-    const nextVisibleCount = visibleCount + 9;
-
-    // If we have enough in buffer, just show more
-    if (articles.length >= nextVisibleCount + 2) {
-      setVisibleCount(nextVisibleCount);
-      return;
-    }
-
-    // Otherwise fetch next page
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const nextPage = page + 1;
-    try {
-      const newData = await getWordPressPosts(activeCategoryId, 12, nextPage);
-      if (newData.length < 12) setHasMore(false);
-
-      setArticles((prev) => [...prev, ...newData]);
-      setPage(nextPage);
-      setVisibleCount(nextVisibleCount);
-    } catch (error) {
-      console.error("Failed to fetch more news:", error);
-    } finally {
-      setLoadingMore(false);
-    }
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 9);
   };
-
-  useEffect(() => {
-    // Initial fetch handled by NewsTabs component
-
-    // Fetch replays once on mount
-    const fetchReplays = async () => {
-      try {
-        const data = await getAllChannelReplays();
-        setReplays(data);
-      } catch (error) {
-        console.error("Failed to fetch replays:", error);
-      }
-    };
-    fetchReplays();
-  }, []);
 
   const heroItems = articles.slice(0, 2);
-  const gridItems = articles.slice(2, 5 + visibleCount);
+  const gridItems = articles.slice(2);
+
+  const mainLoading = isLoading && articles.length === 0;
 
   return (
     <div className="crtv-page-enter max-w-[1400px] mx-auto px-4 py-8 space-y-20">
@@ -93,7 +50,7 @@ export default function NewsPage() {
       </div>
 
       <div className="space-y-12">
-        {loading ? (
+        {mainLoading ? (
           <>
             <NewsHeroShimmer />
             <NewsGridShimmer />
@@ -106,8 +63,8 @@ export default function NewsPage() {
             {/* Secondary Feed - 3-Column Grid Component */}
             <NewsGrid
               items={gridItems}
-              loadingMore={loadingMore}
-              hasMore={hasMore}
+              loadingMore={isValidating && articles.length > 0}
+              hasMore={articles.length >= visibleCount + 2}
               onLoadMore={handleLoadMore}
               title={t("moreOf")}
               title2={t("newsTitle")}
@@ -116,13 +73,13 @@ export default function NewsPage() {
         )}
 
         {/* Replay Section - Load separately */}
-        {replays.length === 0 ? (
+        {replaysLoading && replays.length === 0 ? (
           <ReplaySectionShimmer />
         ) : (
           <ReplaySection videos={replays} />
         )}
 
-        {articles.length === 0 && !loading && (
+        {articles.length === 0 && !isLoading && (
           <div className="py-24 text-center space-y-6">
             <div className="text-6xl opacity-10">📰</div>
             <p className="text-xl font-medium text-gray-400 max-w-md mx-auto">
@@ -131,7 +88,6 @@ export default function NewsPage() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

@@ -8,9 +8,12 @@ import { SafeImage } from "../ui/SafeImage";
 interface NewsHeroProps {
     items: WordPressPost[];
     categoryName?: string;
+    categoryId?: string | number;
 }
 
 export function NewsHero({ items, categoryName }: NewsHeroProps) {
+    if (!items || items.length === 0) return null;
+
     if (!items || items.length === 0) return null;
 
     // Item 0: Spans Col 1 (Meta) and Col 2 (Primary Image)

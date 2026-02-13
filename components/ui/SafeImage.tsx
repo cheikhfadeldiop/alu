@@ -22,6 +22,7 @@ export function SafeImage({
     className,
     containerClassName,
     fill,
+    priority,
     ...props
 }: SafeImageProps) {
     const [imgSrc, setImgSrc] = React.useState(src);
@@ -31,10 +32,7 @@ export function SafeImage({
     React.useEffect(() => {
         setImgSrc(src);
         setHasError(false);
-        // Only set loading if there's actually a source to load
-        if (src) {
-            setIsLoading(true);
-        } else {
+        if (!src) {
             setIsLoading(false);
             setHasError(true);
             setImgSrc(fallbackSrc);
@@ -52,17 +50,16 @@ export function SafeImage({
     };
 
     return (
-        <div className={`relative overflow-hidden w-full h-full ${containerClassName || ""}`}>
-            {/* Loading & Error Placeholder Overlay */}
+        <div className={`relative overflow-hidden w-full h-full bg-foreground/5 ${containerClassName || ""}`}>
+            {/* Placeholder Background (always behind the image) */}
             {(isLoading || hasError) && (
-                <div className={`absolute inset-0 z-0 flex items-center justify-center p-6 bg-background/40 backdrop-blur-sm transition-opacity duration-500 ${!isLoading && hasError ? 'opacity-100' : 'opacity-100'}`}>
+                <div className="absolute inset-0 flex items-center justify-center p-6 grayscale opacity-20 transition-opacity duration-300">
                     <Image
                         src={SITE_CONFIG.theme.placeholders.logo}
-                        alt="CRTV"
-                        width={80}
-                        height={80}
-                        className={`object-contain opacity-20  ${isLoading ? 'animate-pulse' : ''}`}
-                        priority
+                        alt="Loading..."
+                        width={60}
+                        height={60}
+                        className={`object-contain ${isLoading && !hasError ? 'animate-pulse' : ''}`}
                     />
                 </div>
             )}
@@ -72,11 +69,11 @@ export function SafeImage({
                 src={imgSrc || fallbackSrc}
                 alt={alt || "CRTV Content"}
                 fill={fill}
+                priority={priority}
                 className={[
                     className,
-                    "transition-opacity duration-700 ease-in-out",
-                    isLoading ? "opacity-0" : "opacity-100",
-                    hasError ? "object-contain p-12 bg-muted/5 opacity-50" : ""
+                    "transition-opacity duration-500 ease-out",
+                    hasError ? "object-contain p-12 opacity-50" : "opacity-100"
                 ].join(" ")}
                 onLoadingComplete={handleLoadingComplete}
                 onError={handleError}

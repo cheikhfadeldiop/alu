@@ -6,7 +6,9 @@ import * as React from "react";
  */
 export function PageContainer({ children }: { children: React.ReactNode }) {
   return (
+
     <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-8 lg:px-10">
+
       {children}
     </div>
   );

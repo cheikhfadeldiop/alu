@@ -288,11 +288,11 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col gap-4 border-t border-[color:var(--border)] pt-6">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-[color:var(--muted)]">
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtv")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvSport")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.posteNational")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvReligion")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvNews")}</a>
+            <Link href="/" className="hover:text-foreground">{t("footer.strip.crtv")}</Link>
+            <Link href="/live?channel=crtv-sport" className="hover:text-foreground">{t("footer.strip.crtvSport")}</Link>
+            <Link href="/radio?channel=poste-national" className="hover:text-foreground">{t("footer.strip.posteNational")}</Link>
+            <Link href="/live" className="hover:text-foreground">{t("footer.strip.crtvReligion")}</Link>
+            <Link href="/live?channel=crtv-news" className="hover:text-foreground">{t("footer.strip.crtvNews")}</Link>
           </div>
           <p className="text-center text-xs text-[color:var(--muted)]">
             {t("footer.copyright")}

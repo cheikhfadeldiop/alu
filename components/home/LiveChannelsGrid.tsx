@@ -9,6 +9,7 @@ import { LiveCarousel } from "../shared/LiveCarousel";
 import { useTranslations } from "next-intl";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
+import { useLiveChannels, useEPGNow } from "@/hooks/useData";
 
 interface LiveChannelsGridProps {
     channels: LiveChannel[];
@@ -18,8 +19,16 @@ interface LiveChannelsGridProps {
     actionLabel: string;
 }
 
-export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabel }: LiveChannelsGridProps) {
+export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialEpg, title, title2, actionLabel }: LiveChannelsGridProps) {
     const t = useTranslations("common");
+
+    // Real-time status sync via Robust SWR Cache with fallback data for instant display
+    const { data: channelsRes } = useLiveChannels({ allitems: initialChannels } as any);
+    const { data: epgRes } = useEPGNow({ allitems: initialEpg } as any);
+
+    const channels = channelsRes?.allitems || initialChannels;
+    const epgItems = epgRes?.allitems || initialEpg;
+
     if (!channels || channels.length === 0) return null;
 
     return (
@@ -58,9 +67,9 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                             key={index}
                             href={`/live?channel=${channel.slug}`}
                             className="group relative flex flex-col w-[280px] sm:w-[300px] h-[220px] 
-                                overflow-hidden rounded-xl 
-                                bg-background/30 backdrop-blur-sm text-left transition-all duration-300 
-                                hover:scale-[1.02] transition-all                               "
+                                overflow-hidden rounded-xl border border-white/5
+                                text-left transition-all duration-300 
+                                hover:scale-[1.02]"
                         >
                             <div className="relative h-[65%] w-full
                             ">
