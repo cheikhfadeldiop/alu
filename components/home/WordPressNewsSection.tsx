@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "../ui/SafeImage";
 
 interface WordPressNewsSectionProps {
     alauneItems: WordPressPost[];
@@ -12,8 +13,6 @@ interface WordPressNewsSectionProps {
 }
 
 type TabType = "alaune" | "trending";
-
-import { SITE_CONFIG } from "@/constants/site-config";
 
 export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNewsSectionProps) {
     const t = useTranslations("pages.home");
@@ -32,10 +31,6 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
         return SITE_CONFIG.theme.placeholders.news;
     };
 
-    const stripHtml = (html: string): string => {
-        return html.replace(/<[^>]*>/g, '').replace(/&hellip;/g, '...');
-    };
-
     return (
         <section className="w-full">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-surface/50 backdrop-blur-sm rounded-lg ">
@@ -49,7 +44,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                             hover:scale-[1.02] transition-all"
                         >
                             <div className="absolute inset-0">
-                                <Image
+                                <SafeImage
                                     src={getImageUrl(featuredItem)}
                                     alt={featuredItem.title.rendered}
                                     fill
@@ -122,7 +117,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                 "
                             >
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
-                                    <Image
+                                    <SafeImage
                                         src={getImageUrl(item)}
                                         alt={item.title.rendered}
                                         fill

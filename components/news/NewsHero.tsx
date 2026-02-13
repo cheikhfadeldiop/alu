@@ -1,15 +1,14 @@
 import Link from "next/link";
-import Image from "next/image";
 import { WordPressPost } from "../../types/api";
 import { decodeHtmlEntities } from "../../utils/text";
 import { SectionTitle } from "../ui/SectionTitle";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "../ui/SafeImage";
 
 interface NewsHeroProps {
     items: WordPressPost[];
     categoryName?: string;
 }
-
-import { SITE_CONFIG } from "@/constants/site-config";
 
 export function NewsHero({ items, categoryName }: NewsHeroProps) {
     if (!items || items.length === 0) return null;
@@ -48,7 +47,6 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
 
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-5  items-stretch min-h-[400px]">
                 {/* 30% Left: Metadata (Larger scale) */}
-
                 <div className="lg:col-span-3  flex flex-col justify-between space-y-8 order-2 lg:order-1 px-2">
                     <Link href={primaryItem.link}
                         target="_blank"
@@ -74,7 +72,7 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block relative h-full min-h-[400px] overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5 rounded-sm">
-                        <Image
+                        <SafeImage
                             src={primaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                             alt={primaryItem.title.rendered}
                             fill
@@ -94,7 +92,7 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
                             rel="noopener noreferrer"
                             className="group flex flex-col h-full bg-surface-2/50 dark:bg-surface-2/10 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-white/10 rounded-sm">
                             <div className="relative h-[60%] w-full overflow-hidden">
-                                <Image
+                                <SafeImage
                                     src={secondaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                     alt={secondaryItem.title.rendered}
                                     fill

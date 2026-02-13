@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SliderVideoItem } from "../../types/api";
 import { useTranslations } from "next-intl";
+import { SafeImage } from "../ui/SafeImage";
 
 interface LiveVideosSectionProps {
     videos: SliderVideoItem[];
@@ -56,7 +57,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                         >
                             {/* Image Container */}
                             <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
-                                <Image
+                                <SafeImage
                                     src={featuredVideo.logo_url}
                                     alt={featuredVideo.title}
                                     fill
@@ -65,7 +66,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 />
 
                                 {/* Play Button Overlay - Center (Design a gauche) */}
-                                <div className="absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110">
+                                <div className="absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110 pointer-events-none">
                                     <Image
                                         src={'/assets/placeholders/play_overlay.png'}
                                         alt="Play"
@@ -78,13 +79,12 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                 {/* Channel Logo - Top Right (Design a gauche) */}
                                 {featuredVideo.channel_logo && (
                                     <div className="absolute top-3 right-3 z-10">
-                                        <div className="w-20 h-16 rounded-lg p-1.5 ">
-                                            <Image
+                                        <div className="w-20 h-16 rounded-lg p-1.5 shadow-lg bg-black/20 backdrop-blur-md">
+                                            <SafeImage
                                                 src={featuredVideo.channel_logo}
                                                 alt="Channel Logo"
-                                                width={58}
-                                                height={58}
-                                                className="object-contain w-full h-full"
+                                                fill
+                                                className="object-contain"
                                             />
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                             >
                                 {/* Thumbnail with overlays */}
                                 <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-white/5">
-                                    <Image
+                                    <SafeImage
                                         src={video.logo_url}
                                         alt={video.title}
                                         fill
@@ -135,7 +135,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                     />
 
                                     {/* Play icon inside thumbnail - Bottom Left */}
-                                    <div className="absolute bottom-1 left-1 z-10">
+                                    <div className="absolute bottom-1 left-1 z-10 pointer-events-none">
                                         <Image
                                             src={'/assets/placeholders/play_overlay.png'}
                                             alt="Play"
@@ -148,13 +148,12 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                                     {/* Channel logo inside thumbnail - Bottom Right */}
                                     {video.channel_logo && (
                                         <div className="absolute bottom-1 right-1 z-10">
-                                            <div className="w-6 h-6 bg-white rounded p-0.5 shadow-sm">
-                                                <Image
+                                            <div className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded p-0.5 shadow-sm overflow-hidden">
+                                                <SafeImage
                                                     src={video.channel_logo}
                                                     alt="Channel"
-                                                    width={20}
-                                                    height={20}
-                                                    className="object-contain w-full h-full"
+                                                    fill
+                                                    className="object-contain"
                                                 />
                                             </div>
                                         </div>

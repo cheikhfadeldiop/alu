@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { SafeImage } from "../ui/SafeImage";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
@@ -158,14 +159,13 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center ">
           <Link href="/" className="flex items-center gap-2">
-            <Image
+            <SafeImage
               src={SITE_CONFIG.theme.placeholders.logo}
               alt="CRTV"
               width={72}
               height={72}
               className="h-10 w-20"
               priority
-              objectFit="contain"
             />
           </Link>
         </div>

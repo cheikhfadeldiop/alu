@@ -6,10 +6,9 @@ import * as React from "react";
 import { SectionTitle } from "../ui/SectionTitle";
 import { LiveChannel, EPGItem } from "../../types/api";
 import { LiveCarousel } from "../shared/LiveCarousel";
-
 import { useTranslations } from "next-intl";
 import { SITE_CONFIG } from "@/constants/site-config";
-import { time } from "console";
+import { SafeImage } from "../ui/SafeImage";
 
 interface LiveChannelsGridProps {
     channels: LiveChannel[];
@@ -65,7 +64,7 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
                         >
                             <div className="relative h-[65%] w-full
                             ">
-                                <Image
+                                <SafeImage
                                     src={channel.logo_url || channel.logo || SITE_CONFIG.theme.placeholders.video}
                                     alt={channel.title}
                                     fill
@@ -83,24 +82,22 @@ export function LiveChannelsGrid({ channels, epgItems, title, title2, actionLabe
 
                                 <div className="absolute bottom-3 right-3">
                                     <div className="w-20 h-12 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 p-1">
-                                        <Image
+                                        <SafeImage
                                             src={channel.logo_url || channel.logo}
                                             alt={channel.title}
-                                            width={64}
-                                            height={64}
+                                            fill
                                             className="object-contain w-full h-full"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="absolute bottom-3 left-3">
-                                    <div className="w-8 h-8 relative drop-shadow-lg">
-                                        <Image
+                                    <div className="w-8 h-8 relative drop-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <SafeImage
                                             src={SITE_CONFIG.theme.placeholders.video}
                                             alt="Live TV"
-                                            width={32}
-                                            height={32}
-                                            className="object-contain w-full h-full"
+                                            fill
+                                            className="object-contain"
                                         />
                                     </div>
                                 </div>

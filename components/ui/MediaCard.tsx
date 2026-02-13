@@ -1,8 +1,8 @@
 import * as React from "react";
-import Image from "next/image";
-
 import { Link } from "../../i18n/navigation";
 import { LiveBadge } from "./LiveBadge";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "./SafeImage";
 
 export type MediaCardProps = {
   href: string;
@@ -33,23 +33,19 @@ function aspectClass(aspect: MediaCardProps["aspect"]) {
 function PlayOverlay() {
   return (
     <div
-      className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 l transition-transform group-hover:scale-110"
+      className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transition-transform group-hover:scale-110"
       aria-hidden
     >
-      <Image
+      <SafeImage
         src="/assets/placeholders/play_overlay.png"
-        alt="CRTV"
+        alt="Play"
         width={40}
         height={40}
         className="h-12 w-12"
-        priority
-        objectFit="contain"
       />
     </div>
   );
 }
-
-import { SITE_CONFIG } from "@/constants/site-config";
 
 export function MediaCard({
   href,
@@ -62,12 +58,6 @@ export function MediaCard({
   channelLogo,
   target = true,
 }: MediaCardProps) {
-  const [imgSrc, setImgSrc] = React.useState(imageSrc);
-
-  React.useEffect(() => {
-    setImgSrc(imageSrc);
-  }, [imageSrc]);
-
   return (
     <Link
       href={href}
@@ -76,13 +66,12 @@ export function MediaCard({
       className="group block overflow-hidden  bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 "
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
-        <Image
-          src={imgSrc || SITE_CONFIG.theme.placeholders.logo}
+        <SafeImage
+          src={imageSrc}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover "
-          onError={() => setImgSrc(SITE_CONFIG.theme.placeholders.logo)}
+          className="object-cover"
         />
 
         {live ? (
@@ -97,17 +86,12 @@ export function MediaCard({
         ) : null}
 
         {channelLogo && (
-          <div className="absolute bottom-2 right-2 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
-            <Image
+          <div className="absolute bottom-2 right-2 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md overflow-hidden">
+            <SafeImage
               src={channelLogo}
               alt="Channel"
-              width={42}
-              height={42}
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
+              fill
+              className="object-contain p-1"
             />
           </div>
         )}
@@ -128,4 +112,3 @@ export function MediaCard({
     </Link>
   );
 }
-

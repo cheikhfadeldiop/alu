@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SafeImage } from "../ui/SafeImage";
 import { useTranslations } from "next-intl";
 
 function IconX(props: React.SVGProps<SVGSVGElement>) {
@@ -84,7 +85,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
           <div className="space-y-4 sm:pr-10 gap-10">
             <div className="flex items-center gap-3  min-w-[150px]  ">
-              <Image
+              <SafeImage
                 src={SITE_CONFIG.theme.placeholders.logo}
                 alt="CRTV"
                 width={154}
@@ -102,7 +103,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <SafeImage
                   src="/assets/backgrounds/store.webp"
                   alt="CRTV on Google Play"
                   width={135}
@@ -117,7 +118,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <SafeImage
                   src="/assets/backgrounds/apple.png"
                   alt="CRTV on App Store"
                   width={235}

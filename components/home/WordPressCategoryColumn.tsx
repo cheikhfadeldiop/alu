@@ -1,7 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { WordPressPost } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "../ui/SafeImage";
 
 interface WordPressCategoryColumnProps {
     title: string;
@@ -10,8 +11,6 @@ interface WordPressCategoryColumnProps {
     enter?: boolean;
     categorySlug: string;
 }
-
-import { SITE_CONFIG } from "@/constants/site-config";
 
 export function WordPressCategoryColumn({ title, title2, items, enter, categorySlug }: WordPressCategoryColumnProps) {
     if (!items || items.length === 0) return null;
@@ -30,14 +29,13 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
     return (
         <div className="space-y-2">
             {/* Header */}
-            <SectionTitle title={title} title2={title2} actionHref={`/news`}
-            />
+            <SectionTitle title={title} title2={title2} actionHref={`/news`} />
 
             {/* Featured Item */}
             {featuredItem && !enter && (
                 <Link href={featuredItem.link} className="group block space-y-3 border-b dark:border-muted/30">
                     <div className="relative aspect-video overflow-hidden bg-white/5">
-                        <Image
+                        <SafeImage
                             src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                             alt={featuredItem.title.rendered}
                             fill
@@ -61,7 +59,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                 {listItems.map((item) => (
                     <Link key={item.id} href={item.link} className="group flex gap-4 items-start">
                         <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-white/5">
-                            <Image
+                            <SafeImage
                                 src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={item.title.rendered}
                                 fill

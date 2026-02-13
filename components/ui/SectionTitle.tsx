@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link } from "../../i18n/navigation";
-import Image from "next/image";
 import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "./SafeImage";
 
 export function SectionTitle({
   title,
@@ -45,7 +45,7 @@ export function SectionTitle({
         >
           {actionLabel}
           <div className="text-gray-400">
-            <Image
+            <SafeImage
               src={SITE_CONFIG.theme.placeholders.arrow}
               alt=""
               width={24}

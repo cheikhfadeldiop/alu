@@ -1,9 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Carousel } from "../ui/Carousel";
 import { SliderVideoItem } from "../../types/api";
-import dynamic from "next/dynamic";
+import { SafeImage } from "../ui/SafeImage";
 
 interface ShortsCarouselProps {
     videos: SliderVideoItem[];
@@ -21,7 +20,7 @@ export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCar
                     <Link key={index} href={`/playback/${video.slug}`} className="group block">
                         <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2
                         hover:scale-[1.02] transition-all ">
-                            <Image
+                            <SafeImage
                                 src={video.logo_url || video.logo}
                                 alt={video.title}
                                 fill

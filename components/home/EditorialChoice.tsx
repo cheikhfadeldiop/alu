@@ -1,7 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import { SectionTitle } from "../ui/SectionTitle";
 import { WordPressPost } from "../../types/api";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { useTranslations } from "next-intl";
+import { SafeImage } from "../ui/SafeImage";
 
 interface EditorialChoiceProps {
     items: WordPressPost[];
@@ -9,9 +11,6 @@ interface EditorialChoiceProps {
     title2?: string;
     actionLabel?: string;
 }
-
-import { SITE_CONFIG } from "@/constants/site-config";
-import { useTranslations } from "next-intl";
 
 export function EditorialChoice({ items, title, title2, actionLabel }: EditorialChoiceProps) {
     const t = useTranslations("common");
@@ -65,18 +64,13 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                 <div className="lg:col-span-4 relative group">
                     {featuredItem && (
                         <Link href={`/news/${featuredItem.id}`} className="block relative aspect-video  overflow-hidden bg-white/5">
-                            <Image
+                            <SafeImage
                                 src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={featuredItem.title.rendered}
                                 fill
                                 sizes="(max-width: 1024px) 100vw, 40vw"
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                             />
-
-                            {/* Logo Overlay - Top Right */}
-                            <div className="absolute top-4 right-4 z-10">
-                                {/* <Image src={featuredItem.acan_image_url || "/assets/placeholders/news_wide.png"} alt="CRTV" width={40} height={20} className="object-contain brightness-0 invert" /> */}
-                            </div>
                         </Link>
                     )}
                 </div>
@@ -96,7 +90,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                                 </div>
                             </div>
                             <div className="relative w-24 h-24 flex-shrink-0  overflow-hidden bg-white/5">
-                                <Image
+                                <SafeImage
                                     src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                     alt={item.title.rendered}
                                     fill
@@ -110,13 +104,11 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
             </div>
 
             {/* Row 2: Grid of 4 Items (3, 4, 5, 6) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 
-            pt-8
-            ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
                 {gridItems.map((item) => (
                     <Link key={item.id} href={`/news/${item.id}`} className="group block space-y-3">
                         <div className="relative aspect-[16/10] overflow-hidden bg-white/5">
-                            <Image
+                            <SafeImage
                                 src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                 alt={item.title.rendered}
                                 fill
