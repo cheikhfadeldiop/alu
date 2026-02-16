@@ -17,23 +17,23 @@ export function RegionalCategoriesSection({
     const t = useTranslations("pages.home");
 
     return (
-        <section className="py-20">
+        <section className="py-10">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 <WordPressCategoryColumn
-                    title={t("actu")}
-                    title2={t("regionalNewsSuffix")}
+                    title={t("regionalNewsSuffix")}
+                    title2=''
                     items={regionalPosts}
                     categorySlug="actualites-regionale"
                 />
                 <WordPressCategoryColumn
-                    title={t("actu")}
-                    title2={t("matam")}
+                    title={t("matam")}
+                    title2=''
                     items={matamPosts}
                     categorySlug="actu-matam"
                 />
                 <WordPressCategoryColumn
-                    title={t("actu")}
-                    title2={t("agriculture")}
+                    title={t("agriculture")}
+                    title2=''
                     items={agriculturePosts}
                     categorySlug="agriculture"
                 />

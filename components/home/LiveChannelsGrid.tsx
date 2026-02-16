@@ -33,7 +33,7 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
 
     return (
         <section className="space-y-6">
-            <SectionTitle title={title} title2={title2} actionLabel={actionLabel} actionHref="/live" />
+            <SectionTitle title={title} title2={title2}  actionHref="/live" />
 
             <LiveCarousel>
                 {channels.map((channel, index) => {
@@ -83,14 +83,14 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
                                 <div className="absolute top-3 right-3">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-grey/90 backdrop-blur-sm text-white text-xs font-bold shadow-lg">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-sm text-black text-xs font-bold shadow-lg">
                                         <span className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse" />
                                         {t("direct")}
                                     </span>
                                 </div>
 
                                 <div className="absolute bottom-3 right-3">
-                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 p-1">
+                                    <div className="w-20 h-12 p-1">
                                         <SafeImage
                                             src={channel.logo_url || channel.logo}
                                             alt={channel.title}

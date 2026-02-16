@@ -33,7 +33,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                                     : new Date().toLocaleDateString("fr-FR")}{" "}
                                 • {(hero as any).category || "À la une"}
                             </p>
-                            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight group-hover:underline">
+                            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight ">
                                 {hero.title}
                             </h1>
                         </div>
@@ -45,7 +45,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
             <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-[color:var(--border)] pb-2">
                     <h2 className="text-sm font-bold uppercase">À la une</h2>
-                    <Link href="/news" className="text-xs text-[color:var(--accent)] hover:underline">
+                    <Link href="/news" className="text-xs text-[color:var(--accent)] ">
                         Trending news
                     </Link>
                 </div>
@@ -66,7 +66,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                                 />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-xs font-semibold line-clamp-2 group-hover:underline mb-1">
+                                <h3 className="text-xs font-semibold line-clamp-2  mb-1">
                                     {item.title}
                                 </h3>
                                 <p className="text-[10px] text-[color:var(--muted)]">

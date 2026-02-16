@@ -22,7 +22,7 @@ export const SITE_CONFIG = {
         cache: {
             ttl: {
                 static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
-                standard: 1000 * 60 * 10,    // 10 min (News, Replays)
+                standard: 1000 * 60 * 5,     // 5 min (News, Replays)
                 dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
                 realtime: 1000 * 30,         // 30 sec (Live status)
             }
@@ -78,7 +78,7 @@ export const SITE_CONFIG = {
             radio: "/assets/placeholders/radio_icon_sur_card.png",
             logo: "/assets/logo/logo.png",
         }
-    },
+    },z
 
     // Content Organization & Logic
     categories: {
@@ -104,5 +104,12 @@ export const SITE_CONFIG = {
         liveLabel: "LIVE",
         replayLabel: "REPLAY",
         unavailabilityMsg: "Flux indisponible pour le moment.",
-    }
+    },
+
+    // Channel Metadata (Dynamic Resolution)
+    channels: [
+        { id: '50004', slug: 'crtv', name: 'CRTV', logo: "https://cdn.tve.static.acan.group/images/channel_1731344652.png" },
+        { id: '50005', slug: 'crtv-news', name: 'CRTV NEWS', logo: "https://cdn.tve.static.acan.group/images/channel_1731344640.png" },
+        { id: '50006', slug: 'crtv-sport', name: 'CRTV SPORT', logo: "https://cdn.tve.static.acan.group/images/channel_1731344621.png" },
+    ]
 };

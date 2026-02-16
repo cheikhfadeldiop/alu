@@ -10,6 +10,8 @@ export function SectionTitle({
   actionHref,
   actionIcon = true,
   uppercase = true,
+  uppercase2 = true,
+
   className,
 }: {
   title: string;
@@ -18,6 +20,7 @@ export function SectionTitle({
   actionHref?: string;
   actionIcon?: boolean;
   uppercase?: boolean;
+  uppercase2?: boolean;
   className?: string;
 }) {
   return (
@@ -32,12 +35,12 @@ export function SectionTitle({
         {uppercase ? title.toUpperCase() : title}
       </h2>
       <h1 className={
-        uppercase
+        uppercase2
           ? "text-sm font-bold tracking-widest text-[color:var(--accent)] sm:text-base"
           : "text-base font-semibold tracking-wide text-foreground"
       }
       >
-        {title2}</h1>
+        {uppercase2 ? title2.toUpperCase() : title2}</h1>
       {actionIcon && title ? (
         <Link
           href={actionHref || "#"}

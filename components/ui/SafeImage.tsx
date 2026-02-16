@@ -50,7 +50,7 @@ export function SafeImage({
     };
 
     return (
-        <div className={`relative overflow-hidden w-full h-full bg-foreground/5 ${containerClassName || ""}`}>
+        <div className={`relative overflow-hidden w-full h-full  ${containerClassName || ""}`}>
             {/* Placeholder Background (always behind the image) */}
             {(isLoading || hasError) && (
                 <div className="absolute inset-0 flex items-center justify-center p-6 grayscale opacity-20 transition-opacity duration-300">

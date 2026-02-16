@@ -139,7 +139,7 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                                     />
                                 </div>
                                 <div className="flex-1 min-w-0 space-x-2">
-                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3 group-hover:underline mb-2">
+                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3  mb-2">
                                         {item.title.rendered}
                                     </h3>
                                     <div className="flex items-center gap-5 text-xs text-gray-500 dark:text-gray-400">

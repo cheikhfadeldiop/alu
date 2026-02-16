@@ -33,7 +33,7 @@ export function RegionalNews({ items, title, title2, actionLabel }: RegionalNews
                                 />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-sm font-semibold line-clamp-2 group-hover:underline mb-1">
+                                <h3 className="text-sm font-semibold line-clamp-2 mb-1">
                                     {item.title}
                                 </h3>
                                 <p className="text-xs text-[color:var(--muted)] uppercase">

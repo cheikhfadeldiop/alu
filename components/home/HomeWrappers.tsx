@@ -94,8 +94,9 @@ export async function CategoryWithAdWrapper() {
     const posts = await getWordPressLatestPosts(8).catch(() => []);
     return (
         <CategoryWithAdSection
-            title={t("regionalNews")}
-            title2={t("regionalNewsSuffix")}
+            title={t("regionalNews") + " " + t("regionalNewsSuffix")}
+            title2=''
+            
             posts={posts}
             categorySlug="rts-1"
         />
@@ -109,9 +110,9 @@ export async function ShortsCarouselWrapper() {
     return (
         <ShortsCarousel
             videos={sliderVideosRes.allitems || []}
-            title={t("shorts")}
-            title2={t("shortsSuffix")}
-            actionLabel={tc("seeMore")}
+            title={t("shorts") + " " + t("shortsSuffix")}
+            title2=""
+            actionLabel=''
         />
     );
 }
@@ -120,8 +121,8 @@ export async function CorporateNewsWrapper() {
     const posts = await getWordPressLatestPosts(3).catch(() => []);
     return (
         <CorporateNewsSection
-            title="Corporate"
-            title2="News"
+            title="Corporate News"
+            title2=""
             posts={posts}
         />
     );

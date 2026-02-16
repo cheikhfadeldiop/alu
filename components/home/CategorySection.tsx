@@ -31,7 +31,7 @@ export function CategorySection({ items, title, category, actionLabel }: Categor
                                 className="object-cover"
                             />
                         </div>
-                        <h3 className="font-semibold text-xs line-clamp-2 group-hover:underline mb-1">
+                        <h3 className="font-semibold text-xs line-clamp-2 mb-1">
                             {item.title}
                         </h3>
                         <p className="text-[10px] text-[color:var(--muted)] uppercase">

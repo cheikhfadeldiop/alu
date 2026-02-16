@@ -29,7 +29,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
     return (
         <div className="space-y-2">
             {/* Header */}
-            <SectionTitle title={title} title2={title2} actionHref={`/news`} />
+            <SectionTitle title={title} title2={title2} actionHref={`/news`}  className="font-bold"/>
 
             {/* Featured Item */}
             {featuredItem && !enter && (
@@ -43,7 +43,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                     </div>
-                    <h4 className="text-lg font-bold leading-tight group-hover:underline line-clamp-2">
+                    <h4 className="text-lg font-bold leading-tight line-clamp-2">
                         {featuredItem.title.rendered}
                     </h4>
                     <div className="flex items-center gap-2 text-[11px] text-gray-500 pb-5">
@@ -68,7 +68,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                             />
                         </div>
                         <div className="flex-1 min-w-0 py-0.5">
-                            <h5 className="text-[12px] font-bold uppercase leading-[1.5] group-hover:underline line-clamp-3 mb-2 tracking-tight">
+                            <h5 className="text-[12px] font-bold uppercase leading-[1.5] line-clamp-3 mb-2 tracking-tight">
                                 {item.title.rendered}
                             </h5>
                             <div className="flex items-center gap-2 text-[10px] text-gray-500">
