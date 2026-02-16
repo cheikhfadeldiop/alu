@@ -10,14 +10,19 @@
   },
   "header": {
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "themes": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "footer": {
     "about": "About",
     "resources": "Resources",
     "commitments": "Our commitments",
     "other": "Other",
-    "description": "Cameroon Radio Television is Cameroon’s public radio and television broadcaster.",
+    "description": "Cameroon Radio Television is Cameroon’s public radio and television broadcaster. It includes 03 television channels: CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
     "links": {
       "about": "About",
       "crtvCameroon": "CRTV Cameroon",
@@ -44,30 +49,149 @@
   },
   "common": {
     "seeAll": "See all",
+    "seeMore": "See more",
     "live": "LIVE",
-    "send": "Send"
+    "direct": "LIVE",
+    "send": "Send",
+    "play": "Play",
+    "follow": "Follow",
+    "retry": "Retry",
+    "about": "About",
+    "all": "All",
+    "toWatchNow": "To watch now",
+    "latestVideos": "Latest videos",
+    "upNext": "Up next",
+    "relatedContent": "Related content",
+    "otherLiveChannels": "Other live channels",
+    "previous": "Previous",
+    "next": "Next",
+    "collapse": "Collapse",
+    "archives": "Archives",
+    "shows": "shows",
+    "missed": "What you missed",
+    "onAir": "on air",
+    "inProgress": "In progress",
+    "loading": "Loading...",
+    "loadMore": "Load +",
+    "controls": "CONTROLS",
+    "previewUnavailable": "Preview unavailable",
+    "streamUnavailable": "Stream unavailable",
+    "liveDescription": "Follow your favorite channel live on the CRTV portal.",
+    "itinerary": "Get directions",
+    "copyCoords": "Copy coordinates",
+    "viewOSM": "View on OpenStreetMap",
+    "watchMissedFallback": "Watch the latest videos you missed",
+    "replayTag": "Replay",
+    "pressRelease": "PRESS RELEASE",
+    "readRelease": "Read release",
+    "deepSearch": "Deep search...",
+    "fetchingArchive": "Fetching from archives...",
+    "episodeNotFound": "Episode not found",
+    "contentUnavailable": "Content unavailable or moved to deep archives.",
+    "retrySearch": "Retry search",
+    "scheduleUnavailable": "Schedule not available at the moment.",
+    "tvSchedule": "TV Schedule",
+    "noDescription": "No description"
   },
   "pages": {
     "home": {
       "hero": "Top story",
-      "liveChannels": "Live channels",
+      "liveChannels": "Our channels",
+      "liveChannelsSuffix": "live",
       "latestEditions": "Latest editions",
-      "editorChoice": "Editor’s choice",
+      "editorChoice": "Editor’s",
+      "editorChoiceSuffix": "choice",
       "categories": "Categories",
-      "regionalNews": "Regional news",
-      "shorts": "Shorts / Highlights",
-      "corporate": "Corporate news"
+      "regionalNews": "Regional",
+      "regionalNewsSuffix": "news",
+      "shorts": "News Summary",
+      "shortsSuffix": "#CrtvShorts",
+      "corporate": "Corporate news",
+      "actu": "NEWS",
+      "matam": "MATAM",
+      "agriculture": "AGRICULTURE"
     },
     "radio": {
-      "title": "Radio FM",
-      "upNext": "Up next"
+      "title": "OUR RADIOS",
+      "titleSuffix": "LIVE",
+      "upNext": "Upcoming programs",
+      "noRadioAvailable": "No radio available"
+    },
+    "live": {
+      "title": "OUR CHANNELS",
+      "titleSuffix": "LIVE"
     },
     "replay": {
-      "title": "Replay TV"
+      "title": "Replay TV",
+      "ourShows": "Our TV",
+      "tvSubtitle": "Shows",
+      "latest": "Latest",
+      "editions": "Editions"
+    },
+    "map": {
+      "loading": "Loading map...",
+      "error": "Error loading map",
+      "copied": "Coordinates copied!",
+      "poweredBy": "Powered by",
+      "defaultTitle": "Our Location"
+    },
+    "radioPlayer": {
+      "errors": {
+        "noStream": "No stream source available",
+        "offline": "Radio seems to be offline (Playback error)",
+        "notResponding": "Stream not responding - radio is offline",
+        "playError": "Unable to play this radio stream",
+        "networkError": "Network error - radio seems offline",
+        "formatError": "Audio format not supported",
+        "unavailable": "Radio is offline or stream is unavailable",
+        "aborted": "Loading aborted",
+        "playFailed": "Unable to play audio stream"
+      },
+      "status": {
+        "loading": "Loading radio...",
+        "longLoad": "This may take up to 45 seconds...",
+        "offlineTitle": "Radio Offline",
+        "offlineMessage": "Radio is currently unavailable. The stream might be temporarily offline.",
+        "offline": "Offline",
+        "connecting": "Connecting...",
+        "ready": "Ready"
+      },
+      "player": {
+        "retry": "Retry",
+        "presentedBy": "PRESENTED BY:",
+        "live": "Live"
+      },
+      "fallback": {
+        "desc": "Your national radio, at the heart of Cameroonian news and culture. Stay tuned for our varied programs.",
+        "program": "LIVE NEWS",
+        "presenter": "CRTV EDITORIAL"
+      },
+      "channels": {
+        "poste-national": {
+          "desc": "Poste Nationale is the beating heart of Cameroonian public radio, broadcasting news, culture and education across the national territory from Yaoundé.",
+          "program": "SPOKEN NEWS"
+        },
+        "fm-94": {
+          "desc": "CRTV FM 94 is the urban radio of Yaoundé, focused on capital news, contemporary music and citizen debates for a young and dynamic audience.",
+          "program": "YAOUNDÉ BY NIGHT"
+        },
+        "fm-105": {
+          "desc": "CRTV FM 105 Suelaba is the vibrant voice of Douala, mixing local music, economic news and entertainment for the economic metropolis of Cameroon.",
+          "program": "SUELABA MORNING"
+        },
+        "mount-cameroon-fm": {
+          "desc": "Based in Buea, Mount Cameroon FM is the reference for English-speaking regions, offering bilingual programs rich in culture and local news.",
+          "program": "MOUNTAIN SHOW"
+        }
+      }
     },
     "news": {
       "title": "News",
-      "trending": "Trending"
+      "trending": "Trending",
+      "moreOf": "more of",
+      "newsTitle": "NEWS",
+      "loadingNews": "Loading news...",
+      "noArticles": "No articles found in this category for now. We will be back soon with more news!"
     },
     "contact": {
       "title": "Contact",
@@ -89,7 +213,25 @@
         "subject": "Subject",
         "message": "What is your message?"
       }
+    },
+    "info": {
+      "dataProtection": "Data protection",
+      "privacyHero": "Respect for Privacy",
+      "dataQuestion": "Any questions about your data?",
+      "dataDPO": "Our data protection officer is here to help.",
+      "termsHero": "Terms of Use",
+      "termsRules": "Platform rules",
+      "legalHero": "Legal Notice",
+      "legalTransparency": "Transparency",
+      "legalEditor": "Site Editor",
+      "legalHosting": "Hosting"
+    },
+    "about": {
+      "titlePart1": "Our",
+      "titlePart2": "History",
+      "intro": "Discover the journey of Cameroon Radio Television, a pillar of broadcasting in Cameroon.",
+      "commitmentTitle": "Public Commitment",
+      "commitmentDesc": "Since 1963, we have been working for the education, information and entertainment of all citizens."
     }
   }
 }
-

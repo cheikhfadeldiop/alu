@@ -27,9 +27,11 @@ import type {
 
 export type { SliderVideoItem } from '../types/api';
 
-const API_BASE_URL = 'https://tveapi.acan.group/myapiv2';
-const WORDPRESS_API_BASE_URL = 'https://actu.rts.sn/wp-json/wp/v2';
-const APP_ID = 'larts';
+import { SITE_CONFIG } from '../constants/site-config';
+
+const API_BASE_URL = SITE_CONFIG.api.baseUrl;
+const WORDPRESS_API_BASE_URL = SITE_CONFIG.api.wordpressBaseUrl;
+const APP_ID = SITE_CONFIG.api.appId;
 
 export function ensureAbsoluteUrl(url: string | undefined): string {
     if (!url || url === "null") return "";
@@ -46,7 +48,7 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 }, // Cache for 60 seconds
+            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
         });
 
         if (!response.ok) {
@@ -66,6 +68,42 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
 export async function getAppDetails(): Promise<AppDetails> {
     return fetchAPI<AppDetails>(`/appdetails/${APP_ID}/json`);
 }
+
+export interface AppInfoResponse {
+    app_description: string;
+    app_privacy: string;
+}
+
+/**
+ * Get application info (contains both description and privacy)
+ */
+export async function getAppInfo(): Promise<AppInfoResponse> {
+    return fetchAPI<AppInfoResponse>(`/appinfo/${APP_ID}/json`);
+}
+
+/**
+ * Get application description specifically
+ */
+export async function getAppDescription(): Promise<{ app_description: string }> {
+    return fetchAPI<{ app_description: string }>(`/appinfo/${APP_ID}/description/json`);
+}
+
+/**
+ * Get application privacy policy specifically
+ */
+export async function getAppPrivacy(): Promise<{ app_privacy: string }> {
+    return fetchAPI<{ app_privacy: string }>(`/appinfo/${APP_ID}/privacy/json`);
+}
+
+/**
+ * Get application terms of use specifically
+ */
+export async function getAppTerms(): Promise<{ app_description: string }> {
+    return fetchAPI<{ app_description: string }>(`/appinfo/${APP_ID}/terms/json`);
+}
+
+
+
 
 /**
  * Get main application data structure (navigation items)
@@ -406,7 +444,7 @@ export async function getRelatedItems(url: string): Promise<SliderVideoItem[]> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 },
+            next: { revalidate: SITE_CONFIG.api.revalidateTime },
         });
 
         if (!response.ok) {
@@ -461,8 +499,8 @@ export async function getEPGNowByChannel(channelId: string): Promise<EPGResponse
 /**
  * Get full EPG schedule for today
  */
-export async function getEPGAll(): Promise<EPGResponse> {
-    return fetchAPI<EPGResponse>(`/guidetvall/${APP_ID}/today/json`);
+export async function getEPGAll(): Promise<import('../types/api').FullEPGChannel[]> {
+    return fetchAPI<import('../types/api').FullEPGChannel[]>(`/guidetvall/${APP_ID}/today/json`);
 }
 
 /**
@@ -559,7 +597,7 @@ async function fetchWordPressAPI<T>(endpoint: string): Promise<T> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: 60 }, // Cache for 60 seconds
+            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
         });
 
         if (!response.ok) {
@@ -612,10 +650,7 @@ export async function getWordPressLatestPosts(perPage: number = 10): Promise<imp
 }
 
 
-/**
- * Get WordPress posts for "À la une" category
- */
 export async function getWordPressAlaunePost(): Promise<import('../types/api').WordPressPost[]> {
-    // Category ID 121 is "À LA UNE" - fetch 20 articles for pagination
-    return getWordPressPosts(121, 20);
+    // Category ID from config
+    return getWordPressPosts(SITE_CONFIG.categories.news.alaune, 20);
 }

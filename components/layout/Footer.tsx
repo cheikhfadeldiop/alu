@@ -71,78 +71,119 @@ function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+import { Link } from "@/i18n/navigation";
+
+
 export function Footer() {
   const t = useTranslations();
 
   return (
-    <footer className="w-full border-t border-[color:var(--border)] bg-[color:var(--surface)]">
+    <footer className="w-full border-t border-[color:var(--border)] bg-foreground/3 backdrop-blur-sm  ">
       <div className="mx-auto max-w-[1440px] px-6 py-12 sm:px-8 lg:px-10">
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+          <div className="space-y-4 sm:pr-10 gap-10">
+            <div className="flex items-center gap-3  min-w-[150px]  ">
               <Image
-                src="/assets/logo/logo.png"
+                src={SITE_CONFIG.theme.placeholders.logo}
                 alt="CRTV"
-                width={44}
-                height={44}
-                className="h-11 w-11 rounded-sm"
+                width={154}
+                height={34}
+                className="object-contain rounded-sm"
               />
-              <div className="text-sm font-semibold tracking-wide">CRTV</div>
             </div>
             <p className="max-w-xs text-sm text-[color:var(--muted)]">
               {t("footer.description")}
             </p>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-[235px]  ">
               <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-md border border-[color:var(--border)] bg-[color:var(--surface-2)] px-3 py-2 text-xs font-semibold text-foreground"
+                href={SITE_CONFIG.apps.googlePlay}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                App Store
+                <Image
+                  src="/assets/backgrounds/store.webp"
+                  alt="CRTV on Google Play"
+                  width={135}
+                  height={40}
+                  className="h-11 w-full rounded-sm"
+                />
               </a>
+
+
               <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-md border border-[color:var(--border)] bg-[color:var(--surface-2)] px-3 py-2 text-xs font-semibold text-foreground"
+                href={SITE_CONFIG.apps.appleStore}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Google Play
+                <Image
+                  src="/assets/backgrounds/apple.png"
+                  alt="CRTV on App Store"
+                  width={235}
+                  height={40}
+                  className="h-11 w-full rounded-sm"
+                />
               </a>
             </div>
 
-            <div className="flex items-center gap-2 text-[color:var(--muted)]">
+            <div className="flex items-center gap-5 text-[color:var(--muted)]">
               <a
-                href="#"
+                href={SITE_CONFIG.social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
               >
-                <IconFacebook className="h-5 w-5" />
+                <IconFacebook className="h-7 w-7" />
               </a>
               <a
-                href="#"
+                href={SITE_CONFIG.social.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="X"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
               >
-                <IconX className="h-5 w-5" />
+                <IconX className="h-7 w-7" />
               </a>
               <a
-                href="#"
+                href={SITE_CONFIG.social.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
               >
-                <IconYouTube className="h-5 w-5" />
+                <IconYouTube className="h-7 w-7" />
               </a>
               <a
-                href="#"
+                href={SITE_CONFIG.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
               >
-                <IconLinkedIn className="h-5 w-5" />
+                <IconLinkedIn className="h-7 w-7" />
               </a>
               <a
-                href="#"
+                href={SITE_CONFIG.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
               >
-                <IconInstagram className="h-5 w-5" />
+                <IconInstagram className="h-7 w-7" />
+              </a>
+              <a
+                href={SITE_CONFIG.social.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+              >
+                {/* Fallback for TikTok icon since it's not defined, or I can add one */}
+                <svg className="h-8   w-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.01 1.62 4.2 1.13 1.33 2.77 2.13 4.49 2.19v3.86a11.583 11.583 0 01-5.32-1.35c.03 4.1.02 8.21.03 12.31 0 2.25-.87 4.41-2.45 6.01-1.84 1.83-4.48 2.62-6.95 2.15-2.61-.41-4.88-2.26-5.83-4.72-1.12-2.73-.65-6 1.15-8.23 1.41-1.83 3.73-2.85 6.05-2.6v3.9c-1.2-.18-2.44.22-3.32 1.05-.85.76-1.28 1.94-1.13 3.07.11 1.25.96 2.37 2.11 2.85.96.42 2.06.39 2.98-.12.87-.45 1.48-1.36 1.61-2.33.04-1.16.03-2.32.03-3.48V0l.02.02z" />
+                </svg>
               </a>
             </div>
           </div>
@@ -151,25 +192,26 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.about")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/about" className="hover:text-foreground">
                   {t("footer.links.about")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/about" className="hover:text-foreground">
                   {t("footer.links.crtvCameroon")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/contact" className="hover:text-foreground">
                   {t("footer.links.helpCenters")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/contact" className="hover:text-foreground">
                   {t("footer.links.contact")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -177,25 +219,26 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.resources")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/live" className="hover:text-foreground">
                   {t("footer.links.tv")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/news" className="hover:text-foreground">
                   {t("footer.links.news")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/radio" className="hover:text-foreground">
                   {t("footer.links.radio")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/replay" className="hover:text-foreground">
                   {t("footer.links.replay")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -205,20 +248,22 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/commitments" className="hover:text-foreground">
                   {t("footer.links.quality")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/terms" className="hover:text-foreground">
                   {t("footer.links.terms")}
-                </a>
+                </Link>
               </li>
+
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/privacy" className="hover:text-foreground">
                   {t("footer.links.data")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
 
@@ -226,15 +271,16 @@ export function Footer() {
             <div className="text-sm font-semibold">{t("footer.other")}</div>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/legal" className="hover:text-foreground">
                   {t("footer.links.legal")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-foreground">
+                <Link href="/advertising" className="hover:text-foreground">
                   {t("footer.links.ads")}
-                </a>
+                </Link>
               </li>
+
             </ul>
           </div>
         </div>

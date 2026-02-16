@@ -4,15 +4,21 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LiveSelectionCarousel } from "../live/LiveSelectionCarousel";
 import { RadioPlayerSection } from "./RadioPlayerSection";
-import { LiveChannel, EPGItem } from "../../types/api";
+import { UpcomingProgramsTimeline } from "./UpcomingProgramsTimeline";
+import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
+import { AdBanner } from "../ui/AdBanner";
 
 interface RadioPageClientProps {
     initialRadios: LiveChannel[];
     allChannels: LiveChannel[]; // Both radios and TV channels
     epgData: EPGItem[];
+    fullEpgData: FullEPGChannel[];
 }
 
-export function RadioPageClient({ initialRadios, allChannels, epgData }: RadioPageClientProps) {
+import { useTranslations } from "next-intl";
+
+export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgData }: RadioPageClientProps) {
+    const t = useTranslations("pages.radio");
     const router = useRouter();
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
@@ -59,8 +65,14 @@ export function RadioPageClient({ initialRadios, allChannels, epgData }: RadioPa
         }
     };
 
+    // Current program for the selected radio
+    const currentRadioProgram = useMemo(() => {
+        if (!selectedRadio) return undefined;
+        return currentPrograms.find(p => p.channel_id === selectedRadio.id);
+    }, [selectedRadio, currentPrograms]);
+
     if (!selectedRadio) {
-        return <div className="text-center text-foreground py-20">Aucune radio disponible</div>;
+        return <div className="text-center text-foreground py-20">{t("noRadioAvailable")}</div>;
     }
 
     return (
@@ -74,7 +86,13 @@ export function RadioPageClient({ initialRadios, allChannels, epgData }: RadioPa
             />
 
             {/* 2. Radio Player Section - Only plays radios */}
-            <RadioPlayerSection channel={selectedRadio} />
+            <RadioPlayerSection channel={selectedRadio} currentProgram={currentRadioProgram} />
+            <AdBanner />
+
+            {/* 3. Upcoming Programs Timeline */}
+            <UpcomingProgramsTimeline epgData={fullEpgData} />
+
+
         </div>
     );
 }

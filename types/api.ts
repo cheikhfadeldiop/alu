@@ -241,6 +241,38 @@ export interface EPGItem {
     is_current: boolean;
 }
 
+export interface FullEPGChannel {
+    id: string;
+    logo: string;
+    titre: string;
+    streamName: string;
+    today: string;
+    subitems: {
+        direct: string;
+        matin: FullEPGProgram[];
+        soir: FullEPGProgram[];
+        day: string;
+    };
+}
+
+export interface FullEPGProgram {
+    channelId: string;
+    title: string;
+    streamName: string;
+    logo: string;
+    startTime: string;
+    endTime: string;
+    categoryName: string;
+    subcategoryName: string;
+    daysInWeek: string;
+    description: string | null;
+    presentateurs: string;
+    feed_url: string;
+    slug: string;
+    channelLogo?: string;
+    channelName?: string;
+}
+
 // Cinema Types
 export interface CinemaCategoriesResponse {
     allitems: CinemaCategory[];

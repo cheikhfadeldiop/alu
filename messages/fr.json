@@ -10,14 +10,19 @@
   },
   "header": {
     "language": "Langue",
-    "theme": "Thème"
+    "theme": "Thème",
+    "themes": {
+      "system": "Système",
+      "light": "Clair",
+      "dark": "Sombre"
+    }
   },
   "footer": {
     "about": "Nous connaître",
     "resources": "Ressources",
     "commitments": "Nos engagements",
     "other": "Autres",
-    "description": "La Cameroon Radio Television est l’organisme public camerounais de radio-télévision.",
+    "description": "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
     "links": {
       "about": "À propos",
       "crtvCameroon": "CRTV Cameroun",
@@ -44,30 +49,149 @@
   },
   "common": {
     "seeAll": "Voir tout",
+    "seeMore": "Voir plus",
     "live": "LIVE",
-    "send": "Envoyer"
+    "direct": "EN DIRECT",
+    "send": "Envoyer",
+    "play": "Lire",
+    "follow": "Suivre",
+    "retry": "Réessayer",
+    "about": "À propos",
+    "all": "Tous",
+    "toWatchNow": "À regarder maintenant",
+    "latestVideos": "Dernières vidéos",
+    "upNext": "À suivre",
+    "relatedContent": "Contenus associés",
+    "otherLiveChannels": "Autres chaînes en direct",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "collapse": "Réduire",
+    "archives": "Archives",
+    "shows": "des Émissions",
+    "missed": "Ce que vous avez raté",
+    "onAir": "à l'antenne",
+    "inProgress": "En cours",
+    "loading": "Chargement...",
+    "loadMore": "Charger +",
+    "controls": "CONTRÔLES",
+    "previewUnavailable": "Aperçu non disponible",
+    "streamUnavailable": "Flux indisponible",
+    "liveDescription": "Suivez votre chaîne préférée en direct sur le portail CRTV.",
+    "itinerary": "Obtenir l'itinéraire",
+    "copyCoords": "Copier les coordonnées",
+    "viewOSM": "Voir sur OpenStreetMap",
+    "watchMissedFallback": "Regardez les dernières vidéos que vous avez manquées",
+    "replayTag": "Replay",
+    "pressRelease": "COMMUNIQUÉ",
+    "readRelease": "Lire le communiqué",
+    "deepSearch": "Recherche...",
+    "fetchingArchive": "Récupération...",
+    "episodeNotFound": "Épisode introuvable",
+    "contentUnavailable": "Ce contenu n'est plus disponible ou a été déplacé dans les archives.",
+    "retrySearch": "Réessayer la recherche",
+    "scheduleUnavailable": "Programme non disponible pour le moment.",
+    "tvSchedule": "Programme TV",
+    "noDescription": "Aucune description"
   },
   "pages": {
     "home": {
       "hero": "À la une",
-      "liveChannels": "Nos chaînes en direct",
+      "liveChannels": "Nos chaînes",
+      "liveChannelsSuffix": "en direct",
       "latestEditions": "Dernières éditions",
-      "editorChoice": "Choix de la rédaction",
+      "editorChoice": "Choix de la",
+      "editorChoiceSuffix": "rédaction",
       "categories": "Catégories",
-      "regionalNews": "Actualités régionales",
-      "shorts": "Shorts / Résumés",
-      "corporate": "Corporate news"
+      "regionalNews": "Actualités",
+      "regionalNewsSuffix": "régionales",
+      "shorts": "L'actu en Resumé",
+      "shortsSuffix": "#CrtvShorts",
+      "corporate": "Corporate news",
+      "actu": "ACTU",
+      "matam": "MATAM",
+      "agriculture": "AGRICULTURE"
     },
     "radio": {
-      "title": "Radio FM",
-      "upNext": "Programmes à venir"
+      "title": "NOS RADIOS",
+      "titleSuffix": "EN DIRECT",
+      "upNext": "Programmes à venir",
+      "noRadioAvailable": "Aucune radio disponible"
+    },
+    "live": {
+      "title": "NOS CHAÎNES",
+      "titleSuffix": "EN DIRECT"
     },
     "replay": {
-      "title": "Replay TV"
+      "title": "Replay TV",
+      "ourShows": "Nos Émissions de",
+      "tvSubtitle": "Télévision",
+      "latest": "Dernières",
+      "editions": "Éditions"
+    },
+    "map": {
+      "loading": "Chargement de la carte...",
+      "error": "Erreur de chargement de la carte",
+      "copied": "Coordonnées copiées !",
+      "poweredBy": "Propulsé par",
+      "defaultTitle": "Notre Position"
+    },
+    "radioPlayer": {
+      "errors": {
+        "noStream": "Aucune source de flux disponible",
+        "offline": "La radio semble être hors ligne (Erreur de lecture)",
+        "notResponding": "Le flux ne répond pas - la radio est hors ligne",
+        "playError": "Impossible de lire ce flux radio",
+        "networkError": "Erreur réseau - la radio semble hors ligne",
+        "formatError": "Format audio non supporté",
+        "unavailable": "La radio est hors ligne ou le flux est indisponible",
+        "aborted": "Chargement interrompu",
+        "playFailed": "Impossible de lire le flux audio"
+      },
+      "status": {
+        "loading": "Chargement de la radio...",
+        "longLoad": "Cela peut prendre jusqu'à 45 secondes...",
+        "offlineTitle": "Radio Hors Ligne",
+        "offlineMessage": "La radio est actuellement indisponible. Le flux pourrait être temporairement hors ligne.",
+        "offline": "Hors ligne",
+        "connecting": "Connexion...",
+        "ready": "Prêt"
+      },
+      "player": {
+        "retry": "Réessayer",
+        "presentedBy": "PRÉSENTÉ PAR :",
+        "live": "En direct"
+      },
+      "fallback": {
+        "desc": "Votre radio nationale, au cœur de l'actualité et de la culture camerounaise. Restez à l'écoute pour nos programmes variés.",
+        "program": "JOURNAL EN DIRECT",
+        "presenter": "LA RÉDACTION CRTV"
+      },
+      "channels": {
+        "poste-national": {
+          "desc": "La Poste Nationale est le cœur battant de la radio publique camerounaise, diffusant l'information, la culture et l'éducation sur l'ensemble du territoire national depuis Yaoundé.",
+          "program": "JOURNAL PARLÉ"
+        },
+        "fm-94": {
+          "desc": "CRTV FM 94 est la radio urbaine de Yaoundé, centrée sur l'actualité de la capitale, la musique contemporaine et les débats citoyens pour un public jeune et dynamique.",
+          "program": "YAOUNDÉ BY NIGHT"
+        },
+        "fm-105": {
+          "desc": "CRTV FM 105 Suelaba est la voix vibrante de Douala, mêlant musiques locales, informations économiques et divertissements pour la métropole économique du Cameroun.",
+          "program": "SUELABA MATIN"
+        },
+        "mount-cameroon-fm": {
+          "desc": "Basée à Buea, Mount Cameroon FM est la référence pour les régions anglophones, offrant des programmes bilingues riches en culture et actualités locales.",
+          "program": "MOUNTAIN SHOW"
+        }
+      }
     },
     "news": {
       "title": "News",
-      "trending": "Trending"
+      "trending": "Trending",
+      "moreOf": "plus d'",
+      "newsTitle": "ACTUALITÉS",
+      "loadingNews": "Chargement de l'actualité...",
+      "noArticles": "Aucun article trouvé dans cette catégorie pour le moment. Nous revenons bientôt avec plus d'actu !"
     },
     "contact": {
       "title": "Contact",
@@ -89,7 +213,25 @@
         "subject": "Sujet",
         "message": "Quel est votre message ?"
       }
+    },
+    "info": {
+      "dataProtection": "Protection des données",
+      "privacyHero": "Respect de la Vie Privée",
+      "dataQuestion": "Une question sur vos données ?",
+      "dataDPO": "Notre délégué à la protection des données vous répond.",
+      "termsHero": "Conditions Générales d'Utilisation",
+      "termsRules": "Règles de plateforme",
+      "legalHero": "Mentions Légales",
+      "legalTransparency": "Transparence",
+      "legalEditor": "Éditeur du site",
+      "legalHosting": "Hébergement"
+    },
+    "about": {
+      "titlePart1": "Notre",
+      "titlePart2": "Histoire",
+      "intro": "Découvrez le parcours de la Cameroon Radio Television, pilier de l'audiovisuel au Cameroun.",
+      "commitmentTitle": "Engagement Public",
+      "commitmentDesc": "Depuis 1963, nous œuvrons pour l'éducation, l'information et le divertissement de tous les citoyens."
     }
   }
 }
-

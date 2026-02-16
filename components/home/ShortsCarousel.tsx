@@ -19,7 +19,8 @@ export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCar
             <Carousel itemClassName="w-[250px]" >
                 {videos.map((video, index) => (
                     <Link key={index} href={`/playback/${video.slug}`} className="group block">
-                        <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2">
+                        <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2
+                        hover:scale-[1.02] transition-all ">
                             <Image
                                 src={video.logo_url || video.logo}
                                 alt={video.title}

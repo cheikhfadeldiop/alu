@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/leaflet.js";
+import { SITE_CONFIG } from "@/constants/site-config";
 
+
+import { useTranslations } from "next-intl";
 
 interface MapLocationProps {
     latitude: number;
@@ -17,16 +20,20 @@ interface MapLocationProps {
 export function MapLocation({
     latitude,
     longitude,
-    title = "Notre Position",
+    title,
     address,
     zoom = 15,
     height = "500px",
 }: MapLocationProps) {
+    const t = useTranslations("map");
     const mapRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const mapInstanceRef = useRef<any>(null);
     const markerRef = useRef<any>(null);
+
+    const defaultTitle = t("defaultTitle");
+    const displayTitle = title || defaultTitle;
 
     useEffect(() => {
         // Load Leaflet CSS and JS
@@ -58,7 +65,7 @@ export function MapLocation({
                 await initMap();
             } catch (err) {
                 console.error("Error loading map:", err);
-                setError("Erreur de chargement de la carte");
+                setError(t("error"));
                 setIsLoading(false);
             }
         };
@@ -81,7 +88,7 @@ export function MapLocation({
             const greenIcon = L.icon({
                 iconUrl: 'data:image/svg+xml;base64,' + btoa(`
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40">
-                        <path fill="#22c55e" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                        <path fill="${SITE_CONFIG.theme.colors.success}" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
                         <circle cx="12" cy="9" r="2.5" fill="#ffffff"/>
                     </svg>
                 `),
@@ -94,10 +101,10 @@ export function MapLocation({
             const marker = L.marker([latitude, longitude], { icon: greenIcon }).addTo(map);
 
             // Add popup
-            if (title || address) {
+            if (displayTitle || address) {
                 const popupContent = `
                     <div style="padding: 8px; font-family: system-ui; min-width: 200px;">
-                        ${title ? `<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${title}</h3>` : ""}
+                        ${displayTitle ? `<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${displayTitle}</h3>` : ""}
                         ${address ? `<p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280;">${address}</p>` : ""}
                         <p style="margin: 0; font-size: 12px; color: #9ca3af; font-family: monospace;">
                             ${latitude.toFixed(6)}, ${longitude.toFixed(6)}
@@ -109,8 +116,8 @@ export function MapLocation({
 
             // Add circle around marker
             L.circle([latitude, longitude], {
-                color: "#22c55e",
-                fillColor: "#22c55e",
+                color: SITE_CONFIG.theme.colors.success,
+                fillColor: SITE_CONFIG.theme.colors.success,
                 fillOpacity: 0.15,
                 radius: 100, // 100 meters
             }).addTo(map);
@@ -128,7 +135,7 @@ export function MapLocation({
                 mapInstanceRef.current.remove();
             }
         };
-    }, [latitude, longitude, title, address, zoom]);
+    }, [latitude, longitude, displayTitle, address, zoom, t]);
 
     const handleDirections = () => {
         // Open OpenStreetMap directions in new tab
@@ -140,7 +147,7 @@ export function MapLocation({
 
     const handleCopyCoordinates = () => {
         navigator.clipboard.writeText(`${latitude}, ${longitude}`);
-        alert("Coordonnées copiées !");
+        alert(t("copied"));
     };
 
     const handleViewOnOSM = () => {
@@ -163,7 +170,7 @@ export function MapLocation({
                         <div className="text-center">
                             <div className="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin mx-auto mb-3" />
                             <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                Chargement de la carte...
+                                {t("loading")}
                             </p>
                         </div>
                     </div>
@@ -203,8 +210,8 @@ export function MapLocation({
                 <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-[1000]">
                     <button
                         onClick={handleDirections}
-                        className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
-                        title="Obtenir l'itinéraire"
+                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
+                        title={t("common.itinerary")}
                     >
                         <svg
                             className="w-5 h-5 text-green-600 group-hover:text-green-700"
@@ -223,11 +230,11 @@ export function MapLocation({
 
                     <button
                         onClick={handleCopyCoordinates}
-                        className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
+                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
                         title="Copier les coordonnées"
                     >
                         <svg
-                            className="w-5 h-5 text-gray-600 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                            className="w-5 h-5 text-red-600 group-hover:text-red-700"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -243,8 +250,8 @@ export function MapLocation({
 
                     <button
                         onClick={handleViewOnOSM}
-                        className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
-                        title="Voir sur OpenStreetMap"
+                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
+                        title={t("common.viewOSM")}
                     >
                         <svg
                             className="w-5 h-5 text-blue-600 group-hover:text-blue-700"
@@ -263,110 +270,9 @@ export function MapLocation({
                 </div>
             </div>
 
-            {/* Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Address Card */}
-                {address && (
-                    <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-                        <div className="flex items-start gap-3">
-                            <div className="p-2 bg-green-500/10 rounded-lg">
-                                <svg
-                                    className="w-5 h-5 text-green-600"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                    />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                                    Adresse
-                                </h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {address}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Coordinates Card */}
-                <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-                    <div className="flex items-start gap-3">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <svg
-                                className="w-5 h-5 text-blue-600"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                                Coordonnées GPS
-                            </h4>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-                                {latitude.toFixed(6)}, {longitude.toFixed(6)}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Directions Card */}
-                <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-                    <div className="flex items-start gap-3">
-                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                            <svg
-                                className="w-5 h-5 text-purple-600"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                                Itinéraire
-                            </h4>
-                            <button
-                                onClick={handleDirections}
-                                className="text-sm text-green-600 hover:text-green-700 font-medium"
-                            >
-                                Obtenir l'itinéraire →
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Powered by OpenStreetMap */}
             <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-                Propulsé par{" "}
+                {t("poweredBy")}{" "}
                 <a
                     href="https://www.openstreetmap.org/"
                     target="_blank"

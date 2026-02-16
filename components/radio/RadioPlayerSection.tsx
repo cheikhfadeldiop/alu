@@ -1,14 +1,43 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { LiveChannel } from "../../types/api";
+import { LiveChannel, EPGItem } from "../../types/api";
+
+import { useTranslations } from "next-intl";
 
 interface RadioPlayerSectionProps {
     channel: LiveChannel;
+    currentProgram?: EPGItem;
 }
 
-export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
+export function RadioPlayerSection({ channel, currentProgram }: RadioPlayerSectionProps) {
+    const t = useTranslations("radioPlayer");
+    const tCommon = useTranslations("common");
+
+    const RADIO_FALLBACK_DATA: Record<string, { desc: string, presenter: string, program: string }> = {
+        'poste-national': {
+            desc: t('channels.poste-national.desc'),
+            presenter: "EUGÈNE SIAKA",
+            program: t('channels.poste-national.program')
+        },
+        'fm-94': {
+            desc: t('channels.fm-94.desc'),
+            presenter: "ÉQUIPE FM 94",
+            program: t('channels.fm-94.program')
+        },
+        'fm-105': {
+            desc: t('channels.fm-105.desc'),
+            presenter: "ANTONY PAYSAN",
+            program: t('channels.fm-105.program')
+        },
+        'mount-cameroon-fm': {
+            desc: t('channels.mount-cameroon-fm.desc'),
+            presenter: "PETER MBE",
+            program: t('channels.mount-cameroon-fm.program')
+        }
+    };
     const audioRef = useRef<HTMLAudioElement>(null);
     const [streamUrl, setStreamUrl] = useState<string>("");
     const [loading, setLoading] = useState(true);
@@ -34,7 +63,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
 
             try {
                 if (!channel.stream_url) {
-                    throw new Error("Aucune source de flux disponible");
+                    throw new Error(t('errors.noStream'));
                 }
 
                 if (mounted) {
@@ -60,7 +89,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                                     // Don't hide loader immediately, let handleError event handle it with the 5s check
                                     // OR force error if we want immediate feedback
                                     // Let's set error immediately if it's clearly not an autoplay block
-                                    const errorMsg = "La radio semble être hors ligne (Erreur de lecture)";
+                                    const errorMsg = t('errors.offline');
                                     setError(errorMsg);
                                     setLoading(false);
                                     setIsStreamDead(true);
@@ -72,7 +101,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
             } catch (err) {
                 console.error("[RadioPlayer] Failed to fetch stream", err);
                 if (mounted) {
-                    const errorMsg = err instanceof Error ? err.message : "Erreur de chargement du flux";
+                    const errorMsg = err instanceof Error ? err.message : t('errors.playError');
                     setError(errorMsg);
                     setLoading(false);
                     setIsStreamDead(true);
@@ -123,7 +152,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
             playingTimeout = setTimeout(() => {
                 if (!isActuallyPlaying) {
                     console.error(`[RadioPlayer] Stream never started playing after 45s`);
-                    setError("Le flux ne répond pas - la radio est hors ligne");
+                    setError(t('errors.notResponding'));
                     setLoading(false);
                     setIsPlaying(false);
                     setIsStreamDead(true);
@@ -148,24 +177,24 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
             // Wait 5 seconds to see if it's a temporary glitch
             clearTimeout(errorTimeout);
             errorTimeout = setTimeout(() => {
-                let errorMessage = "Impossible de lire ce flux radio";
+                let errorMessage = t('errors.playError');
                 let shouldMarkDead = true;
 
                 if (audioElement.error) {
                     switch (audioElement.error.code) {
                         case MediaError.MEDIA_ERR_NETWORK:
-                            errorMessage = "Erreur réseau - la radio semble hors ligne";
+                            errorMessage = t('errors.networkError');
                             break;
                         case MediaError.MEDIA_ERR_DECODE:
-                            errorMessage = "Format audio non supporté";
+                            errorMessage = t('errors.formatError');
                             break;
                         case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMessage = "La radio est hors ligne ou le flux est indisponible";
+                            errorMessage = t('errors.unavailable');
                             break;
                         case MediaError.MEDIA_ERR_ABORTED:
                             // Don't show error for aborted - user might have clicked pause
                             if (isPlaying) {
-                                errorMessage = "Chargement interrompu";
+                                errorMessage = t('errors.aborted');
                             } else {
                                 shouldMarkDead = false;
                                 return; // Don't set error
@@ -285,7 +314,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
             setIsStreamDead(false);
             audioRef.current.play().catch((err) => {
                 console.error("[RadioPlayer] Playback failed:", err);
-                setError("Impossible de lire le flux audio");
+                setError(t('errors.playFailed'));
                 setLoading(false);
                 setIsActuallyPlaying(false);
                 setIsStreamDead(true);
@@ -321,33 +350,33 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
     const frequency = channel.desc?.match(/(\d+\.?\d*)\s*(FM|MHz)/i)?.[0] || "FM";
 
     return (
-        <div className="w-full space-y-6">
+        <div className="w-full space-y-6 ">
             {/* Main Player Container */}
-            <div className="relative rounded-2xl p-8 bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
+            <div className="relative rounded-sm p-8 bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
                 {/* Loading Overlay */}
                 {loading && !error && !isStreamDead && (
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
                         <div className="text-center">
                             <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
-                            <p className="text-white text-lg font-semibold">Chargement de la radio...</p>
+                            <p className="text-white text-lg font-semibold">{t('status.loading')}</p>
                             <p className="text-white/60 text-sm mt-2">{channel.title}</p>
-                            <p className="text-white/40 text-xs mt-2">Cela peut prendre jusqu'à 45 secondes...</p>
+                            <p className="text-white/40 text-xs mt-2">{t('status.longLoad')}</p>
                         </div>
                     </div>
                 )}
 
                 {/* Stream Dead Overlay */}
                 {isStreamDead && (
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="absolute inset-0  rounded-2xl bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
                         <div className="text-center max-w-md px-6">
                             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
                                 <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                 </svg>
                             </div>
-                            <h3 className="text-white text-xl font-bold mb-3">Radio Hors Ligne</h3>
+                            <h3 className="text-white text-xl font-bold mb-3">{t('status.offlineTitle')}</h3>
                             <p className="text-white/70 text-sm mb-6">
-                                {error || "La radio est actuellement indisponible. Le flux pourrait être temporairement hors ligne."}
+                                {error || t('status.offlineMessage')}
                             </p>
                             <button
                                 onClick={handleRetry}
@@ -356,7 +385,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
-                                Réessayer
+                                {t('player.retry')}
                             </button>
                         </div>
                     </div>
@@ -364,7 +393,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
 
 
                 {/* Background Waveform Pattern */}
-                <div className="absolute  pointer-events-none inset-0 opacity-00  bg-[url('/images/waveform.png')] bg-cover bg-center">
+                <div className="absolute  rounded-2xl pointer-events-none inset-0 opacity-00  bg-[url('/images/waveform.png')] bg-cover bg-center">
                     {/*image de fond sur le player avec opaciter 0.5*/}
                     {/* Background Image */}
                     <div className="absolute inset-0 z-0 pointer-events-none">
@@ -372,7 +401,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                             src="/assets/logo/fondd.png"
                             alt="Background"
                             fill
-                            className="object-cover opacity-50" // Ajuste l'opacité ici
+                            className="object-cover opacity-50  rounded-2xl" // Ajuste l'opacité ici
                         />
                     </div>
 
@@ -409,14 +438,14 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                 </button>
 
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className=" mb-10 mt-[-35px] flex flex-col items-center bg-white/20 w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
+                    <div className=" mb-10 mt-[-35px] flex flex-col items-center bg-white/10 backdrop-blur-sm w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
                         <div className="mb-4">
                             <Image
                                 src={channel.logo_url || channel.logo || channel.hd_logo || "/assets/placeholders/radio_icon_sur_card.png"}
                                 alt={channel.title}
-                                width={80}
-                                height={80}
-                                className="object-contain"
+                                width={100}
+                                height={100}
+                                className="object-contain bg-black rounded-full"
                             />
                         </div>
 
@@ -545,12 +574,12 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                                             }`}
                                     />
                                     {isActuallyPlaying
-                                        ? 'En direct'
+                                        ? t('player.live')
                                         : isStreamDead
-                                            ? 'Hors ligne'
+                                            ? t('status.offline')
                                             : loading && isPlaying
-                                                ? 'Connexion...'
-                                                : 'Prêt'}
+                                                ? t('status.connecting')
+                                                : t('status.ready')}
                                 </span>
                                 <span>•</span>
                                 <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -614,7 +643,7 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
 
             {/* Error State with Retry - Only show if not already showing dead overlay */}
             {error && !isStreamDead && (
-                <div className="flex items-center justify-center gap-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="flex items-center  rounded-2xl justify-center gap-4 p-4 bg-red-500/10 border border-red-500/30 ">
                     <div className="flex items-center gap-3 flex-1">
                         <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -625,46 +654,87 @@ export function RadioPlayerSection({ channel }: RadioPlayerSectionProps) {
                         onClick={handleRetry}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap"
                     >
-                        Réessayer
+                        {t('player.retry')}
                     </button>
                 </div>
             )}
 
-            {/* Channel Description */}
-            <div className="p-6 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/10">
-                <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-white/5 p-2 border border-gray-200 dark:border-white/10">
+            {/* Premium Channel Info Container */}
+            <div className="relative p-8 md:p-10  backdrop-blur-3xl bg-background/85   border border-white/5 overflow-hidden group/info">
+                {/* Decoration Background */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                    {/* Channel Logo */}
+                    <div className="w-30 h-20 md:w-34 md:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                         <Image
-                            src={channel.logo_url || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
+                            src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
                             alt={channel.title}
-                            width={64}
-                            height={64}
-                            className="object-contain w-full h-full"
+                            width={120}
+                            height={100}
+                            className=" object-contain w-full h-full brightness-110 drop-shadow-md "
                         />
                     </div>
-                    <div className="flex-1">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{channel.title}</h2>
-                        <p className="text-sm text-gray-600 dark:text-white/60">
-                            {channel.desc || "Radio en direct du Cameroun"}
-                        </p>
+
+                    {/* Content */}
+                    <div className="flex-1 text-center md:text-left justify-center items-center space-y-4">
+                        {/* Header: Status + Title */}
+                        <div className="flex items-center justify-center md:justify-start gap-3">
+                            <div className="flex items-center gap-2 px-3 py-1">
+                                <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
+                                <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-black  uppercase tracking-tighter drop-shadow-sm">
+                                {channel.title}
+                            </h2>
+                        </div>
+
+
                     </div>
-                    <div className="hidden sm:block">
-                        <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isActuallyPlaying
-                            ? 'bg-red-600/10 text-red-500 border border-red-600/20'
-                            : isStreamDead
-                                ? 'bg-gray-600/10 text-gray-500 border border-gray-600/20'
-                                : loading && isPlaying
-                                    ? 'bg-yellow-600/10 text-yellow-500 border border-yellow-600/20'
-                                    : 'bg-gray-600/10 text-gray-500 border border-gray-600/20'
-                            }`}>
-                            <span className={`w-2 h-2 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse'
-                                : loading && isPlaying && !isStreamDead ? 'bg-yellow-500 animate-pulse'
-                                    : 'bg-gray-500'
-                                }`} />
-                            {isActuallyPlaying ? 'LIVE'
-                                : isStreamDead ? 'OFFLINE'
-                                    : loading && isPlaying ? 'CONNECTING'
-                                        : 'READY'}
+
+
+                    {/* Share Button (Top Right Desktop) */}
+                    <div className="absolute top-0 right-0 p-4 shrink-0">
+                        <button className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300  group/share">
+                            <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {/* Description */}
+                <div className="max-w-3xl pt-4 pb-8">
+                    <p className="text-sm md:text-base text-foreground/50 leading-relaxed font-medium">
+                        {channel.desc || (
+                            Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
+                                channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
+                            )?.[1].desc || t('fallback.desc')
+                        )}
+                    </p>
+                </div>
+
+                {/* Program Info (New addition matching image) */}
+                <div className="pt-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border-t border-white/5">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                            {currentProgram?.program_title || (
+                                Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
+                                    channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
+                                )?.[1].program || t('fallback.program')
+                            )}
+                        </span>
+                    </div>
+                    <div className="hidden md:block w-px h-4 bg-white/10" />
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">{t('player.presentedBy')}</span>
+                        <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                            {currentProgram?.program_desc?.split('|')[1]?.trim() || (
+                                Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
+                                    channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
+                                )?.[1].presenter || t('fallback.presenter')
+                            )}
                         </span>
                     </div>
                 </div>

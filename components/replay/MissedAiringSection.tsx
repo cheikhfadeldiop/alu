@@ -7,6 +7,7 @@ import { SliderVideoItem } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
 import { getRelatedItems } from "../../services/api";
 import { useReplayFetcher } from "../../hooks/useReplayFetcher";
+import { useTranslations } from "next-intl";
 
 interface MissedAiringSectionProps {
     initialVideos: SliderVideoItem[];
@@ -19,6 +20,7 @@ interface Block {
 }
 
 export function MissedAiringSection({ initialVideos, liveChannels = [] }: MissedAiringSectionProps) {
+    const t = useTranslations("common");
     const [blocks, setBlocks] = React.useState<Block[]>([]);
 
     // We use the hook to manage the full list of available replays (initial + fetched)
@@ -92,7 +94,7 @@ export function MissedAiringSection({ initialVideos, liveChannels = [] }: Missed
 
     return (
         <section className=" w-full max-w-[1400px] mx-auto px-4 ">
-            <SectionTitle title="Ce que vous avez raté" title2="à l'antenne" actionIcon={true} />
+            <SectionTitle title={t("missed")} title2={t("onAir")} actionIcon={true} />
 
             <div className="space-y-16">
                 {blocks.map((block, blockIdx) => (
@@ -136,7 +138,7 @@ export function MissedAiringSection({ initialVideos, liveChannels = [] }: Missed
                         className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
                     >
                         <span className="text-sm font-bold uppercase tracking-[0.2em] ">
-                            {loading ? "Chargement..." : "Charger +"}
+                            {loading ? t("loading") : t("loadMore")}
                         </span>
                     </button>
                 </div>

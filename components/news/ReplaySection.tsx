@@ -21,7 +21,7 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
                     title2="Dernières Émissions"
                     uppercase={true}
                     actionIcon={true}
-                    actionIconLink="/replay tv"
+                    actionHref={`/replay`}
                 />
             </div>
 
@@ -29,7 +29,8 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
                 {displayVideos.map((video, index) => (
                     <MediaCard
                         key={`${video.slug}-${index}`}
-                        href={video.video_url || "#"}
+                        href={video.video_url || `/replay/${video.slug}`}
+                        target={false}
                         title={video.title}
                         imageSrc={video.logo_url}
                         meta={`${video.date} • ${video.time || 'Replay'}`}

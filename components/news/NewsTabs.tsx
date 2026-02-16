@@ -2,25 +2,21 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { getWordPressCategories } from "../../services/api";
 import { WordPressCategory } from "../../types/api";
 import { decodeHtmlEntities } from "../../utils/text";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { TabsShimmer } from "../ui/shimmer/CommonShimmers";
 
 interface NewsTabsProps {
     onFilterChange: (categoryIds: string, categoryName: string) => void;
 }
 
+const VIRTUAL_PARENTS = SITE_CONFIG.categories.news.groups;
+
 interface VirtualParent {
     id: string;
     name: string;
-    matchIds: number[]; // Explicit parent IDs or specific category IDs to include
-    keywords: string[]; // Keywords to look for in slug or name for auto-distribution
+    matchIds: number[];
+    keywords: string[];
 }
-
-const VIRTUAL_PARENTS: VirtualParent[] = [
-    { id: "a-la-une", name: "A LA UNE", matchIds: [121], keywords: ["une", "actualit", "general"] },
-    { id: "regions", name: "RÉGIONS", matchIds: [145], keywords: ["dakar", "matam", "region", "saint-louis", "louga", "tambacounda", "diourbel", "kaolack", "fatick", "kolda", "ziguinchor", "sedhiou", "kedougou", "kaffrine"] },
-    { id: "international", name: "INTERNATIONAL", matchIds: [128], keywords: ["monde", "world", "afrique", "europe", "asie", "amerique"] },
-    { id: "societe-politique", name: "SOCIÉTÉ & POLITIQUE", matchIds: [136, 132, 151, 123, 129], keywords: ["politique", "economie", "sante", "education", "societe", "justice", "gouvernance"] },
-    { id: "loisirs-tech", name: "LOISIRS & TECH", matchIds: [125, 612, 148, 116], keywords: ["sport", "culture", "tech", "musique", "cinema", "loisirs", "variet"] },
-];
 
 export function NewsTabs({ onFilterChange }: NewsTabsProps) {
     const [categories, setCategories] = useState<WordPressCategory[]>([]);
@@ -138,7 +134,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
     };
 
 
-    if (loading) return <div className="h-28 animate-pulse bg-muted/10 rounded-lg w-full mb-6"></div>;
+    if (loading) return <TabsShimmer />;
 
     return (
         <div className="w-full space-y-4 py-6">
@@ -156,7 +152,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
                         >
                             {decodeHtmlEntities(group.name)}
                             {activeGroupId === group.id && (
-                                <div className="absolute bottom-0 left-0 w-full h-1 bg-green-500 rounded-t-full" />
+                                <div className="absolute bottom-0 left-0 w-full h-1 bg-[color:var(--success)] rounded-t-full" />
                             )}
                         </button>
                     ))}
@@ -176,7 +172,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
                                 <button
                                     onClick={() => handleSubClick(tab.id)}
                                     className={`text-[13px] font-bold tracking-wider transition-colors uppercase ${activeSubId === tab.id
-                                        ? "text-red-600"
+                                        ? "text-[color:var(--accent)]"
                                         : "text-gray-500 hover:text-foreground"
                                         }`}
                                 >
@@ -199,7 +195,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
                 {scrollRef.current && scrollRef.current.scrollWidth > scrollRef.current.clientWidth && (
                     <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gray-100 dark:bg-muted/10 overflow-hidden">
                         <div
-                            className="h-full bg-red-600/60 transition-all duration-150 ease-out rounded-full"
+                            className="h-full bg-[color:var(--accent)]/60 transition-all duration-150 ease-out rounded-full"
                             style={{
                                 width: `${(scrollRef.current.clientWidth / scrollRef.current.scrollWidth) * 100}%`,
                                 transform: `translateX(${(scrollProgress * (scrollRef.current.clientWidth - (scrollRef.current.clientWidth / scrollRef.current.scrollWidth) * scrollRef.current.clientWidth)) / 100}px)`

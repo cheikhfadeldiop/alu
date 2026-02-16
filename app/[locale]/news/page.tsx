@@ -9,8 +9,10 @@ import { NewsGrid } from "../../../components/news/NewsGrid";
 import { ReplaySection } from "../../../components/news/ReplaySection";
 import { getWordPressPosts, getAllChannelReplays } from "../../../services/api";
 import { WordPressPost, SliderVideoItem } from "../../../types/api";
+import { NewsHeroShimmer, NewsGridShimmer, ReplaySectionShimmer } from "@/components/ui/shimmer/NewsShimmers";
 
 export default function NewsPage() {
+  const t = useTranslations("pages.news");
   const [articles, setArticles] = useState<WordPressPost[]>([]);
   const [replays, setReplays] = useState<SliderVideoItem[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | number>("");
@@ -90,44 +92,46 @@ export default function NewsPage() {
         <NewsTabs onFilterChange={fetchNews} />
       </div>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-32 space-y-4">
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 rounded-full border-4 border-gray-100 dark:border-white/5" />
-            <div className="absolute inset-0 rounded-full border-4 border-red-600 border-t-transparent animate-spin" />
-          </div>
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">
-            Chargement de l'actualité...
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-10">
-          {/* Main Feature Section (NewsHero) */}
-          <NewsHero items={heroItems} categoryName={activeCategoryName} />
+      <div className="space-y-12">
+        {loading ? (
+          <>
+            <NewsHeroShimmer />
+            <NewsGridShimmer />
+          </>
+        ) : (
+          <>
+            {/* Main Feature Section (NewsHero) */}
+            <NewsHero items={heroItems} categoryName={activeCategoryName} />
 
-          {/* Secondary Feed - 3-Column Grid Component */}
-          <NewsGrid
-            items={gridItems}
-            loadingMore={loadingMore}
-            hasMore={hasMore}
-            onLoadMore={handleLoadMore}
-            title="plus d'"
-            title2="ACTUALITES"
-          />
+            {/* Secondary Feed - 3-Column Grid Component */}
+            <NewsGrid
+              items={gridItems}
+              loadingMore={loadingMore}
+              hasMore={hasMore}
+              onLoadMore={handleLoadMore}
+              title={t("moreOf")}
+              title2={t("newsTitle")}
+            />
+          </>
+        )}
 
-          {/* Replay Section */}
+        {/* Replay Section - Load separately */}
+        {replays.length === 0 ? (
+          <ReplaySectionShimmer />
+        ) : (
           <ReplaySection videos={replays} />
+        )}
 
-          {articles.length === 0 && !loading && (
-            <div className="py-24 text-center space-y-6">
-              <div className="text-6xl opacity-10">📰</div>
-              <p className="text-xl font-medium text-gray-400 max-w-md mx-auto">
-                Aucun article trouvé dans cette catégorie pour le moment. Nous revenons bientôt avec plus d'actu !
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+        {articles.length === 0 && !loading && (
+          <div className="py-24 text-center space-y-6">
+            <div className="text-6xl opacity-10">📰</div>
+            <p className="text-xl font-medium text-gray-400 max-w-md mx-auto">
+              {t("noArticles")}
+            </p>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

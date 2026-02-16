@@ -6,11 +6,14 @@ import { Link } from "../../i18n/navigation";
 import { SliderVideoItem } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
 
+import { useTranslations } from "next-intl";
+
 interface EmissionsSliderProps {
     shows: SliderVideoItem[];
 }
 
 export function EmissionsSlider({ shows }: EmissionsSliderProps) {
+    const t = useTranslations();
     const scrollerRef = React.useRef<HTMLDivElement | null>(null);
     const [scrollProgress, setScrollProgress] = React.useState(0);
 
@@ -38,15 +41,15 @@ export function EmissionsSlider({ shows }: EmissionsSliderProps) {
         <section className="w-full max-w-[1400px] mx-auto px-4  space-y-8">
             {/* Header with Title and Custom Navigation */}
             <div className="flex items-center justify-between">
-                <SectionTitle title="Nos Émissions de"
-                    title2="Télévision" />
+                <SectionTitle title={t("pages.replay.ourShows")}
+                    title2={t("pages.replay.tvSubtitle")} />
 
                 {/* Top Right Navigation Buttons */}
                 <div className="flex gap-2">
                     <button
                         onClick={() => scrollBy('left')}
                         className="w-10 h-10 border border-white/10 bg-foreground/10 hover:bg-red-600 transition-colors flex items-center justify-center rounded-sm group"
-                        aria-label="Previous"
+                        aria-label={t("common.previous")}
                     >
                         <svg className="w-5 h-5 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -55,7 +58,7 @@ export function EmissionsSlider({ shows }: EmissionsSliderProps) {
                     <button
                         onClick={() => scrollBy('right')}
                         className="w-10 h-10 border border-white/10 bg-foreground/10 hover:bg-red-600 transition-colors flex items-center justify-center rounded-sm group"
-                        aria-label="Next"
+                        aria-label={t("common.next")}
                     >
                         <svg className="w-5 h-5  group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

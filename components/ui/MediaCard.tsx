@@ -13,6 +13,7 @@ export type MediaCardProps = {
   showPlayIcon?: boolean;
   aspect?: "16/9" | "4/3" | "1/1" | "469/246";
   channelLogo?: string;
+  target?: boolean;
 };
 
 function aspectClass(aspect: MediaCardProps["aspect"]) {
@@ -48,6 +49,8 @@ function PlayOverlay() {
   );
 }
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 export function MediaCard({
   href,
   title,
@@ -57,6 +60,7 @@ export function MediaCard({
   showPlayIcon = false,
   aspect = "16/9",
   channelLogo,
+  target = true,
 }: MediaCardProps) {
   const [imgSrc, setImgSrc] = React.useState(imageSrc);
 
@@ -67,16 +71,18 @@ export function MediaCard({
   return (
     <Link
       href={href}
+      target={target ? "_blank" : "_self"}
+      rel="noopener noreferrer"
       className="group block overflow-hidden  bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 "
     >
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <Image
-          src={imgSrc || "/assets/logo/logo.png"}
+          src={imgSrc || SITE_CONFIG.theme.placeholders.logo}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover "
-          onError={() => setImgSrc("/assets/logo/logo.png")}
+          onError={() => setImgSrc(SITE_CONFIG.theme.placeholders.logo)}
         />
 
         {live ? (
@@ -114,7 +120,7 @@ export function MediaCard({
         {meta ? (
           <div className="flex items-center gap-2">
             <div className="text-xs text-[color:var(--muted)]">{meta}</div>
-            <span className="w-1 h-1 bg-[color:green] rounded-full"></span>
+            <span className="w-1 h-1 bg-[color:var(--secondary)] rounded-full"></span>
             <span className="text-xs text-[color:var(--muted)]">la rédaction</span>
           </div>
         ) : null}

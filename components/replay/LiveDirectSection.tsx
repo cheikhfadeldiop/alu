@@ -5,6 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { LiveChannel, EPGItem } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
+import { LiveCarousel } from "../shared/LiveCarousel";
+import { SITE_CONFIG } from "@/constants/site-config";
+
+import { useTranslations } from "next-intl";
 
 interface LiveDirectSectionProps {
     channels: LiveChannel[];
@@ -12,27 +16,33 @@ interface LiveDirectSectionProps {
 }
 
 export function LiveDirectSection({ channels, epgItems }: LiveDirectSectionProps) {
+    const t = useTranslations("common");
     if (!channels || channels.length === 0) return null;
 
     return (
-        <section className="">
-            <SectionTitle title="Directs"
-                title2="à l'antenne"
+        <section className="py-8">
+            <SectionTitle title={t("direct")}
+                title2={t("onAir")}
                 actionIcon={true}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                {channels.slice(0, 3).map((channel) => {
+            <LiveCarousel>
+                {channels.map((channel) => {
                     const currentProgram = epgItems.find(
                         (epg) => epg.channel_id === channel.id && epg.is_current
                     );
-                    return <LiveChannelCard key={channel.id} channel={channel} currentProgram={currentProgram} />;
+                    return (
+                        <div key={channel.id} className="w-[340px] md:w-[400px]">
+                            <LiveChannelCard channel={channel} currentProgram={currentProgram} />
+                        </div>
+                    );
                 })}
-            </div>
+            </LiveCarousel>
         </section>
     );
 }
 
 function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, currentProgram?: EPGItem }) {
+    const t = useTranslations("common");
     const [imgSrc, setImgSrc] = React.useState(channel.logo_url || channel.logo);
 
     React.useEffect(() => {
@@ -40,21 +50,22 @@ function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, cu
     }, [channel.logo_url, channel.logo]);
 
     return (
+
         <Link
             href={`/live?channel=${channel.id}`}
-            className="group flex items-center backdrop-blur-xl bg-background/30 
+            className="group flex items-center backdrop-blur-xl bg-background/5 
             hover:scale-105 transition-transform hover:z-10
             p-5 transition-colors rounded-sm overflow-hidden  h-[140px]
             "
         >
             {/* Left: Thumbnail/Logo */}
-            <div className="relative w-[180px] h-full object-contain">
+            <div className="relative w-[35%] h-full object-contain">
                 <Image
-                    src={imgSrc || "/assets/placeholders/live_tv_frame.png"}
+                    src={imgSrc || SITE_CONFIG.theme.placeholders.video}
                     alt={channel.title}
                     fill
                     className="object-contain opacity-80 "
-                    onError={() => setImgSrc("/assets/placeholders/live_tv_frame.png")}
+                    onError={() => setImgSrc(SITE_CONFIG.theme.placeholders.video)}
                 />
                 {/* Channel Overlay inside thumb if needed */}
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
@@ -63,20 +74,20 @@ function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, cu
             {/* Right: Info */}
             <div className="flex-1 p-4 flex flex-col justify-center space-y-2 min-w-0">
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
-                        EN DIRECT
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[color:var(--accent)]">
+                        {t("direct")}
                     </span>
 
                 </div>
 
                 <div className="space-y-0.5 flex flex-grow">
                     <h3 className="text-sm font-bold line-clamp-1">
-                        {currentProgram?.channel_name || "En cours"}
+                        {currentProgram?.channel_name || t("inProgress")}
                     </h3>
 
-                    <div className="flex items-center  pl-2">
+                    <div className="flex items-center  pl-2 ">
                         {/* logence en rouge */}
-                        <span className="  w-2 h-2 bg-red-600  rotate-45 animate-pulse" />
+                        <span className="  w-2 h-2 bg-[color:var(--accent)]  rotate-45 animate-pulse" />
                         <span className="w-1 h-1  rounded-full" />
                         <p className="text-[11px] font-bold uppercase tracking-tighter">
                             {channel.title}
@@ -85,7 +96,7 @@ function LiveChannelCard({ channel, currentProgram }: { channel: LiveChannel, cu
                 </div>
 
                 <p className="text-[10px] text-gray-400 line-clamp-2 leading-tight">
-                    {currentProgram?.program_desc || "Suivez votre chaîne préférée en direct sur le portail CRTV."}
+                    {currentProgram?.program_desc || t("liveDescription")}
                 </p>
             </div>
         </Link>
