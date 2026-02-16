@@ -22,8 +22,6 @@ import {
 import {
     WordPressNewsShimmer,
     LiveChannelsShimmer,
-    VideoCardShimmer,
-    MoviePosterShimmer,
     ShortsShimmer,
     CorporateShimmer
 } from "../ui/shimmer/HomeShimmers";

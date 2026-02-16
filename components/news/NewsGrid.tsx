@@ -58,12 +58,10 @@ export function NewsGrid({
                         disabled={loadingMore}
                         className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-[color:var(--accent)] transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
                     >
-                        <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
+                        <span className="text-sm  uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
                             {loadingMore ? t("loading") : t("loadMore")}
                         </span>
-                        {!loadingMore && (
-                            <div className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse group-hover:scale-125 transition-transform" />
-                        )}
+
                     </button>
                 </div>
             )}

@@ -200,19 +200,17 @@ export default function ContactPage() {
               />
             </label>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
               <p className="text-[14px] text-foreground/40 uppercase tracking-wide">
                 * {t("requiredHint")}
               </p>
 
               <button
                 type="button"
-                className="w-full md:w-auto px-8 py-4 rounded-sm bg-red-600 hover:bg-black hover:text-red-600 hover:border-red-600 border border-transparent font-black text-xs uppercase tracking-[0.2em] text-white transition-all duration-300 shadow-lg hover:shadow-red-600/20 active:scale-95 flex items-center justify-center gap-3"
+                className="w-full md:w-auto px-8 py-4 rounded-sm bg-green-600 hover:bg-black hover:text-red-600 hover:border-red-600 border border-transparent font-black text-xs uppercase tracking-[0.2em] text-white transition-all duration-300 shadow-lg hover:shadow-red-600/20 active:scale-95 flex items-center justify-center gap-3"
               >
                 {tc("send")}
                 <IconSend className="h-4 w-4" />
               </button>
-            </div>
 
           </form>
         </section>

@@ -214,12 +214,12 @@ export function Header() {
         </nav>
 
         {/* Right section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ">
           {/* Language Dropdown - Fond transparent gris en light, noir en dark */}
           <div className="relative">
             <button
               type="button"
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors border-gray-400/50 bg-gray-400/30 text-gray-900 hover:bg-gray-400/40 backdrop-blur-sm dark:border-white/20 dark:bg-black/30 dark:text-white dark:hover:bg-black/40"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md  px-3 text-[13px] font-medium transition-colors ] text-gray-900 hover:bg-gray-400/40 dark:text-foreground bg-foreground/5 backdrop-blur-sm"
               onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
               aria-label={t("header.language")}
             >
@@ -263,7 +263,7 @@ export function Header() {
           </div>
 
           {/* Theme Selector - Fond transparent gris en light, noir en dark */}
-          <div className="relative inline-flex h-8 items-center rounded-md border p-0.5 border-gray-400/50 bg-gray-400/30 backdrop-blur-sm dark:border-white/20 dark:bg-black/30">
+          <div className="relative inline-flex h-8 items-center rounded-md  p-0.5 bg-foreground/5 backdrop-blur-sm">
             {/* Sliding background */}
             {mounted && (
               <div
@@ -289,7 +289,7 @@ export function Header() {
                     "relative z-10 rounded-sm flex h-full items-center justify-center px-2.5 text-[11px] font-medium transition-colors duration-200",
                     isActive
                       ? "text-background bg-foreground  "
-                      : "text-white hover:bg-foreground dark:text-gray-300 dark:hover:text-background",
+                      : "text-foreground hover:bg-foreground  dark:hover:text-background",
                   ].join(" ")}
                   onClick={() => setTheme(option.value)}
                   aria-label={option.label}

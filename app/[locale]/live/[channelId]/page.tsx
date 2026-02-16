@@ -9,14 +9,14 @@ import { MediaCard } from "../../../../components/ui/MediaCard";
 import { getDirectPlayback, getLiveChannels, getEPGNowByChannel, getAlauneByChannel } from "../../../../services/api";
 
 interface LiveChannelPageProps {
-    params: {
+    params: Promise<{
         channelId: string;
         locale: string;
-    };
+    }>;
 }
 
 export default async function LiveChannelPage({ params }: LiveChannelPageProps) {
-    const { channelId } = params;
+    const { channelId } = await params;
     const t = await getTranslations("common");
 
     try {
@@ -87,11 +87,11 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {relatedContent.slice(0, 6).map((item) => (
                                 <MediaCard
-                                    key={item.id}
-                                    href={`/playback/${item.id}`}
+                                    key={item.slug}
+                                    href={`/replay/${item.slug}`}
                                     title={item.title}
-                                    imageSrc={item.image_url || item.image || "/assets/placeholders/article_list.png"}
-                                    meta={item.category || item.duration}
+                                    imageSrc={item.logo_url || item.logo || "/assets/placeholders/article_list.png"}
+                                    meta={item.chaine_name || item.time}
                                     aspect="16/9"
                                     showPlayIcon
                                 />

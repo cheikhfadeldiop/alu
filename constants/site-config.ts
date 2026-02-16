@@ -9,7 +9,7 @@ export const SITE_CONFIG = {
     name: "CRTV",
     officialName: "Cameroon Radio Television",
     tagline: "L'organisme public camerounais de radio-télévision",
-    description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun. Elle comprend : 03 chaînes de télévision : CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
+    description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
 
     // URL & API Configurations de teste celui de larts
     api: {
@@ -78,7 +78,7 @@ export const SITE_CONFIG = {
             radio: "/assets/placeholders/radio_icon_sur_card.png",
             logo: "/assets/logo/logo.png",
         }
-    },z
+    },
 
     // Content Organization & Logic
     categories: {

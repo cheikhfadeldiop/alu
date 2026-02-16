@@ -40,7 +40,7 @@ export function SectionTitle({
           : "text-base font-semibold tracking-wide text-foreground"
       }
       >
-        {uppercase2 ? title2.toUpperCase() : title2}</h1>
+        {uppercase2 ? title2?.toUpperCase() : title2}</h1>
       {actionIcon && title ? (
         <Link
           href={actionHref || "#"}
