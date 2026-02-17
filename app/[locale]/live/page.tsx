@@ -34,13 +34,9 @@ async function LivePageContent() {
 }
 
 export default async function LivePage() {
-  const t = await getTranslations("pages.live");
 
   return (
     <div className="crtv-page-enter space-y-10 max-w-[1400px] mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-2">
-        <SectionTitle title={t("title")} title2={t("titleSuffix")} />
-      </div>
 
       <Suspense fallback={<LivePageShimmer />}>
         <LivePageContent />

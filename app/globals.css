@@ -9,6 +9,7 @@
   --muted: #5b616b;
   --border: rgba(11, 13, 18, 0.12);
   --accent: #d1121f;
+  --secondary: #009e49;
 
   /* Pattern */
   --pattern-opacity: 0.04;
@@ -31,6 +32,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-secondary: var(--secondary);
 
   --color-flag-green: var(--flag-green);
   --color-flag-red: var(--flag-red);

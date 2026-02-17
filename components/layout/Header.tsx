@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { SafeImage } from "../ui/SafeImage";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
@@ -12,7 +13,7 @@ type NavItem = {
   key: string;
   href: string;
   label: string;
-  hasIcon?: boolean;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 function IconSun(props: React.SVGProps<SVGSVGElement>) {
@@ -92,19 +93,71 @@ function IconCheck(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function IconList(props: React.SVGProps<SVGSVGElement>) {
+function IconHome(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <path
-        d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
     </svg>
   );
 }
+
+function IconInfo(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  );
+}
+
+function IconLive(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="2" />
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.48m-8.48 0a6 6 0 0 1 0-8.48m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
+    </svg>
+  );
+}
+
+function IconVideo(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <polygon points="23 7 16 12 23 17 23 7" />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+}
+
+function IconAudio(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+      <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+      <line x1="12" y1="19" x2="12" y2="23" />
+      <line x1="8" y1="23" x2="16" y2="23" />
+    </svg>
+  );
+}
+
+function IconCorporate(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  );
+}
+
+function IconContact(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  );
+}
+
 
 import { SITE_CONFIG } from "@/constants/site-config";
 
@@ -125,12 +178,13 @@ export function Header() {
   }, []);
 
   const navItems: NavItem[] = [
-    { key: "home", href: "/", label: t("nav.home") },
-    { key: "news", href: "/news", label: t("nav.news"), hasIcon: true },
-    { key: "replay", href: "/replay", label: t("nav.replay") },
-    { key: "radio", href: "/radio", label: t("nav.radio") },
-    { key: "live", href: "/live", label: t("nav.live") },
-    { key: "contact", href: "/contact", label: t("nav.contact") },
+    { key: "home", href: "/", label: t("nav.home"), icon: IconHome },
+    { key: "news", href: "/news", label: t("nav.news"), icon: IconInfo },
+    { key: "live", href: "/live", label: t("nav.live"), icon: IconLive },
+    { key: "replay", href: "/replay", label: t("nav.replay"), icon: IconVideo },
+    { key: "radio", href: "/radio", label: t("nav.radio"), icon: IconAudio },
+    { key: "corporate", href: "/news2", label: t("nav.corporate"), icon: IconCorporate },
+    { key: "contact", href: "/contact", label: t("nav.contact"), icon: IconContact },
   ];
 
   const themeOptions = [
@@ -158,20 +212,19 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center ">
           <Link href="/" className="flex items-center gap-2">
-            <Image
+            <SafeImage
               src={SITE_CONFIG.theme.placeholders.logo}
               alt="CRTV"
               width={72}
               height={72}
               className="h-10 w-20"
               priority
-              objectFit="contain"
             />
           </Link>
         </div>
 
         {/* Navigation - Fond transparent gris en light, noir en dark */}
-        <nav className="flex items-center gap-1 rounded-full p-1 backdrop-blur-sm ">
+        <nav className="flex items-center gap-1 rounded-full p-1 bg-foreground/5 backdrop-blur-sm ">
           {navItems.map((item) => {
             const active =
               item.href === "/"
@@ -184,31 +237,34 @@ export function Header() {
                 key={item.key}
                 href={item.href}
                 className={[
-                  "relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 text-font",
+                  "relative flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300 min-w-[44px] justify-center",
                   active
-                    ? "border-2 border-[color:var(--accent)] bg-white text-gray-900 dark:bg-black dark:text-white"
+                    ? "border-2 border-[color:var(--accent)] bg-gackground "
                     : "",
                 ].join(" ")}
               >
-                {item.hasIcon && (
-                  <IconList className="h-3.5 w-3.5" />
+                {active ? (
+                  <item.icon className="h-5 w-5 text-foreground" />
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    {isLive && (
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)] animate-pulse" aria-hidden />
+                    )}
+                    <span>{item.label}</span>
+                  </div>
                 )}
-                {isLive && (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]" aria-hidden />
-                )}
-                {item.label}
               </Link>
             );
           })}
         </nav>
 
         {/* Right section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ">
           {/* Language Dropdown - Fond transparent gris en light, noir en dark */}
           <div className="relative">
             <button
               type="button"
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors border-gray-400/50 bg-gray-400/30 text-gray-900 hover:bg-gray-400/40 backdrop-blur-sm dark:border-white/20 dark:bg-black/30 dark:text-white dark:hover:bg-black/40"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md  px-3 text-[13px] font-medium transition-colors ] text-gray-900 hover:bg-gray-400/40 dark:text-foreground bg-foreground/5 backdrop-blur-sm"
               onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
               aria-label={t("header.language")}
             >
@@ -223,7 +279,7 @@ export function Header() {
                   className="fixed inset-0 z-10"
                   onClick={() => setIsLangDropdownOpen(false)}
                 />
-                <div className="absolute right-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-lg border shadow-lg border-gray-400/50 bg-gray-400/80 backdrop-blur-md dark:border-white/20 dark:bg-black/80">
+                <div className="absolute right-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-lg border shadow-lg border-gray-400/50 bg-gray-400/80 backdrop-blur-md dark:border-white/20 ">
                   {languageOptions.map((lang) => (
                     <button
                       key={lang.value}
@@ -252,11 +308,12 @@ export function Header() {
           </div>
 
           {/* Theme Selector - Fond transparent gris en light, noir en dark */}
-          <div className="relative inline-flex h-8 items-center rounded-md border p-0.5 border-gray-400/50 bg-gray-400/30 backdrop-blur-sm dark:border-white/20 dark:bg-black/30">
+          <div className="relative inline-flex h-8 items-center rounded-lg border border-gray-400/50 py-5
+          ">
             {/* Sliding background */}
             {mounted && (
               <div
-                className="absolute h-[calc(100%-4px)] w-[calc(33.333%-2px)] rounded-[4px] bg-white transition-transform duration-300 ease-out dark:bg-black"
+                className="absolute h-[calc(100%-4px)] w-[calc(33.333%-2px)] rounded-[4px] transition-transform duration-300 ease-out "
                 style={{
                   transform: `translateX(${currentThemeIndex * 100}%)`,
                 }}
@@ -275,10 +332,10 @@ export function Header() {
                   suppressHydrationWarning
                   className={[
 
-                    "relative z-10 rounded-sm flex h-full items-center justify-center px-2.5 text-[11px] font-medium transition-colors duration-200",
+                    "relative z-10 rounded-sm flex m-1 h-full items-center justify-center py-3.5 px-2.5 text-[11px] font-medium transition-colors duration-200",
                     isActive
-                      ? "text-background bg-foreground  "
-                      : "text-white hover:bg-foreground dark:text-gray-300 dark:hover:text-background",
+                      ? "text-background bg-foreground   "
+                      : "text-foreground hover:bg-foreground   dark:hover:text-background  bg-foreground/5 backdrop-blur-sm",
                   ].join(" ")}
                   onClick={() => setTheme(option.value)}
                   aria-label={option.label}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { WordPressPost } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
 
@@ -18,16 +18,16 @@ export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSect
     if (!posts || posts.length === 0) return null;
 
     return (
-        <section className="space-y-8 ">
+        <section className="space-y-6 ">
             <div className="flex items-center justify-between">
-                <SectionTitle title={title} title2={title2} actionLabel={t("seeMore")} actionHref="/news" />
+                <SectionTitle title={title} title2={title2} actionLabel='' actionHref="/news" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {posts.slice(0, 3).map((post) => (
                     <Link
                         key={post.id}
-                        href={post.link}
+                        href={`/news?id=${post.id}`}
                         className="group   backdrop-blur-sm bg-background/30 border border-gray-100 dark:border-muted/30 rounded-2xl p-8 flex flex-col h-full hover:shadow-xl hover:border-[color:var(--accent)]/20 transition-all duration-300"
                     >
                         {/* Communiqué Label */}
@@ -42,7 +42,7 @@ export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSect
 
                         {/* Excerpt */}
                         <div
-                            className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow"
+                            className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-2 flex-grow"
                             dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
                         />
 

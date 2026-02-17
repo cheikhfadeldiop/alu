@@ -1,11 +1,11 @@
 {
   "nav": {
     "home": "Accueil",
-    "news": "News",
-    "replay": "Replay TV",
-    "radio": "Radio FM",
-    "live": "Live TV",
-    "playback": "Playback",
+    "news": "Info",
+    "replay": "Vidéos",
+    "radio": "Audios",
+    "live": "Live",
+    "corporate": "Corporate news",
     "contact": "Nous contacter"
   },
   "header": {
@@ -23,15 +23,16 @@
     "commitments": "Nos engagements",
     "other": "Autres",
     "description": "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
+    "short_description": "Telechargez nos applications depuis ",
     "links": {
       "about": "À propos",
       "crtvCameroon": "CRTV Cameroun",
       "helpCenters": "Centres d’aide",
       "contact": "Nous contacter",
       "tv": "TV",
-      "news": "Actualités",
-      "radio": "Radio",
-      "replay": "Replay TV",
+      "news": "Info",
+      "radio": "Audios",
+      "replay": "Vidéos",
       "quality": "Engagements et qualité",
       "terms": "Conditions générales d’utilisation",
       "data": "Mise à disposition des données",
@@ -45,13 +46,13 @@
       "crtvReligion": "CRTV RELIGION",
       "crtvNews": "CRTV NEWS"
     },
-    "copyright": "© 2026 CRTV — Conception : iCAN GROUP"
+    "copyright": "© 2026 CRTV — Conception : aCAN GROUP"
   },
   "common": {
     "seeAll": "Voir tout",
     "seeMore": "Voir plus",
     "live": "LIVE",
-    "direct": "EN DIRECT",
+    "direct": "DIRECT",
     "send": "Envoyer",
     "play": "Lire",
     "follow": "Suivre",
@@ -82,6 +83,7 @@
     "viewOSM": "Voir sur OpenStreetMap",
     "watchMissedFallback": "Regardez les dernières vidéos que vous avez manquées",
     "replayTag": "Replay",
+    "replays": "REPLAYS",
     "pressRelease": "COMMUNIQUÉ",
     "readRelease": "Lire le communiqué",
     "deepSearch": "Recherche...",
@@ -99,20 +101,24 @@
       "liveChannels": "Nos chaînes",
       "liveChannelsSuffix": "en direct",
       "latestEditions": "Dernières éditions",
-      "editorChoice": "Choix de la",
-      "editorChoiceSuffix": "rédaction",
+      "editorChoice": "ARTICLES",
+      "editorChoiceSuffix": "",
       "categories": "Catégories",
       "regionalNews": "Actualités",
       "regionalNewsSuffix": "régionales",
-      "shorts": "L'actu en Resumé",
-      "shortsSuffix": "#CrtvShorts",
+      "shorts": "CAPSULES VIDEOS",
+      "shortsSuffix": "#CRTVWEB",
       "corporate": "Corporate news",
       "actu": "ACTU",
       "matam": "MATAM",
-      "agriculture": "AGRICULTURE"
+      "agriculture": "AGRICULTURE",
+      "journalsRadio": "DERNIERS JOURNAUX RADIO",
+      "journalsTV": "DERNIERS JOURNAUX TV",
+      "directRadios": "Directs RADIOS",
+      "latestReplays": "DERNIERS REPLAYS"
     },
     "radio": {
-      "title": "NOS RADIOS",
+      "title": "NOS AUDIOS",
       "titleSuffix": "EN DIRECT",
       "upNext": "Programmes à venir",
       "noRadioAvailable": "Aucune radio disponible"
@@ -122,7 +128,7 @@
       "titleSuffix": "EN DIRECT"
     },
     "replay": {
-      "title": "Replay TV",
+      "title": "Vidéos",
       "ourShows": "Nos Émissions de",
       "tvSubtitle": "Télévision",
       "latest": "Dernières",
@@ -186,7 +192,7 @@
       }
     },
     "news": {
-      "title": "News",
+      "title": "Info",
       "trending": "Trending",
       "moreOf": "plus d'",
       "newsTitle": "ACTUALITÉS",

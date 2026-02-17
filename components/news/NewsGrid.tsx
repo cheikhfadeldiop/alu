@@ -11,6 +11,7 @@ interface NewsGridProps {
     onLoadMore: () => void;
     title?: string;
     title2?: string;
+    onItemClick?: (item: WordPressPost) => void;
 }
 
 import { useTranslations } from "next-intl";
@@ -22,9 +23,9 @@ export function NewsGrid({
     onLoadMore,
     title = "plus d'",
     title2 = "ACTUELLES",
+    onItemClick,
 }: NewsGridProps) {
     const t = useTranslations("common");
-    // Helper to get image URL (duplicated from page for autonomy, or could be moved to utils)
     const getImageUrl = (post: WordPressPost) => {
         return post.acan_image_url ||
             post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
@@ -35,21 +36,22 @@ export function NewsGrid({
 
     return (
         <section className="space-y-6 pt-6 border-t-2 border-transparent dark:border-white/5">
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                 {items.map((a) => (
                     <MediaCard
                         key={a.id}
-                        href={a.link}
-                        target={true}
+                        href={`/news?id=${a.id}`}
+                        target={false}
                         title={decodeHtmlEntities(a.title.rendered)}
                         imageSrc={getImageUrl(a)}
                         meta={`${new Date(a.date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })}`}
                         aspect="16/9"
                         showPlayIcon={false}
+                        onClick={onItemClick ? () => onItemClick(a) : undefined}
                     />
                 ))}
             </div>
+            {/* ... load more ... */}
 
             {hasMore && (
                 <div className="flex justify-center pt-12">
@@ -58,12 +60,10 @@ export function NewsGrid({
                         disabled={loadingMore}
                         className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-[color:var(--accent)] transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
                     >
-                        <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
+                        <span className="text-sm  uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
                             {loadingMore ? t("loading") : t("loadMore")}
                         </span>
-                        {!loadingMore && (
-                            <div className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse group-hover:scale-125 transition-transform" />
-                        )}
+
                     </button>
                 </div>
             )}

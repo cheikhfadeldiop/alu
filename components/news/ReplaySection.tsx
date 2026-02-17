@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SliderVideoItem } from "../../types/api";
 import { MediaCard } from "../ui/MediaCard";
-import { SectionTitle } from "../ui/SectionTitle";
+import { SectionTitle } from "../ui/SectionTitle"; 
 
 interface ReplaySectionProps {
     videos: SliderVideoItem[];
@@ -17,17 +17,17 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
         <section className="space-y-6">
             <div className="flex items-center">
                 <SectionTitle
-                    title="Le Replay"
-                    title2="Dernières Émissions"
+                    title="VOIR AUSSI"
+                    title2=""
                     uppercase={true}
                     actionIcon={true}
                     actionHref={`/replay`}
                 />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 ">
                 {displayVideos.map((video, index) => (
-                    <MediaCard
+                    <MediaCard 
                         key={`${video.slug}-${index}`}
                         href={video.video_url || `/replay/${video.slug}`}
                         target={false}
@@ -36,6 +36,7 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
                         meta={`${video.date} • ${video.time || 'Replay'}`}
                         aspect="16/9"
                         showPlayIcon={true}
+                        
                     />
                 ))}
             </div>

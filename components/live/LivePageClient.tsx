@@ -86,13 +86,20 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
                 <LivePlayerSection channel={selectedChannel} />
             )}
 
-            {/* 3. Info & EPG Schedule - Only for TV */}
-           
+            {/* 3. Info & EPG Schedule - Only for TV
 
             <AdBanner />
+             */}
+
 
             {/* 4. Upcoming Programs Timeline */}
-            {fullEpg.length > 0 && <UpcomingProgramsTimeline epgData={fullEpg} />}
+            {fullEpg.length > 0 && (
+                <UpcomingProgramsTimeline
+                    epgData={fullEpg}
+                    currentChannelId={selectedChannel.id}
+                    currentChannelLogo={selectedChannel.logo_url || selectedChannel.logo}
+                />
+            )}
         </div>
     );
 }

@@ -1,22 +1,21 @@
-import Link from "next/link";
-import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { WordPressPost } from "../../types/api";
 import { decodeHtmlEntities } from "../../utils/text";
 import { SectionTitle } from "../ui/SectionTitle";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "../ui/SafeImage";
 
 interface NewsHeroProps {
     items: WordPressPost[];
     categoryName?: string;
+    categoryId?: string | number;
+    onItemClick?: (item: WordPressPost) => void;
 }
 
-import { SITE_CONFIG } from "@/constants/site-config";
-
-export function NewsHero({ items, categoryName }: NewsHeroProps) {
+export function NewsHero({ items, categoryName, onItemClick }: NewsHeroProps) {
     if (!items || items.length === 0) return null;
 
-    // Item 0: Spans Col 1 (Meta) and Col 2 (Primary Image)
     const primaryItem = items[0];
-    // Item 1: Exclusive to Col 3
     const secondaryItem = items[1];
 
     const formatDate = (dateStr: string) => {
@@ -28,33 +27,38 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
     };
 
     const excerpt = (post: WordPressPost) => {
-        // Cleaning HTML and limiting text for the larger hero
         const cleanText = post.excerpt?.rendered.replace(/<[^>]*>/g, '').trim() ||
             post.content?.rendered.replace(/<[^>]*>/g, '').trim();
         return cleanText?.slice(0, 220) + "...";
     };
 
+    const handleItemClick = (e: React.MouseEvent, item: WordPressPost) => {
+        if (onItemClick) {
+            e.preventDefault();
+            onItemClick(item);
+        }
+    };
+
     return (
-        <section className="space-y-6  animate-in fade-in slide-in-from-bottom-6 duration-1000">
+        <section className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
             {categoryName && (
                 <SectionTitle
-                    title="Suivez"
-                    title2={decodeHtmlEntities(categoryName)}
+                    title={decodeHtmlEntities(categoryName)}
+                    title2=''
                     uppercase={true}
                     actionLabel=""
+                    className="font-bold"
                     actionHref="/news"
                 />
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-10 gap-5  items-stretch min-h-[400px]">
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 items-stretch min-h-[400px]">
                 {/* 30% Left: Metadata (Larger scale) */}
-
-                <div className="lg:col-span-3  flex flex-col justify-between space-y-8 order-2 lg:order-1 px-2">
-                    <Link href={primaryItem.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                <div className="lg:col-span-3 flex flex-col justify-between space-y-8 order-2 lg:order-1 px-2">
+                    <Link href={`/news?id=${primaryItem.id}`}
+                        onClick={(e) => handleItemClick(e, primaryItem)}
                         className="group block space-y-5">
-                        <h1 className="text-2xl lg:text-4xl line-clamp-5  font-black leading-[1.05] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300">
+                        <h1 className="text-2xl lg:text-4xl line-clamp-5 font-black leading-[1.05] tracking-tight group-hover:text-[color:var(--accent)] transition-colors duration-300">
                             {decodeHtmlEntities(primaryItem.title.rendered)}
                         </h1>
                         <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-5">
@@ -70,11 +74,10 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
 
                 {/* 40% Middle: Hero Image */}
                 <div className="lg:col-span-4 relative order-1 lg:order-2">
-                    <Link href={primaryItem.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <Link href={`/news?id=${primaryItem.id}`}
+                        onClick={(e) => handleItemClick(e, primaryItem)}
                         className="block relative h-full min-h-[400px] overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5 rounded-sm">
-                        <Image
+                        <SafeImage
                             src={primaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                             alt={primaryItem.title.rendered}
                             fill
@@ -86,15 +89,14 @@ export function NewsHero({ items, categoryName }: NewsHeroProps) {
                     </Link>
                 </div>
 
-                {/* 30% Right: Vertical Feature (Strict 60% Image height) */}
+                {/* 30% Right: Vertical Feature */}
                 <div className="lg:col-span-3 order-3 h-full">
                     {secondaryItem ? (
-                        <Link href={secondaryItem.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <Link href={`/news?id=${secondaryItem.id}`}
+                            onClick={(e) => handleItemClick(e, secondaryItem)}
                             className="group flex flex-col h-full bg-surface-2/50 dark:bg-surface-2/10 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-white/10 rounded-sm">
                             <div className="relative h-[60%] w-full overflow-hidden">
-                                <Image
+                                <SafeImage
                                     src={secondaryItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
                                     alt={secondaryItem.title.rendered}
                                     fill

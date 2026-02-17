@@ -88,9 +88,10 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
         >
             <div className="max-w-[1400px] mx-auto px-4">
                 <SectionTitle
-                    title={t("pages.replay.latest")}
-                    title2={t("pages.replay.editions")}
+                    title={t("pages.replay.latest")+" "+t("pages.replay.editions")}
+                    title2=""
                     actionIcon={true}
+                    className="font-bold"
                 />
             </div>
 

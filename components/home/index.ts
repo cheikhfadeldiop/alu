@@ -10,3 +10,4 @@ export * from './CorporateNewsSection';
 export * from './WordPressCategoryColumn';
 export * from './WordPressNewsSection';
 export * from './LiveVideosSection';
+export * from './PromoAntenne';

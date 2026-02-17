@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { SafeImage } from "../ui/SafeImage";
+import { useWordPressNews } from "@/hooks/useData";
 
 interface WordPressNewsSectionProps {
     alauneItems: WordPressPost[];
@@ -13,12 +15,22 @@ interface WordPressNewsSectionProps {
 
 type TabType = "alaune" | "trending";
 
-import { SITE_CONFIG } from "@/constants/site-config";
-
-export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNewsSectionProps) {
+export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems: initialTrending }: WordPressNewsSectionProps) {
     const t = useTranslations("pages.home");
     const tn = useTranslations("pages.news");
     const [activeTab, setActiveTab] = useState<TabType>("alaune");
+
+    // Use SWR for robust background refresh and instant cache delivery with fallback data
+    const { data: alauneItems = initialAlaune } = useWordPressNews(
+        SITE_CONFIG.categories.news.alaune,
+        20,
+        initialAlaune
+    );
+    const { data: trendingItems = initialTrending } = useWordPressNews(
+        SITE_CONFIG.categories.news.trending,
+        10,
+        initialTrending
+    );
 
     const currentItems = activeTab === "alaune" ? alauneItems : trendingItems;
     const featuredItem = currentItems[0];
@@ -32,24 +44,18 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
         return SITE_CONFIG.theme.placeholders.news;
     };
 
-    const stripHtml = (html: string): string => {
-        return html.replace(/<[^>]*>/g, '').replace(/&hellip;/g, '...');
-    };
-
     return (
         <section className="w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-surface/50 backdrop-blur-sm rounded-lg ">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 rounded-lg">
                 <div className="w-full col-span-2">
                     {featuredItem && (
                         <Link
-                            href={featuredItem.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={`/news?id=${featuredItem.id}`}
                             className="group relative block w-full h-[520px] rounded-lg overflow-hidden
                             hover:scale-[1.02] transition-all"
                         >
                             <div className="absolute inset-0">
-                                <Image
+                                <SafeImage
                                     src={getImageUrl(featuredItem)}
                                     alt={featuredItem.title.rendered}
                                     fill
@@ -112,17 +118,14 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                         {listItems.map((item) => (
                             <Link
                                 key={item.id}
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={`/news?id=${item.id}`}
                                 className="group flex gap-4 items-start hover:bg-muted/10  p-3  transition-colors
                                 border-b dark:border-muted/30
                                 hover:scale-[1.01] transition-all
-                                
                                 "
                             >
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
-                                    <Image
+                                    <SafeImage
                                         src={getImageUrl(item)}
                                         alt={item.title.rendered}
                                         fill
@@ -131,7 +134,7 @@ export function WordPressNewsSection({ alauneItems, trendingItems }: WordPressNe
                                     />
                                 </div>
                                 <div className="flex-1 min-w-0 space-x-2">
-                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3 group-hover:underline mb-2">
+                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3  mb-2">
                                         {item.title.rendered}
                                     </h3>
                                     <div className="flex items-center gap-5 text-xs text-gray-500 dark:text-gray-400">

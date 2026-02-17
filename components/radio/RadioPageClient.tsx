@@ -1,25 +1,29 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { LiveSelectionCarousel } from "../live/LiveSelectionCarousel";
 import { RadioPlayerSection } from "./RadioPlayerSection";
 import { UpcomingProgramsTimeline } from "./UpcomingProgramsTimeline";
-import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
+import { LiveChannel, EPGItem, FullEPGChannel, AODItem, FullEPGProgram } from "../../types/api";
+import { RadioAudiosSection } from "./RadioAudiosSection";
+import { PromoAntenne } from "../home/PromoAntenne";
 import { AdBanner } from "../ui/AdBanner";
+import { useTranslations } from "next-intl";
 
 interface RadioPageClientProps {
     initialRadios: LiveChannel[];
     allChannels: LiveChannel[]; // Both radios and TV channels
     epgData: EPGItem[];
     fullEpgData: FullEPGChannel[];
+    audiosData?: AODItem[];
+    promoPrograms?: FullEPGProgram[];
 }
 
-import { useTranslations } from "next-intl";
-
-export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgData }: RadioPageClientProps) {
+export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgData, audiosData = [], promoPrograms = [] }: RadioPageClientProps) {
     const t = useTranslations("pages.radio");
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
 
@@ -60,8 +64,9 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
         if (item.type === 'TV') {
             router.push(`/live?channel=${itemKey}`);
         } else {
-            // If it's a radio, update the player
+            // Radio: Update state and URL
             setSelectedRadio(item);
+            router.replace(`${pathname}?channel=${itemKey}`, { scroll: false });
         }
     };
 
@@ -76,7 +81,7 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-12">
             {/* 1. Carousel with Tabs - Shows both radios and TV channels */}
             <LiveSelectionCarousel
                 channels={allChannels}
@@ -86,12 +91,29 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
             />
 
             {/* 2. Radio Player Section - Only plays radios */}
-            <RadioPlayerSection channel={selectedRadio} currentProgram={currentRadioProgram} />
+            <RadioPlayerSection
+                channel={selectedRadio}
+                currentProgram={currentRadioProgram}
+                onNextChannel={() => {
+                    const currentIndex = initialRadios.findIndex(r => (r.id || r.slug) === (selectedRadio.id || selectedRadio.slug));
+                    const nextIndex = (currentIndex + 1) % initialRadios.length;
+                    handleItemSelect(initialRadios[nextIndex]);
+                }}
+                onPrevChannel={() => {
+                    const currentIndex = initialRadios.findIndex(r => (r.id || r.slug) === (selectedRadio.id || selectedRadio.slug));
+                    const prevIndex = (currentIndex - 1 + initialRadios.length) % initialRadios.length;
+                    handleItemSelect(initialRadios[prevIndex]);
+                }}
+            />
+
             <AdBanner />
 
-            {/* 3. Upcoming Programs Timeline */}
-            <UpcomingProgramsTimeline epgData={fullEpgData} />
+            <div className="space-y-16">
+                {/* 3. Audios Section */}
+                <RadioAudiosSection items={audiosData} promoPrograms={promoPrograms} />
 
+                {/* 4. Promo Section matches Home design */}
+            </div>
 
         </div>
     );

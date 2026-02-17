@@ -9,14 +9,29 @@ export const SITE_CONFIG = {
     name: "CRTV",
     officialName: "Cameroon Radio Television",
     tagline: "L'organisme public camerounais de radio-télévision",
-    description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun. Elle comprend : 03 chaînes de télévision : CRTV, CRTV NEWS, CRTV SPORT AND ENTERTAINMENT.",
+    description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
 
     // URL & API Configurations de teste celui de larts
     api: {
         baseUrl: 'https://tveapi.acan.group/myapiv2',
         wordpressBaseUrl: 'https://actu.rts.sn/wp-json/wp/v2',
         appId: 'larts',
-        revalidateTime: 60 * 30, // Cache revalidation 30min
+        revalidateTime: 60 * 30, // Default server-side revalidation (30min)
+
+        // Refresh Controller (Client-side cache management)
+        cache: {
+            ttl: {
+                static: 0, // 24h (App details, terms)
+                standard: 0,     // 5 min (News, Replays)
+                dynamic: 0,      // 2 min (EPG, Adverts)
+                realtime: 0,         // 30 sec (Live status)
+                /*
+                static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
+                standard: 1000 * 60 * 5,     // 5 min (News, Replays)
+                dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
+                realtime: 1000 * 30,         // 30 sec (Live status)*/
+            }
+        }
     },
 
     // Social Media Links (DIRECT)
@@ -78,6 +93,8 @@ export const SITE_CONFIG = {
             regional: 145,
             matam: 133,
             agriculture: 153,
+            radioJournals: 141, // Placeholder for radio journals
+            tvJournals: 121,    // Placeholder for TV journals
             groups: [
                 { id: "a-la-une", name: "A LA UNE", matchIds: [121], keywords: ["une", "actualit", "general"] },
                 { id: "regions", name: "RÉGIONS", matchIds: [145], keywords: ["dakar", "matam", "region", "saint-louis", "louga", "tambacounda", "diourbel", "kaolack", "fatick", "kolda", "ziguinchor", "sedhiou", "kedougou", "kaffrine"] },
@@ -94,5 +111,12 @@ export const SITE_CONFIG = {
         liveLabel: "LIVE",
         replayLabel: "REPLAY",
         unavailabilityMsg: "Flux indisponible pour le moment.",
-    }
+    },
+
+    // Channel Metadata (Dynamic Resolution)
+    channels: [
+        { id: '50004', slug: 'crtv', name: 'CRTV', logo: "https://cdn.tve.static.acan.group/images/channel_1731344652.png" },
+        { id: '50005', slug: 'crtv-news', name: 'CRTV NEWS', logo: "https://cdn.tve.static.acan.group/images/channel_1731344640.png" },
+        { id: '50006', slug: 'crtv-sport', name: 'CRTV SPORT', logo: "https://cdn.tve.static.acan.group/images/channel_1731344621.png" },
+    ]
 };

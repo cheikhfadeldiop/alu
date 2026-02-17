@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import "./globals.css";
 
 import { ThemeProvider } from "../components/providers/ThemeProvider";
+import { SWRProvider } from "../components/providers/SWRProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,11 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <SWRProvider>
+            {children}
+          </SWRProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

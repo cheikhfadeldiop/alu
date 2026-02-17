@@ -4,14 +4,23 @@ import Link from "next/link";
 import Image from "next/image";
 import { SliderVideoItem } from "../../types/api";
 import { useTranslations } from "next-intl";
+import { SafeImage } from "../ui/SafeImage";
+import { useSliderVideos, useLiveChannels, useChannelResolver } from "@/hooks/useData";
+import { ensureAbsoluteUrl } from "@/services/api";
 
 interface LiveVideosSectionProps {
     videos: SliderVideoItem[];
 }
 
-export function DernieresEditions({ videos }: LiveVideosSectionProps) {
+export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionProps) {
     const t = useTranslations("pages.home");
     const tc = useTranslations("common");
+
+    // SWR Cache sync for robust management with fallback data
+    const { data: sliderRes } = useSliderVideos({ allitems: initialVideos } as any);
+    const { resolveLogo } = useChannelResolver();
+
+    const videos = sliderRes?.allitems || initialVideos;
 
     // Ensure we have videos
     if (!videos || videos.length === 0) return null;
@@ -20,7 +29,7 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
     const listVideos = videos.slice(1); // Show all remaining items in the scrollable list
 
     return (
-        <section className="w-full max-w-[1400px] mx-auto bg-surface/50 backdrop-blur-sm rounded-lg p-6">
+        <section className="w-full max-w-[1400px] mx-auto p-6 rounded-lg bg-foreground/5 backdrop-blur-sl">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -48,64 +57,64 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
             <div className="flex lg:flex-row flex-col justify-between gap-x-6">
                 {/* Left Side - Featured Video (60%) */}
                 <div className="w-full lg:w-3/5 pb-6">
-                    {featuredVideo && (
-                        <Link
-                            href={`/replay/${featuredVideo.slug}`}
-                            className="group relative block w-full overflow-hidden 
-                            hover:scale-[1.02] transition-all   "
-                        >
-                            {/* Image Container */}
-                            <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
-                                <Image
-                                    src={featuredVideo.logo_url}
-                                    alt={featuredVideo.title}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 60vw"
-                                    className="object-cover z-0"
-                                />
-
-                                {/* Play Button Overlay - Center (Design a gauche) */}
-                                <div className="absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110">
-                                    <Image
-                                        src={'/assets/placeholders/play_overlay.png'}
-                                        alt="Play"
-                                        width={64}
-                                        height={64}
-                                        className="object-contain z-10"
+                    {featuredVideo && (() => {
+                        const channelLogo = resolveLogo(featuredVideo);
+                        return (
+                            <Link
+                                href={`/replay/${featuredVideo.slug}`}
+                                className="group relative block w-full overflow-hidden 
+                                hover:scale-[1.02] transition-all   "
+                            >
+                                {/* Image Container */}
+                                <div className="relative w-full aspect-video bg-surface-2 bg-gray-100">
+                                    <SafeImage
+                                        src={featuredVideo.logo_url}
+                                        alt={featuredVideo.title}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 60vw"
+                                        className="object-cover z-0"
                                     />
-                                </div>
 
-                                {/* Channel Logo - Top Right (Design a gauche) */}
-                                {featuredVideo.channel_logo && (
-                                    <div className="absolute top-3 right-3 z-10">
-                                        <div className="w-20 h-16 rounded-lg p-1.5 ">
-                                            <Image
-                                                src={featuredVideo.channel_logo}
+                                    {/* Play Button Overlay - Center (Design a gauche) */}
+                                    <div className="absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110 pointer-events-none">
+                                        <Image
+                                            src={'/assets/placeholders/play_overlay.png'}
+                                            alt="Play"
+                                            width={64}
+                                            height={64}
+                                            className="object-contain z-10"
+                                        />
+                                    </div>
+
+                                    {/* Channel Logo Overlay - Top Right */}
+                                    {channelLogo && (
+                                        <div className="absolute top-3 right-3 z-10 w-16 h-12 p-1.5 shadow-lg overflow-hidden">
+                                            <SafeImage
+                                                src={ensureAbsoluteUrl(channelLogo)}
                                                 alt="Channel Logo"
-                                                width={58}
-                                                height={58}
-                                                className="object-contain w-full h-full"
+                                                fill
+                                                className="object-contain"
                                             />
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Description Band - Below Image */}
-                            <div className="relative p-4  bg-background z-10 mt-[-22] ml-20 mr-20 ">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time}</span>
-                                    <span className="text-xs text-[color:var(--accent)] font-semibold">{tc("toWatchNow")}</span>
+                                    )}
                                 </div>
-                                <h3 className="text-base font-bold mb-2 group-hover:underline">
-                                    {featuredVideo.title}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                    {featuredVideo.desc || tc("watchMissedFallback")}
-                                </p>
-                            </div>
-                        </Link>
-                    )}
+
+                                {/* Description Band - Below Image */}
+                                <div className="relative p-4  bg-background z-10 mt-[-22] ml-20 mr-20 ">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time}</span>
+                                        <span className="text-xs text-[color:var(--accent)] font-semibold">{tc("toWatchNow")}</span>
+                                    </div>
+                                    <h3 className="text-base font-bold mb-2 ">
+                                        {featuredVideo.title}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                        {featuredVideo.desc || tc("watchMissedFallback")}
+                                    </p>
+                                </div>
+                            </Link>
+                        );
+                    })()}
                 </div>
 
                 {/* Right Side - Scrollable List (40%) */}
@@ -117,71 +126,71 @@ export function DernieresEditions({ videos }: LiveVideosSectionProps) {
                         [&::-webkit-scrollbar-thumb]:rounded-full 
                         hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]
                         ">
-                        {listVideos.map((video, index) => (
-                            <Link
-                                key={`${video.slug}-${index}`}
-                                href={`/replay/${video.slug}`}
-                                className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full
-                                hover:scale-[1.02] transition-all "
-                            >
-                                {/* Thumbnail with overlays */}
-                                <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-white/5">
-                                    <Image
-                                        src={video.logo_url}
-                                        alt={video.title}
-                                        fill
-                                        sizes="128px"
-                                        className="object-cover"
-                                    />
-
-                                    {/* Play icon inside thumbnail - Bottom Left */}
-                                    <div className="absolute bottom-1 left-1 z-10">
-                                        <Image
-                                            src={'/assets/placeholders/play_overlay.png'}
-                                            alt="Play"
-                                            width={24}
-                                            height={24}
-                                            className="object-contain"
+                        {listVideos.map((video, index) => {
+                            const channelLogo = resolveLogo(video);
+                            return (
+                                <Link
+                                    key={`${video.slug}-${index}`}
+                                    href={`/replay/${video.slug}`}
+                                    className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full
+                                    hover:scale-[1.02] transition-all "
+                                >
+                                    {/* Thumbnail with overlays */}
+                                    <div className="relative w-32 h-20 flex-shrink-0  overflow-hidden bg-white/5">
+                                        <SafeImage
+                                            src={video.logo_url}
+                                            alt={video.title}
+                                            fill
+                                            sizes="128px"
+                                            className="object-cover"
                                         />
-                                    </div>
 
-                                    {/* Channel logo inside thumbnail - Bottom Right */}
-                                    {video.channel_logo && (
-                                        <div className="absolute bottom-1 right-1 z-10">
-                                            <div className="w-6 h-6 bg-white rounded p-0.5 shadow-sm">
-                                                <Image
-                                                    src={video.channel_logo}
+                                        {/* Play icon inside thumbnail - Bottom Left */}
+                                        <div className="absolute bottom-1 left-1 z-10 pointer-events-none">
+                                            <Image
+                                                src={'/assets/placeholders/play_overlay.png'}
+                                                alt="Play"
+                                                width={24}
+                                                height={24}
+                                                className="object-contain"
+                                            />
+                                        </div>
+
+                                        {/* Channel logo inside thumbnail - Bottom Right */}
+                                        {channelLogo && (
+                                            <div className="absolute bottom-1 right-1 z-10 w-6 h-6 ">
+                                                <SafeImage
+                                                    src={ensureAbsoluteUrl(channelLogo)}
                                                     alt="Channel"
-                                                    width={20}
-                                                    height={20}
-                                                    className="object-contain w-full h-full"
+                                                    fill
+                                                    className="object-contain"
                                                 />
                                             </div>
+                                        )}
+                                    </div>
+
+                                    {/* Content - Right Side */}
+                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                        {/* Time */}
+                                        <div className="text-xs text-gray-500  mb-1">
+                                            {video.time}
                                         </div>
-                                    )}
-                                </div>
 
-                                {/* Content - Right Side */}
-                                <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                    {/* Time */}
-                                    <div className="text-xs text-gray-500  mb-1">
-                                        {video.time}
+                                        {/* Title */}
+                                        <h4 className="text-sm font-semibold leading-tight line-clamp-2 mb-1">
+                                            {video.title}
+                                        </h4>
+
+                                        {/* Meta Info */}
+                                        <div className="flex items-center gap-2 text-xs">
+                                            <span className="text-[color:var(--accent)] font-semibold">{tc("replayTag")}</span>
+                                            <span className="text-[color:var(--accent)] ">•</span>
+                                            <span className="text-[color:var(--accent)] dark:text-[color:var(--accent)]">{video.date}</span>
+                                        </div>
                                     </div>
-
-                                    {/* Title */}
-                                    <h4 className="text-sm font-semibold leading-tight line-clamp-2 group-hover:underline mb-1">
-                                        {video.title}
-                                    </h4>
-
-                                    {/* Meta Info */}
-                                    <div className="flex items-center gap-2 text-xs">
-                                        <span className="text-[color:var(--accent)] font-semibold">{tc("replayTag")}</span>
-                                        <span className="text-[color:var(--accent)] ">•</span>
-                                        <span className="text-[color:var(--accent)] dark:text-[color:var(--accent)]">{video.date}</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { Link } from "../../i18n/navigation";
 import { AlauneItem, SliderItem } from "../../types/api";
+import { SafeImage } from "../ui/SafeImage";
 
 interface HeroSectionProps {
     hero: SliderItem | AlauneItem | null;
@@ -17,7 +17,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                     className="group relative block overflow-hidden rounded-lg bg-white/10 dark:bg-black/30 backdrop-blur-sm border border-white/20 dark:border-white/10"
                 >
                     <div className="relative aspect-[16/10] w-full">
-                        <Image
+                        <SafeImage
                             src={hero.image_url || hero.image || "/assets/placeholders/news_wide.png"}
                             alt={hero.title || "Image à la une"}
                             fill
@@ -33,7 +33,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                                     : new Date().toLocaleDateString("fr-FR")}{" "}
                                 • {(hero as any).category || "À la une"}
                             </p>
-                            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight group-hover:underline">
+                            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight ">
                                 {hero.title}
                             </h1>
                         </div>
@@ -45,7 +45,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
             <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-[color:var(--border)] pb-2">
                     <h2 className="text-sm font-bold uppercase">À la une</h2>
-                    <Link href="/news" className="text-xs text-[color:var(--accent)] hover:underline">
+                    <Link href="/news" className="text-xs text-[color:var(--accent)] ">
                         Trending news
                     </Link>
                 </div>
@@ -57,7 +57,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                             className="group flex gap-3 hover:bg-white/10 dark:hover:bg-white/5 p-2 rounded-lg transition-colors border border-transparent hover:border-white/10"
                         >
                             <div className="relative w-24 h-16 flex-shrink-0 rounded overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10">
-                                <Image
+                                <SafeImage
                                     src={item.image_url || item.image || "/assets/placeholders/article_list.png"}
                                     alt={item.title || "Actualité"}
                                     fill
@@ -66,7 +66,7 @@ export function HeroSection({ hero, trendingNews }: HeroSectionProps) {
                                 />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-xs font-semibold line-clamp-2 group-hover:underline mb-1">
+                                <h3 className="text-xs font-semibold line-clamp-2  mb-1">
                                     {item.title}
                                 </h3>
                                 <p className="text-[10px] text-[color:var(--muted)]">

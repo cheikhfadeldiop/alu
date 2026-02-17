@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SafeImage } from "../ui/SafeImage";
 import { useTranslations } from "next-intl";
 
 function IconX(props: React.SVGProps<SVGSVGElement>) {
@@ -84,7 +85,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
           <div className="space-y-4 sm:pr-10 gap-10">
             <div className="flex items-center gap-3  min-w-[150px]  ">
-              <Image
+              <SafeImage
                 src={SITE_CONFIG.theme.placeholders.logo}
                 alt="CRTV"
                 width={154}
@@ -95,6 +96,9 @@ export function Footer() {
             <p className="max-w-xs text-sm text-[color:var(--muted)]">
               {t("footer.description")}
             </p>
+            <p className="max-w-xs text-sm text-[color:var(--muted)]">
+              {t("footer.short_description")}
+            </p>
 
             <div className="flex items-center gap-3 min-w-[235px]  ">
               <a
@@ -102,7 +106,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <SafeImage
                   src="/assets/backgrounds/store.webp"
                   alt="CRTV on Google Play"
                   width={135}
@@ -117,7 +121,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <SafeImage
                   src="/assets/backgrounds/apple.png"
                   alt="CRTV on App Store"
                   width={235}
@@ -133,7 +137,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 <IconFacebook className="h-7 w-7" />
               </a>
@@ -142,7 +146,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 <IconX className="h-7 w-7" />
               </a>
@@ -151,7 +155,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 <IconYouTube className="h-7 w-7" />
               </a>
@@ -160,7 +164,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 <IconLinkedIn className="h-7 w-7" />
               </a>
@@ -169,7 +173,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 <IconInstagram className="h-7 w-7" />
               </a>
@@ -178,7 +182,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-foreground hover:bg-white hover:border-white transition-all"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
               >
                 {/* Fallback for TikTok icon since it's not defined, or I can add one */}
                 <svg className="h-8   w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -285,15 +289,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-[color:var(--border)] pt-6">
+        <div className="mt-10 flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-[color:var(--muted)]">
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtv")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvSport")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.posteNational")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvReligion")}</a>
-            <a href="#" className="hover:text-foreground">{t("footer.strip.crtvNews")}</a>
+            <Link href="/" className="hover:text-foreground">{t("footer.strip.crtv")}</Link>
+            <Link href="/live?channel=crtv-sport" className="hover:text-foreground">{t("footer.strip.crtvSport")}</Link>
+            <Link href="/radio?channel=poste-national" className="hover:text-foreground">{t("footer.strip.posteNational")}</Link>
+            <Link href="/live" className="hover:text-foreground">{t("footer.strip.crtvReligion")}</Link>
+            <Link href="/live?channel=crtv-news" className="hover:text-foreground">{t("footer.strip.crtvNews")}</Link>
           </div>
-          <p className="text-center text-xs text-[color:var(--muted)]">
+          <p className="text-center text-xs text-[color:var(--muted)]  border-t border-[color:var(--border)] pt-6">
             {t("footer.copyright")}
           </p>
         </div>
