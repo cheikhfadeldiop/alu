@@ -1,12 +1,12 @@
 {
   "nav": {
     "home": "Home",
-    "news": "News",
-    "replay": "Replay TV",
-    "radio": "Radio FM",
-    "live": "Live TV",
-    "playback": "Playback",
-    "contact": "Contact"
+    "news": "Info",
+    "replay": "Videos",
+    "radio": "Audios",
+    "live": "Live",
+    "corporate": "Corporate news",
+    "contact": "Contact us"
   },
   "header": {
     "language": "Language",
@@ -30,9 +30,9 @@
       "helpCenters": "Help centers",
       "contact": "Contact",
       "tv": "TV",
-      "news": "News",
-      "radio": "Radio",
-      "replay": "Replay TV",
+      "news": "Info",
+      "radio": "Audios",
+      "replay": "Videos",
       "quality": "Quality & commitments",
       "terms": "Terms of use",
       "data": "Data availability",
@@ -100,20 +100,24 @@
       "liveChannels": "Our channels",
       "liveChannelsSuffix": "live",
       "latestEditions": "Latest editions",
-      "editorChoice": "Editor’s",
-      "editorChoiceSuffix": "choice",
+      "editorChoice": "ARTICLES",
+      "editorChoiceSuffix": "",
       "categories": "Categories",
       "regionalNews": "Regional",
       "regionalNewsSuffix": "news",
-      "shorts": "News Summary",
-      "shortsSuffix": "#CrtvShorts",
+      "shorts": "VIDEO CAPSULES",
+      "shortsSuffix": "WEBCRTV",
       "corporate": "Corporate news",
       "actu": "NEWS",
       "matam": "MATAM",
-      "agriculture": "AGRICULTURE"
+      "agriculture": "AGRICULTURE",
+      "journalsRadio": "LATEST RADIO JOURNALS",
+      "journalsTV": "LATEST TV JOURNALS",
+      "directRadios": "Direct RADIOS",
+      "latestReplays": "LATEST REPLAYS"
     },
     "radio": {
-      "title": "OUR RADIOS",
+      "title": "OUR AUDIOS",
       "titleSuffix": "LIVE",
       "upNext": "Upcoming programs",
       "noRadioAvailable": "No radio available"
@@ -123,7 +127,7 @@
       "titleSuffix": "LIVE"
     },
     "replay": {
-      "title": "Replay TV",
+      "title": "Videos",
       "ourShows": "Our TV",
       "tvSubtitle": "Shows",
       "latest": "Latest",
@@ -187,7 +191,7 @@
       }
     },
     "news": {
-      "title": "News",
+      "title": "Info",
       "trending": "Trending",
       "moreOf": "more of",
       "newsTitle": "NEWS",

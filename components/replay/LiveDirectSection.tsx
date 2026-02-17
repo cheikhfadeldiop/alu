@@ -20,7 +20,7 @@ export function LiveDirectSection({ channels, epgItems }: LiveDirectSectionProps
 
     return (
         <section className="py-8">
-            <SectionTitle title={t("direct")} title2={t("onAir")} actionIcon={true} />
+            <SectionTitle title={t("direct")+" "+t("onAir")} title2="" actionIcon={true} className="font-bold"/>
             <LiveCarousel>
                 {channels.map((channel) => {
                     const currentProgram = epgItems.find(

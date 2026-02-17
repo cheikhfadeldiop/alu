@@ -32,8 +32,8 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
     if (!channels || channels.length === 0) return null;
 
     return (
-        <section className="space-y-6">
-            <SectionTitle title={title} title2={title2}  actionHref="/live" />
+        <section className="">
+            <SectionTitle title={title} title2={title2} actionHref="/live" />
 
             <LiveCarousel>
                 {channels.map((channel, index) => {
@@ -66,7 +66,7 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
                         <Link
                             key={index}
                             href={`/live?channel=${channel.slug}`}
-                            className="group relative flex flex-col w-[280px] sm:w-[300px] h-[220px] 
+                            className="group relative flex flex-col w-[260px] sm:w-[250px] h-[220px] 
                                 overflow-hidden rounded-xl border border-white/5
                                 text-left transition-all duration-300 
                                 hover:scale-[1.02]"
@@ -83,7 +83,7 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
                                 <div className="absolute top-3 right-3">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-sm text-black text-xs font-bold shadow-lg">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-sm text-black text-xs shadow-lg">
                                         <span className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse" />
                                         {t("direct")}
                                     </span>
@@ -129,7 +129,7 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', })}</span>
                                     <span className="text-gray-400 dark:text-white/90  text-xs">-</span>
                                     {/* Clock Icon */}
                                     <svg className="w-5 h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">

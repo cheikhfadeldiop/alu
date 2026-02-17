@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SliderVideoItem } from "../../types/api";
 import { MediaCard } from "../ui/MediaCard";
-import { SectionTitle } from "../ui/SectionTitle";
+import { SectionTitle } from "../ui/SectionTitle"; 
 
 interface ReplaySectionProps {
     videos: SliderVideoItem[];
@@ -17,7 +17,7 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
         <section className="space-y-6">
             <div className="flex items-center">
                 <SectionTitle
-                    title="Plus D'actualités"
+                    title="VOIR AUSSI"
                     title2=""
                     uppercase={true}
                     actionIcon={true}

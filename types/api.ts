@@ -324,6 +324,7 @@ export interface AODItem {
     published_at: string;
     category: string;
     slug: string;
+    channel_name?: string;
 }
 
 // Presenters Types

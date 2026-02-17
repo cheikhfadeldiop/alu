@@ -15,7 +15,7 @@ export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCar
     return (
         <section className="space-y-0">
             <SectionTitle title={title} title2={title2} actionLabel={actionLabel} className="font-bold" actionHref="/replay" />
-            <Carousel itemClassName="w-[250px]" >
+            <Carousel itemClassName="w-[250px] " >
                 {videos.map((video, index) => (
                     <Link key={index} href={`/playback/${video.slug}`} className="group block">
                         <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2

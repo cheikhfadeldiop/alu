@@ -33,6 +33,31 @@ const API_BASE_URL = SITE_CONFIG.api.baseUrl;
 const WORDPRESS_API_BASE_URL = SITE_CONFIG.api.wordpressBaseUrl;
 const APP_ID = SITE_CONFIG.api.appId;
 
+/**
+ * Map a raw VOD item or Slider item to a consistent SliderVideoItem structure
+ */
+export function mapVODToSliderItem(item: any, channelLogo?: string): SliderVideoItem {
+    return {
+        title: item.title || "",
+        desc: item.desc || "",
+        logo: item.image || item.logo || "",
+        logo_url: item.image_url || item.logo_url || "",
+        video_url: ensureAbsoluteUrl(item.video_url),
+        feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
+        stream_url: ensureAbsoluteUrl(item.stream_url),
+        android_url: ensureAbsoluteUrl(item.android_url),
+        web_url: ensureAbsoluteUrl(item.web_url),
+        webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
+        date: item.published_at || item.date || "",
+        time: item.duration || item.time || "",
+        slug: item.slug || "",
+        type: item.type || "vod",
+        views: item.views || "0",
+        relatedItems: item.relatedItems || "",
+        channel_logo: channelLogo || item.chaine_logo || item.channel_logo
+    } as SliderVideoItem;
+}
+
 export function ensureAbsoluteUrl(url: string | undefined): string {
     if (!url || url === "null") return "";
     if (url.startsWith('http')) return url;
@@ -189,26 +214,7 @@ export async function getAggregateReplaysByChannel(chaineId: string, limit: numb
             try {
                 const res = await getVODItems(show.feed_url.split('/').slice(-2, -1)[0] || "");
                 const items = res.allitems || [];
-                // Map VODItem to SliderVideoItem
-                return items.map(item => ({
-                    title: item.title,
-                    desc: item.desc,
-                    logo: item.image,
-                    logo_url: item.image_url,
-                    video_url: ensureAbsoluteUrl(item.video_url),
-                    feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
-                    stream_url: ensureAbsoluteUrl(item.stream_url),
-                    android_url: ensureAbsoluteUrl(item.android_url),
-                    web_url: ensureAbsoluteUrl(item.web_url),
-                    webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
-                    date: item.published_at,
-                    time: "",
-                    slug: item.slug,
-                    type: "vod",
-                    views: "0",
-                    relatedItems: item.relatedItems || "",
-                    channel_logo: show.chaine_logo
-                } as SliderVideoItem));
+                return items.map(item => mapVODToSliderItem(item, show.chaine_logo));
             } catch (err) {
                 return [];
             }
@@ -322,10 +328,41 @@ export async function getReplaysByShowAggregated(limitShows: number = 8, limitRe
  * Get aggregated replays from all channels using the alaunesliders endpoint
  * This is much faster than fetching from each channel individually.
  */
-export async function getLatestAggregateReplays(): Promise<SliderVideoItem[]> {
+export async function getLatestAggregateReplays(limit: number = 20): Promise<SliderVideoItem[]> {
     try {
-        const data = await getSliderVideos();
-        return data.allitems || [];
+        // 1. Get the featured shows/videos (Alaunes)
+        const sliderRes = await getSliderVideos();
+        const initialItems = sliderRes.allitems || [];
+
+        // 2. To get more, we fetch archives for the first few shows
+        const showsToFetch = initialItems.slice(0, 8);
+        const archivesPromises = showsToFetch.map(async (show) => {
+            if (show.relatedItems && show.relatedItems !== "null") {
+                const results = await getRelatedItems(show.relatedItems);
+                return results.map(item => mapVODToSliderItem(item, show.channel_logo || (show as any).chaine_logo));
+            }
+            return [];
+        });
+
+        const archivesResults = await Promise.all(archivesPromises);
+        const allItems = [...initialItems, ...archivesResults.flat()];
+
+        // 3. Deduplicate by slug and sort by date
+        const seenSlugs = new Set();
+        const uniqueItems = allItems.filter(item => {
+            if (!item || !item.slug || seenSlugs.has(item.slug)) return false;
+            seenSlugs.add(item.slug);
+            return true;
+        });
+
+        // Sort by date (descending)
+        return uniqueItems
+            .sort((a, b) => {
+                const dateA = new Date(a.date).getTime();
+                const dateB = new Date(b.date).getTime();
+                return dateB - dateA;
+            })
+            .slice(0, limit);
     } catch (error) {
         console.error("Error fetching latest aggregate replays:", error);
         return [];
@@ -347,7 +384,16 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
         const showsRes = await getVODShows();
         const shows = showsRes.allitems || [];
         const showMatch = shows.find(s => s.slug === slug);
-        if (showMatch) return showMatch;
+        if (showMatch) {
+            // Find the first video of this show to play it
+            if (showMatch.relatedItems && showMatch.relatedItems !== "null") {
+                const archives = await getRelatedItems(showMatch.relatedItems).catch(() => []);
+                if (archives.length > 0) {
+                    return mapVODToSliderItem(archives[0], showMatch.chaine_logo || showMatch.channel_logo);
+                }
+            }
+            return showMatch;
+        }
 
         // 3. Try searching through ALL channels
         const channelsRes = await getLiveChannels();
@@ -366,33 +412,25 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
             } catch { continue; }
         }
 
-        // 4. ULTIMATE FALLBACK: Search through items INSIDE shows
+        // 4. Try matching by TITLE (as last resort fallback for slug)
+        found = shows.find(s => s.title.toLowerCase().replace(/\s+/g, '-') === slug);
+        if (found) {
+            if (found.relatedItems && found.relatedItems !== "null") {
+                const archives = await getRelatedItems(found.relatedItems).catch(() => []);
+                if (archives.length > 0) return mapVODToSliderItem(archives[0], found.chaine_logo || found.channel_logo);
+            }
+            return found;
+        }
+
+        // 5. ULTIMATE FALLBACK: Search through items INSIDE shows
         // Search top 40 shows (aggressive)
         for (const show of shows.slice(0, 40)) {
             if (show.feed_url && show.feed_url !== "null") {
                 try {
                     const showItems = await getVODItems(show.feed_url.split('/').slice(-2, -1)[0] || "");
-                    const item = (showItems.allitems || []).find(v => v.slug === slug);
+                    const item = (showItems.allitems || []).find(v => v.slug === slug || v.title.toLowerCase().replace(/\s+/g, '-') === slug);
                     if (item) {
-                        return {
-                            title: item.title,
-                            desc: item.desc,
-                            logo_url: item.image_url,
-                            logo: item.image,
-                            video_url: ensureAbsoluteUrl(item.video_url),
-                            feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
-                            stream_url: ensureAbsoluteUrl(item.stream_url),
-                            android_url: ensureAbsoluteUrl(item.android_url),
-                            web_url: ensureAbsoluteUrl(item.web_url),
-                            webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
-                            date: item.published_at,
-                            time: "",
-                            slug: item.slug,
-                            type: "vod",
-                            views: "0",
-                            channel_logo: show.chaine_logo,
-                            relatedItems: item.relatedItems || ""
-                        } as SliderVideoItem;
+                        return mapVODToSliderItem(item, show.chaine_logo || show.channel_logo);
                     }
                 } catch { continue; }
             }
@@ -536,7 +574,9 @@ export async function getAODChannels(): Promise<VODChannelsResponse> {
  * Get latest AOD items
  */
 export async function getLatestAOD(): Promise<AODItemsResponse> {
-    return fetchAPI<AODItemsResponse>(`/latestaoditemsByGroupe/${APP_ID}/json`);
+    const res = await fetchAPI<AODItemsResponse>(`/latestaoditemsByGroupe/${APP_ID}/json`);
+    console.log("getLatestAOD Response:", res?.allitems?.length);
+    return res;
 }
 
 /**
@@ -642,11 +682,20 @@ export async function getWordPressPosts(
 }
 
 /**
+ * Get a single WordPress post by ID
+ * @param postId - The ID of the post
+ */
+export async function getWordPressPostById(postId: string | number): Promise<import('../types/api').WordPressPost> {
+    return fetchWordPressAPI<import('../types/api').WordPressPost>(`/posts/${postId}?_embed=wp:featuredmedia,wp:term`);
+}
+
+/**
  * Get latest WordPress posts (all categories)
  * @param perPage - Number of posts to retrieve (default: 10)
+ * @param page - Page number (default: 1)
  */
-export async function getWordPressLatestPosts(perPage: number = 10): Promise<import('../types/api').WordPressPost[]> {
-    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}`);
+export async function getWordPressLatestPosts(perPage: number = 10, page: number = 1): Promise<import('../types/api').WordPressPost[]> {
+    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}`);
 }
 
 

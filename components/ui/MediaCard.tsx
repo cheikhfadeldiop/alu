@@ -11,9 +11,11 @@ export type MediaCardProps = {
   meta?: string;
   live?: boolean;
   showPlayIcon?: boolean;
+  showAudioIcon?: boolean;
   aspect?: "16/9" | "4/3" | "1/1" | "469/246";
   channelLogo?: string;
   target?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 function aspectClass(aspect: MediaCardProps["aspect"]) {
@@ -54,17 +56,14 @@ export function MediaCard({
   meta,
   live,
   showPlayIcon = false,
+  showAudioIcon = false,
   aspect = "16/9",
   channelLogo,
   target = true,
+  onClick,
 }: MediaCardProps) {
-  return (
-    <Link
-      href={href}
-      target={target ? "_blank" : "_self"}
-      rel="noopener noreferrer"
-      className="group block overflow-hidden  bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 "
-    >
+  const content = (
+    <div className="group block overflow-hidden bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 cursor-pointer">
       <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
         <SafeImage
           src={imageSrc}
@@ -84,6 +83,17 @@ export function MediaCard({
             <PlayOverlay />
           </div>
         ) : null}
+        {showAudioIcon ? (
+          <div className="absolute bottom-2 left-2 z-20  p-1.5 flex items-center justify-center">
+            <SafeImage
+              src="/assets/radio composant/audio.png"
+              alt="Audio"
+              width={50}
+              height={50}
+              className="object-contain"
+            />
+          </div>
+        ) : null}
 
         {channelLogo && (
           <div className="absolute bottom-2 right-2 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md overflow-hidden">
@@ -98,7 +108,7 @@ export function MediaCard({
       </div>
 
       <div className="space-y-1 p-4 justify-between">
-        <div className="line-clamp-1 text-sm font-semibold leading-6 text-foreground ">
+        <div className="line-clamp-2 text-sm font-semibold leading-6 text-foreground ">
           {title}
         </div>
         {meta ? (
@@ -109,6 +119,16 @@ export function MediaCard({
           </div>
         ) : null}
       </div>
+    </div>
+  );
+
+  if (onClick) {
+    return <div onClick={onClick}>{content}</div>;
+  }
+
+  return (
+    <Link href={href} target={target ? "_blank" : "_self"} rel="noopener noreferrer">
+      {content}
     </Link>
   );
 }

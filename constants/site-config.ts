@@ -21,10 +21,15 @@ export const SITE_CONFIG = {
         // Refresh Controller (Client-side cache management)
         cache: {
             ttl: {
+                static: 0, // 24h (App details, terms)
+                standard: 0,     // 5 min (News, Replays)
+                dynamic: 0,      // 2 min (EPG, Adverts)
+                realtime: 0,         // 30 sec (Live status)
+                /*
                 static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
                 standard: 1000 * 60 * 5,     // 5 min (News, Replays)
                 dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
-                realtime: 1000 * 30,         // 30 sec (Live status)
+                realtime: 1000 * 30,         // 30 sec (Live status)*/
             }
         }
     },
@@ -88,6 +93,8 @@ export const SITE_CONFIG = {
             regional: 145,
             matam: 133,
             agriculture: 153,
+            radioJournals: 141, // Placeholder for radio journals
+            tvJournals: 121,    // Placeholder for TV journals
             groups: [
                 { id: "a-la-une", name: "A LA UNE", matchIds: [121], keywords: ["une", "actualit", "general"] },
                 { id: "regions", name: "RÉGIONS", matchIds: [145], keywords: ["dakar", "matam", "region", "saint-louis", "louga", "tambacounda", "diourbel", "kaolack", "fatick", "kolda", "ziguinchor", "sedhiou", "kedougou", "kaffrine"] },

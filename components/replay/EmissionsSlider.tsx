@@ -31,7 +31,7 @@ export function EmissionsSlider({ shows }: EmissionsSliderProps) {
     return (
         <section className="w-full max-w-[1400px] mx-auto px-4 space-y-8">
             <div className="flex items-center justify-between">
-                <SectionTitle title={t("pages.replay.ourShows")} title2={t("pages.replay.tvSubtitle")} />
+                <SectionTitle title={t("pages.replay.ourShows")+" "+t("pages.replay.tvSubtitle")} className="font-bold" title2=""/>
                 <div className="flex gap-2">
                     <button onClick={() => scrollBy('left')} className="w-10 h-10 border border-white/10 bg-foreground/10 hover:bg-red-600 transition-colors flex items-center justify-center rounded-sm group"><svg className="w-5 h-5 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
                     <button onClick={() => scrollBy('right')} className="w-10 h-10 border border-white/10 bg-foreground/10 hover:bg-red-600 transition-colors flex items-center justify-center rounded-sm group"><svg className="w-5 h-5  group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
@@ -83,11 +83,11 @@ function ShowCard({ show }: { show: SliderVideoItem }) {
 
                 <div className="flex items-center gap-4 text-[10px] md:text-xs font-medium text-foreground/50 uppercase tracking-tight">
                     <span className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <svg className="w-3.5 h-3.5 text-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         {show.date || "Jeudi -Vendredi"}
                     </span>
                     <span className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <svg className="w-3.5 h-3.5 text-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         {show.time || "10:45"}
                     </span>
                 </div>

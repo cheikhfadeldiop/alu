@@ -72,8 +72,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                     {featuredItem && (() => {
                         const channelLogo = resolveLogo(featuredItem);
                         return (
-                            <Link href={`${featuredItem.link}`}
-                                target="_blank"
+                            <Link href={`/news/${featuredItem.id}`}
                                 className="block relative aspect-video  overflow-hidden bg-white/5 group">
                                 <SafeImage
                                     src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}

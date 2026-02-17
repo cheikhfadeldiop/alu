@@ -1,41 +1,34 @@
-import { WordPressPost } from "../../types/api";
 import { WordPressCategoryColumn } from "./WordPressCategoryColumn";
 
 interface RegionalCategoriesSectionProps {
-    regionalPosts: WordPressPost[];
-    matamPosts: WordPressPost[];
-    agriculturePosts: WordPressPost[];
+    radioItems: any[];
+    replayItems: any[];
 }
 
 import { useTranslations } from "next-intl";
 
 export function RegionalCategoriesSection({
-    regionalPosts,
-    matamPosts,
-    agriculturePosts,
+    radioItems,
+    replayItems,
 }: RegionalCategoriesSectionProps) {
     const t = useTranslations("pages.home");
 
     return (
-        <section className="py-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <section className="py-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <WordPressCategoryColumn
-                    title={t("regionalNewsSuffix")}
+                    title={t("journalsRadio")}
                     title2=''
-                    items={regionalPosts}
-                    categorySlug="actualites-regionale"
+                    items={radioItems}
+                    categorySlug="radio"
+                    type="radio"
                 />
                 <WordPressCategoryColumn
-                    title={t("matam")}
+                    title={t("journalsTV")}
                     title2=''
-                    items={matamPosts}
-                    categorySlug="actu-matam"
-                />
-                <WordPressCategoryColumn
-                    title={t("agriculture")}
-                    title2=''
-                    items={agriculturePosts}
-                    categorySlug="agriculture"
+                    items={replayItems}
+                    categorySlug="replays"
+                    type="tv"
                 />
             </div>
         </section>

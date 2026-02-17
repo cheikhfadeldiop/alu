@@ -5,6 +5,7 @@ import { LiveChannel, EPGItem } from "../../types/api";
 import { useTranslations } from "next-intl";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
+import { SectionTitle } from "../ui/SectionTitle";
 
 interface LiveSelectionCarouselProps {
     channels: LiveChannel[];
@@ -19,6 +20,8 @@ export function LiveSelectionCarousel({
     onSelectChannel,
     selectedChannelId,
 }: LiveSelectionCarouselProps) {
+    const tt = useTranslations("pages.live");
+
     const scrollerRef = useRef<HTMLDivElement>(null);
     const [activeTab, setActiveTab] = useState<"ALL" | "TV" | "RADIO">("ALL");
     const t = useTranslations("common");
@@ -36,17 +39,21 @@ export function LiveSelectionCarousel({
         el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: "smooth" });
     };
 
+
     return (
         <div className="w-full space-y-6">
             <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center  ">
+                    <SectionTitle title={tt("title")} title2={tt("titleSuffix")} />
+                </div>
+                <div className="flex gap-2">
                     {(["ALL", "TV", "RADIO"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`h-9 rounded-sm border border-[color:var(--border)] px-4 text-sm font-bold tracking-wide transition-all uppercase ${activeTab === tab
-                                ? "bg-[color:var(--accent)] text-white border-[color:var(--accent)]"
-                                : "bg-foreground/5 text-foreground/60 border-transparent hover:border-[color:var(--accent)] hover:text-foreground"
+                            className={`h-9 rounded-[20px] border border-[color:var(--border)] px-4 text-sm font-bold tracking-wide transition-all uppercase ${activeTab === tab
+                                ? "border-red-500"
+                                : "border-transparent hover:border-[color:var(--accent)] hover:text-foreground"
                                 }`}
                         >
                             {tab === "ALL" ? t("all") : tab === "TV" ? tf("tv") : tf("radio")}
@@ -54,10 +61,6 @@ export function LiveSelectionCarousel({
                     ))}
                 </div>
 
-                <div className="flex gap-2">
-                    <button onClick={() => scrollBy('left')} className="w-10 h-10 border border-white/10 bg-foreground/5 hover:bg-[color:var(--accent)] transition-colors flex items-center justify-center rounded-sm group"><svg className="w-5 h-5 text-foreground/60 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 19l-7-7 7-7" /></svg></button>
-                    <button onClick={() => scrollBy('right')} className="w-10 h-10 border border-white/10 bg-foreground/5 hover:bg-[color:var(--accent)] transition-colors flex items-center justify-center rounded-sm group"><svg className="w-5 h-5 text-foreground/60 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 5l7 7-7 7" /></svg></button>
-                </div>
             </div>
 
             <div ref={scrollerRef} className="flex gap-6 overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scroll-smooth">
@@ -88,9 +91,9 @@ export function LiveSelectionCarousel({
                         <button
                             key={channelKey}
                             onClick={() => onSelectChannel(channel)}
-                            className={`group relative flex flex-col shrink-0 w-[260px] sm:w-[300px] h-[220px] overflow-hidden rounded-sm bg-background/35 backdrop-blur-sm text-left transition-all duration-300 border-2 hover:translate-y-1 hover:scale-[1.02] ${isSelected ? "border-[color:var(--accent)] scale-[1.02]" : "border-transparent hover:border-[color:var(--accent)]"}`}
+                            className={`group relative flex flex-col m-3 shrink-0 w-[260px] sm:w-[300px] h-[220px] overflow-hidden rounded-2xl bg-background/35 backdrop-blur-sm text-left transition-all duration-300 border-2 hover:translate-y-1 hover:scale-[1.02] ${isSelected ? "border-[color:var(--accent)] scale-[1.02]" : "border-transparent hover:border-[color:var(--accent)]"}`}
                         >
-                            <div className="relative h-[65%] w-full bg-background/20">
+                            <div className="relative h-[65%] w-full bg-background/20 ">
                                 <SafeImage
                                     src={channel.logo_url || channel.logo || channel.hd_logo || channel.sd_logo || SITE_CONFIG.theme.placeholders.video}
                                     alt={channel.title}
@@ -118,18 +121,29 @@ export function LiveSelectionCarousel({
                             </div>
 
                             <div className="h-[35%] w-full bg-background/5 backdrop-blur-sm px-4 py-3 flex flex-col justify-between border-t border-white/5">
-                                <div className="space-y-2">
+                                <div className="space-x-2">
                                     <div className="flex items-center justify-between gap-4">
-                                        <h3 className="font-bold text-sm tracking-wide line-clamp-1 group-hover:text-[color:var(--accent)] transition-colors">{channel.title}</h3>
+
+                                        <h3 className=" w-[40%]font-bold text-sm tracking-wide line-clamp-1 group-hover:text-[color:var(--accent)] transition-colors">{channel.title}</h3>
+                                        <div className="w-[60%] h-1 bg-black/20 rounded-full overflow-hidden">
+                                            <div className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-1000" style={{ width: `${progressPercentage}%` }} />
+                                        </div>
                                     </div>
-                                    <div className="w-full h-1 bg-forground/40 rounded-full overflow-hidden">
-                                        <div className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-1000" style={{ width: `${progressPercentage}%` }} />
-                                    </div>
+
                                 </div>
 
-                                <div className="flex items-center justify-between text-[10px] font-medium text-forground/20 uppercase tracking-wider">
-                                    <span className="flex items-center gap-1.5"><svg className="w-3 h-3 text-[color:var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{currentProgram?.start_time || t("direct")}</span>
-                                    <span>{currentProgram?.end_time || "24/7"}</span>
+                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400  ">
+                                    {/* Calendar Icon */}
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', })}</span>
+                                    <span className="text-gray-400 dark:text-white/90  text-xs">-</span>
+                                    {/* Clock Icon */}
+                                    <svg className="w-5 h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-gray-500 text-sm">{currentProgram?.end_time || new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                             </div>
                         </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
@@ -50,9 +50,7 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                 <div className="w-full col-span-2">
                     {featuredItem && (
                         <Link
-                            href={featuredItem.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={`/news?id=${featuredItem.id}`}
                             className="group relative block w-full h-[520px] rounded-lg overflow-hidden
                             hover:scale-[1.02] transition-all"
                         >
@@ -120,13 +118,10 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                         {listItems.map((item) => (
                             <Link
                                 key={item.id}
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={`/news?id=${item.id}`}
                                 className="group flex gap-4 items-start hover:bg-muted/10  p-3  transition-colors
                                 border-b dark:border-muted/30
                                 hover:scale-[1.01] transition-all
-                                
                                 "
                             >
                                 <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">

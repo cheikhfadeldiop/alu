@@ -24,6 +24,10 @@ const FETCHER_MAP = {
         return api.getWordPressPosts(categoryId, parseInt(count) || 10);
     },
     wordpressCategories: api.getWordPressCategories,
+    wordpressPost: (key: string) => {
+        const [, postId] = key.split(':');
+        return api.getWordPressPostById(postId);
+    }
 };
 
 /**
@@ -42,10 +46,15 @@ export function useData<T>(
     return useSWR<T>(swrKey, async () => {
         const fetcherFn = FETCHER_MAP[fetcherKey];
         if (typeof fetcherFn === 'function') {
+            // Special cases for hooks that need multiple arguments from the key array
             if (fetcherKey === 'wordpressPosts' && Array.isArray(key)) {
                 return await api.getWordPressPosts(key[1] as any, key[2] as any);
             }
-            return await (fetcherFn as any)();
+            if (fetcherKey === 'wordpressPost' && Array.isArray(key)) {
+                return await api.getWordPressPostById(key[1] as any);
+            }
+            // Default: call fetcher with the full string key
+            return await (fetcherFn as any)(swrKey);
         }
         throw new Error(`No fetcher defined for key: ${fetcherKey}`);
     }, {
@@ -76,6 +85,10 @@ export function useEPGNow(fallbackData?: import("@/types/api").EPGResponse) {
 
 export function useWordPressNews(categoryId: string | number, count: number = 10, fallbackData?: import("@/types/api").WordPressPost[]) {
     return useData<import("@/types/api").WordPressPost[]>(["wordpressPosts", categoryId, count], "standard", fallbackData);
+}
+
+export function useWordPressPost(postId: string | number, fallbackData?: import("@/types/api").WordPressPost) {
+    return useData<import("@/types/api").WordPressPost>(["wordpressPost", postId], "standard", fallbackData);
 }
 
 export function useSliderVideos(fallbackData?: import("@/types/api").SliderVideosResponse) {

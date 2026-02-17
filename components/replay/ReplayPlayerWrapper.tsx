@@ -58,7 +58,7 @@ export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapper
     // but the user wants to avoid jumping, so we remove the auto-scroll.
 
     return (
-        <div ref={sectionRef} className="max-w-[1400px] mx-auto px-4 scroll-mt-24 min-h-[400px]">
+        <div ref={sectionRef} className="scroll-mt-24 min-h-[400px]">
             {video ? (
                 <ReplayPlayer video={video} />
             ) : isSearching ? (
