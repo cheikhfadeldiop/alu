@@ -25,7 +25,7 @@ export function MapLocation({
     zoom = 15,
     height = "500px",
 }: MapLocationProps) {
-    const t = useTranslations("map");
+    const t = useTranslations("pages.map");
     const mapRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -206,7 +206,7 @@ export function MapLocation({
                 {/* Map */}
                 <div ref={mapRef} style={{ height, width: "100%", zIndex: 0 }} />
 
-                
+
             </div>
 
             {/* Powered by OpenStreetMap */}

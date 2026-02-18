@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { SectionTitle } from "../ui/SectionTitle";
 import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
@@ -51,7 +51,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                 {/* 30% Left: Metadata of Item 0 */}
                 <div className="lg:col-span-3 space-y-4 group-hover:scale-[1.02] transition-transform ">
                     {featuredItem && (
-                        <Link href={`/news/${featuredItem.id}`} className="group block">
+                        <Link href={`/news?id=${featuredItem.id}`} className="group block">
                             <h2 className="text-xl lg:text-2xl font-bold leading-tight  mb-4">
                                 {featuredItem.title.rendered}
                             </h2>
@@ -72,7 +72,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                     {featuredItem && (() => {
                         const channelLogo = resolveLogo(featuredItem);
                         return (
-                            <Link href={`/news/${featuredItem.id}`}
+                            <Link href={`/news?id=${featuredItem.id}`}
                                 className="block relative aspect-video  overflow-hidden bg-white/5 group">
                                 <SafeImage
                                     src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
@@ -112,7 +112,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
                 {/* 30% Right: Side Items 1 & 2 */}
                 <div className="lg:col-span-3 space-y-6 group-hover:scale-[1.02] transition-transform">
                     {sideItems.map((item) => (
-                        <Link key={item.id} href={`/news/${item.id}`} className="group flex gap-4 items-start hover:scale-[1.02] transition-transform">
+                        <Link key={item.id} href={`/news?id=${item.id}`} className="group flex gap-4 items-start hover:scale-[1.02] transition-transform">
                             <div className="flex-1 min-w-0">
                                 <h3 className="text-sm font-bold leading-tight mb-2 line-clamp-3">
                                     {item.title.rendered}
@@ -140,7 +140,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
             {/* Row 2: Grid of 4 Items (3, 4, 5, 6) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8 group-hover:scale-[1.02] transition-transform">
                 {gridItems.map((item) => (
-                    <Link key={item.id} href={`/news/${item.id}`} className="group block space-y-3">
+                    <Link key={item.id} href={`/news?id=${item.id}`} className="group block space-y-3">
                         <div className="relative aspect-[16/10] overflow-hidden bg-white/5">
                             <SafeImage
                                 src={item.acan_image_url || SITE_CONFIG.theme.placeholders.news}

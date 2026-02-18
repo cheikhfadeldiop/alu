@@ -245,12 +245,30 @@ export function Header() {
     setMounted(true);
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+      // Increased hysteresis gap (120/40) for maximum stability.
+      // This ensures that slow scroll movements don't trigger rapid state flipping.
+      if (scrollY > 120) {
+        if (!isScrolled) setIsScrolled(true);
+      } else if (scrollY < 40) {
+        if (isScrolled) setIsScrolled(false);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    let ticking = false;
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", scrollListener, { passive: true });
+    return () => window.removeEventListener("scroll", scrollListener);
+  }, [isScrolled]);
 
   const navItems: NavItem[] = [
     { key: "home", href: "/", label: t("nav.home"), icon: IconHome },
@@ -284,7 +302,7 @@ export function Header() {
 
       {/* Scrollable Top Part - Optimized for performance */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[height,opacity,transform] ${isScrolled ? "h-0 opacity-0 -translate-y-2 pointer-events-none" : "h-[40px] opacity-100 translate-y-0"
+        className={`overflow-hidden transition-all duration-200 ease-out will-change-[height,opacity,transform] ${isScrolled ? "h-0 opacity-0 -translate-y-2 pointer-events-none" : "h-[40px] opacity-100 translate-y-0"
           }`}
       >
         <div className="mx-auto flex max-w-[1400px] justify-end px-8 py-2">
@@ -311,7 +329,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-8 transition-all duration-300 ease-in-out ${isScrolled ? "h-16" : "h-20"
+      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-8 transition-all duration-200 ease-out will-change-[height] ${isScrolled ? "h-16" : "h-20"
         }`}>
         {/* Logo */}
         <div className="flex items-center ">
@@ -328,7 +346,7 @@ export function Header() {
         </div>
 
         {/* Navigation - Fond transparent gris en light, noir en dark */}
-        <nav className="flex items-center gap-1 rounded-full p-1 bg-foreground/5 backdrop-blur-sm ">
+        <nav className="flex items-center gap-1 rounded-full p-1 bg-foreground/5 backdrop-blur-sm">
           {navItems.map((item) => {
             const active =
               item.href === "/"
@@ -343,7 +361,7 @@ export function Header() {
                 className={[
                   "relative flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300 min-w-[44px] justify-center",
                   active
-                    ? "border-2 border-[color:var(--accent)] bg-gackground "
+                    ? "ring-2 ring-[color:var(--accent)] "
                     : "",
                 ].join(" ")}
               >
@@ -354,6 +372,7 @@ export function Header() {
                     {isLive && (
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)] animate-pulse" aria-hidden />
                     )}
+                    {active && <item.icon className="h-4 w-4 text-[color:var(--accent)]" />}
                     <span>{item.label}</span>
                   </div>
                 )}

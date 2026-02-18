@@ -9,7 +9,7 @@
   --muted: #5b616b;
   --border: rgba(11, 13, 18, 0.12);
   --accent: #d1121f;
-  --secondary: #009e49;
+  --secondary: #ffffffb4;
 
   /* Pattern */
   --pattern-opacity: 0.04;
@@ -53,6 +53,7 @@ html.dark {
   --muted: #a1a7b2;
   --border: rgba(242, 244, 248, 0.14);
   --accent: #ff2f3f;
+  --secondary: #1C1C1C;
 
   --pattern-opacity: 0.06;
   --pattern-invert: 1;
@@ -146,3 +147,4 @@ input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   @apply bg-red-600 rounded-full shadow-lg;
 }
+

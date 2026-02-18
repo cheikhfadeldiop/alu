@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { SectionTitle } from "../../../../components/ui/SectionTitle";
 import { MediaCard } from "../../../../components/ui/MediaCard";
@@ -10,7 +10,7 @@ export default async function PlaybackPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const t = useTranslations("nav");
+  const t = await getTranslations("nav");
 
   return (
     <div className="crtv-page-enter space-y-8">
@@ -52,7 +52,7 @@ export default async function PlaybackPage({
             {Array.from({ length: 4 }).map((_, i) => (
               <MediaCard
                 key={i}
-                href={`/playback/next-${i + 1}`}
+                href={`/replay/next-${i + 1}`}
                 title={`Suggestion ${i + 1}`}
                 imageSrc="/assets/placeholders/actu_regional_469x246.png"
                 meta="Replay"

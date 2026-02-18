@@ -524,8 +524,13 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                 </div>
 
                 {/* Premium Info */}
-                <div className="relative  p-8 md:p-10 backdrop-blur-3xl bg-background/85 border border-white/5 overflow-hidden">
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div className="relative p-8 md:p-10  backdrop-blur-3xl  bg-secondary    border border-white/5 overflow-hidden group/info">
+                    {/* Decoration Background */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                        {/* Channel Logo */}
                         <div className="relative w-32 h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                             <SafeImage
                                 src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
@@ -534,41 +539,59 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                 className="object-contain brightness-110 drop-shadow-md"
                             />
                         </div>
-                        <div className="flex-1 text-center md:text-left space-y-4">
+
+                        {/* Content */}
+                        <div className="flex-1 text-center md:text-left justify-center items-center space-y-4">
+                            {/* Header: Status + Title */}
                             <div className="flex items-center justify-center md:justify-start gap-3">
                                 <div className="flex items-center gap-2 px-3 py-1">
                                     <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
                                     <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
                                     <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-                                    <span className="text-[16px] font-bold ">{channel.title}</span>
                                 </div>
+                                <h2 className="text-2xl  w-[70%] md:text-3xl font-black  uppercase tracking-tighter drop-shadow-sm">
+                                    {channel.title}
+                                </h2>
                             </div>
-                            <p className="text-sm md:text-base text-foreground/50 leading-relaxed max-w-3xl mx-auto md:mx-0">
-                                {channel.desc || (
-                                    Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
-                                        channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
-                                    )?.[1].desc || t('fallback.desc')
-                                )}
-                            </p>
 
-                            {/* Footer Program Info */}
-                            <div className="pt-4 mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
-                                <span className="text-red-600">{currentProgramTitle}</span>
-                                <span className="text-foreground">|</span>
-                                <span className="text-foreground/40">PRÉSENTÉ PAR : <span className="text-foreground/70">{currentPresenter}</span></span>
-                            </div>
+
                         </div>
 
-                        {/* Large Share Button */}
-                        <button onClick={handleShare} className="hidden md:flex w-12 h-12 bg-foreground/25 hover:bg-foreground/95 rounded-lg border border-white/10 items-center justify-center text-white/60 hover:text-white transition-all">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                        </button>
+
+                        {/* Share Button (Top Right Desktop) */}
+                        <div className="absolute top-0 right-0 p-4 shrink-0">
+                            <button className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300  group/share">
+                                <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    {/* Description */}
+                    <div className="max-w-3xl pt-4 pb-8">
+                        <p className="text-sm md:text-base text-foreground/50 leading-relaxed font-medium">
+                            {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
+                        </p>
+                    </div>
+
+                    {/* Program Info (New addition matching image) */}
+                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border-t border-foreground/30">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                                {"RADIO EN DIRECT"}
+                            </span>
+                        </div>
+                        <div className="hidden md:block w-px h-4 bg-foreground/30" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">DIFFUSÉ SUR :</span>
+                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                {channel.title || "RADIO EN DIRECT"}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <audio ref={audioRef} src={streamUrl} preload="metadata" className="hidden" />
+                <audio ref={audioRef} src={streamUrl || undefined} preload="metadata" className="hidden" />
             </div>
             <div className="w-full lg:w-[30%] sticky top-24 h-fit">
                 <AdBannerV />

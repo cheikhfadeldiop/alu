@@ -12,7 +12,7 @@ interface NewsDetailedLayoutProps {
 }
 
 export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: NewsDetailedLayoutProps) {
-    if (!featuredItem) return null;
+    if (!featuredItem || !featuredItem.title) return null;
 
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -80,7 +80,7 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
     const highlightTxt = remainingParagraphs.slice(4, 6).join("");
     const block3 = remainingParagraphs.slice(6).join("");
 
-    const highlightTitle = (featuredItem.title.rendered).split(' ').slice(0, 4).join(' ') + "...";
+    const highlightTitle = (featuredItem.title?.rendered || "").split(' ').slice(0, 4).join(' ') + "...";
 
     const displaySideItems = sideItems.slice(0, 5);
 
@@ -99,7 +99,7 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/5 shadow-2xl rounded-[2px] group">
                     <SafeImage
                         src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
-                        alt={featuredItem.title.rendered}
+                        alt={featuredItem.title?.rendered || "News"}
                         fill
                         priority
                         className="object-cover"
@@ -108,7 +108,7 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
 
                 <div className="space-y-4 border-b border-foreground/30">
                     <h1 className="text-3xl md:text-4xl font-black leading-tight text-foreground tracking-tighter">
-                        {decodeHtmlEntities(featuredItem.title.rendered)}
+                        {decodeHtmlEntities(featuredItem.title?.rendered || "")}
                     </h1>
 
                     <div className="flex items-center gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 pb-4">

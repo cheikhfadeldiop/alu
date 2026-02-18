@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { SectionTitle } from "../ui/SectionTitle";
 import { AlauneItem } from "../../types/api";
 import { SafeImage } from "../ui/SafeImage";
@@ -21,7 +21,7 @@ export function CategorySection({ items, title, category, actionLabel }: Categor
             />
             <div className="space-y-3">
                 {items.map((item) => (
-                    <Link key={item.id} href={`/playback/${item.id}`} className="group block">
+                    <Link key={item.id} href={`/replay/${item.id}`} className="group block">
                         <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 mb-2">
                             <SafeImage
                                 src={item.image_url || item.image || "/assets/placeholders/article_list.png"}

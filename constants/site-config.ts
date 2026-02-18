@@ -21,15 +21,16 @@ export const SITE_CONFIG = {
         // Refresh Controller (Client-side cache management)
         cache: {
             ttl: {
+                /*
                 static: 0, // 24h (App details, terms)
                 standard: 0,     // 5 min (News, Replays)
                 dynamic: 0,      // 2 min (EPG, Adverts)
                 realtime: 0,         // 30 sec (Live status)
-                /*
+                */
                 static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
                 standard: 1000 * 60 * 5,     // 5 min (News, Replays)
                 dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
-                realtime: 1000 * 30,         // 30 sec (Live status)*/
+                realtime: 1000 * 30,         // 30 sec (Live status)
             }
         }
     },
@@ -118,3 +119,6 @@ export const SITE_CONFIG = {
         { id: '50006', slug: 'crtv-sport', name: 'CRTV SPORT', logo: "https://cdn.tve.static.acan.group/images/channel_1731344621.png" },
     ]
 };
+
+{/*
+    salut.... tu peux analyse le code entier objectivement et crre un fichier md de manier struturer pour deceller les faille et point faire et tout l'aspect non profetionne de tout les page et de maniere global de la page.. par rapport au point fort du code... je doit je corriger et les presenter a mon developper senior donc je comppte sur toit */}

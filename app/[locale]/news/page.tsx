@@ -35,7 +35,7 @@ function NewsContent() {
   const { data: routeArticle } = useWordPressPost(idParam || "");
 
   useEffect(() => {
-    if (routeArticle && idParam) {
+    if (routeArticle && routeArticle.title && idParam) {
       setSelectedArticle(routeArticle);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (!idParam) {

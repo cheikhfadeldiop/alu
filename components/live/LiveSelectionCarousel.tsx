@@ -108,10 +108,10 @@ export function LiveSelectionCarousel({
                                     </div>
                                 )}
 
-                                <div className="absolute top-2 right-2 px-2 py-1 bg-[color:var(--accent)] text-white text-[9px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-1.5 shadow-lg">
-                                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                               {isSelected &&( <div className="absolute top-2 right-2 px-2 py-1 bg-white text-black text-[12px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-1.5 shadow-lg">
+                                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
                                     {t("live")}
-                                </div>
+                                </div>)}
 
                                 <div className="absolute bottom-2 left-2">
                                     <div className="w-8 h-8 relative drop-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity">
