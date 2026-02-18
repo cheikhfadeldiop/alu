@@ -100,12 +100,12 @@ export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionPr
                                 </div>
 
                                 {/* Description Band - Below Image */}
-                                <div className="relative p-4  bg-background z-10 mt-[-22] ml-20 mr-20 ">
+                                <div className="relative p-4 sm:p-6 bg-background z-10 sm:-mt-10 mx-4 sm:mx-10 md:mx-20 shadow-xl rounded-lg">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time}</span>
                                         <span className="text-xs text-[color:var(--accent)] font-semibold">{tc("toWatchNow")}</span>
                                     </div>
-                                    <h3 className="text-base font-bold mb-2 ">
+                                    <h3 className="text-base sm:text-lg font-bold mb-2 ">
                                         {featuredVideo.title}
                                     </h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { SectionTitle } from "../ui/SectionTitle";
 import { AlauneItem } from "../../types/api";
 import { SafeImage } from "../ui/SafeImage";
@@ -20,7 +20,7 @@ export function RegionalNews({ items, title, title2, actionLabel }: RegionalNews
                     {items.map((item) => (
                         <Link
                             key={item.id}
-                            href={`/playback/${item.id}`}
+                            href={`/replay/${item.id}`}
                             className="group flex gap-3 hover:bg-white/10 dark:hover:bg-white/5 p-2 rounded-lg transition-colors border border-transparent hover:border-white/10"
                         >
                             <div className="relative w-28 h-20 flex-shrink-0 rounded overflow-hidden bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10">

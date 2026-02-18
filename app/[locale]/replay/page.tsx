@@ -27,7 +27,7 @@ export default async function ReplayPage() {
   const shows = showsData.allitems || [];
 
   return (
-    <div className="py-8 space-y-16">
+    <div className="py-8 space-y-8 md:space-y-12">
       {/* 1. Live Direct Section */}
       <div className="max-w-[1400px] mx-auto px-4">
         <LiveDirectSection

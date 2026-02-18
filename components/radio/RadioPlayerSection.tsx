@@ -7,6 +7,7 @@ import { LiveChannel, EPGItem } from "../../types/api";
 import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
 import { AdBannerV } from "../ui/AdBannerV";
+import { ShareButton } from "../ui/ShareButton";
 
 interface RadioPlayerSectionProps {
     channel: LiveChannel;
@@ -261,45 +262,6 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
         setIsMuted(!isMuted);
     };
 
-    const handleShare = async () => {
-        if (typeof window === 'undefined') return;
-
-        const shareData = {
-            title: channel.title,
-            text: `Écoutez ${channel.title} sur CRTV Web`,
-            url: window.location.href,
-        };
-
-        try {
-            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                await navigator.share(shareData);
-            } else if (navigator.clipboard) {
-                await navigator.clipboard.writeText(window.location.href);
-                // Ideally, show a toast notification here
-                alert(tCommon('linkCopied') || "Lien copié !");
-            } else {
-                // Fallback for browsers without clipboard API or non-secure contexts
-                const textArea = document.createElement("textarea");
-                textArea.value = window.location.href;
-                // Avoid scrolling to bottom
-                textArea.style.top = "0";
-                textArea.style.left = "0";
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    alert(tCommon('linkCopied') || "Lien copié !");
-                } catch (err) {
-                    console.error('Fallback: Oops, unable to copy', err);
-                }
-                document.body.removeChild(textArea);
-            }
-        } catch (err) {
-            console.error('Share failed:', err);
-        }
-    };
 
     const frequency = channel.desc?.match(/(\d+\.?\d*)\s*(FM|MHz)/i)?.[0] || "FM";
     const currentProgramTitle = currentProgram?.program_title ||
@@ -309,7 +271,7 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
 
     return (
         <div className="flex flex-col lg:flex-row justify-between gap-8">
-            <div className="w-full lg:w-[68%] h-auto space-y-4">
+            <div className="w-full lg:w-[68%] h-auto ">
                 {/* Main Player Container */}
                 <div className=" relative  bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
                     {/* ... content ... */}
@@ -373,27 +335,12 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         </svg>
                     </div>
 
-                    <div className="relative z-10 flex flex-col items-center justify-center pt-24 pb-12 px-6 text-center">
-                        {/*<div className=" mt-[-35px] flex flex-col items-center bg-white/10 backdrop-blur-sm w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
-                            <div className="mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-white/20">
-                                <SafeImage
-                                    src={channel.logo_url || channel.logo || channel.hd_logo || "/assets/placeholders/radio_icon_sur_card.png"}
-                                    alt={channel.title}
-                                    fill
-                                    className="object-contain bg-black"
-                                />
-                            </div>
+                    <div className="relative z-10 flex flex-col items-center justify-center pt-8 sm:pt-16 pb-4 sm:pb-8 px-4 sm:px-6 text-center">
 
-                            <div className="text-4xl font-bold text-white mb-8 tracking-tight mt-4">
-                                {frequency}
-                            </div>
-                        </div>
-                        */}
-
-                        <div className="relative w-44 h-44 mb-0 " />
+                        <div className="relative w-44 h-12 mb-0 " />
 
                         {/* Circular Player Control */}
-                        <div className="relative w-64 h-64">
+                        <div className="relative w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64">
                             {/* ... SVG Circle Logic ... */}
                             <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
@@ -411,15 +358,15 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                             </svg>
 
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="relative w-48 h-48 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl flex items-center justify-center">
-                                    <div className="flex items-center gap-4">
+                                <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl flex items-center justify-center">
+                                    <div className="flex items-center gap-2 sm:gap-4">
                                         {/* Prev Button */}
                                         <button
                                             onClick={onPrevChannel}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onPrevChannel ? 'cursor-not-allowed opacity-50' : ''}`}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onPrevChannel ? 'cursor-not-allowed opacity-50' : ''}`}
                                             disabled={!onPrevChannel}
                                         >
-                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" transform="scale(-1, 1) translate(-20, 0)" />
 
                                             </svg>
@@ -429,16 +376,16 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                         <button
                                             onClick={handlePlayPause}
                                             disabled={loading || isStreamDead}
-                                            className="w-16 h-16 flex items-center justify-center rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                            className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                                         >
                                             {loading && !isStreamDead ? (
-                                                <div className="w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                                                <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                                             ) : isPlaying ? (
-                                                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                                                 </svg>
                                             ) : (
-                                                <svg className="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg className="w-6 h-6 sm:w-8 sm:h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                                                 </svg>
                                             )}
@@ -447,10 +394,10 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                         {/* Next Button */}
                                         <button
                                             onClick={onNextChannel}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onNextChannel ? 'cursor-not-allowed opacity-50' : ''}`}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onNextChannel ? 'cursor-not-allowed opacity-50' : ''}`}
                                             disabled={!onNextChannel}
                                         >
-                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" transform="scale(-1, 1) translate(-20, 0)" />
                                             </svg>
                                         </button>
@@ -458,75 +405,96 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                 </div>
                             </div>
                         </div>
-                        <div className="relative w-44 h-24 mt-0 " />
+                        <div className="relative w-44 h-12 mt-0 " />
                         {/* Meta Info Row */}
-                        <div className="w-full max-w-3xl mx-auto mt-6 pt-6 border-t border-white/10 flex items-center justify-between gap-6">
-                            <div className="hidden md:flex items-end gap-1 w-1/4 h-12">
-                                {Array.from({ length: 20 }).map((_, i) => (
-                                    <div key={i} className="w-1 rounded-full bg-white/30" style={{ height: `${isActuallyPlaying ? 10 + ((i * 7) % 40) : 10}px`, animation: isActuallyPlaying ? `crtvWave ${900 + (i % 7) * 120}ms ease-in-out ${(i % 9) * 60}ms infinite alternate` : 'none' }} />
-                                ))}
-                            </div>
-
-                            {/* Center: Title & Info */}
-                            <div className="flex-1 flex flex-col items-center justify-center overflow-hidden px-4">
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h3 className="text-white text-lg font-medium truncate max-w-full">
-                                        {currentProgramTitle}
-                                    </h3>
-                                    <span className="shrink-0 flex items-center gap-1.5 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">
-                                        <span className={`w-1.5 h-1.5 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`} />
-                                        <span className="text-[10px] uppercase font-bold text-red-100 tracking-wider">On air</span>
-                                    </span>
+                        <div className="w-full max-w-4xl mx-auto mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                                {/* Left: Animation - Hidden on very small mobile, shown on SM+ */}
+                                <div className="hidden sm:flex items-end gap-1 w-24 h-8 shrink-0">
+                                    {Array.from({ length: 12 }).map((_, i) => (
+                                        <div key={i} className="w-1 rounded-full bg-white/30" style={{ height: `${isActuallyPlaying ? 5 + ((i * 7) % 25) : 5}px`, animation: isActuallyPlaying ? `crtvWave ${700 + (i % 5) * 100}ms ease-in-out ${(i % 7) * 50}ms infinite alternate` : 'none' }} />
+                                    ))}
                                 </div>
-                                <div className="flex items-center gap-4 text-xs text-white/50">
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>{new Date().toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+
+                                {/* Center: Title & Info */}
+                                <div className="flex-1 flex flex-col items-center justify-center overflow-hidden w-full px-2">
+                                    <div className="flex items-center gap-3 mb-1 max-w-full">
+                                        <h3 className="text-white text-base sm:text-lg font-medium truncate">
+                                            {currentProgramTitle}
+                                        </h3>
+                                        <span className="shrink-0 flex items-center gap-1.5 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">
+                                            <span className={`w-1.5 h-1.5 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`} />
+                                            <span className="text-[10px] uppercase font-bold text-red-100 tracking-wider">Live</span>
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <div className="flex items-center gap-4 text-[10px] sm:text-xs text-white/50">
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="capitalize">{new Date().toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Right: Actions */}
-                            <div className="flex items-center gap-3 shrink-0">
-                                <button onClick={handleShare} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                </button>
-                                <button onClick={toggleMute} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    {isMuted ? (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                {/* Right: Actions */}
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                    <ShareButton
+                                        title={channel.title}
+                                        text={`Écoutez ${channel.title} sur CRTV Web`}
+                                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                         </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                    </ShareButton>
+                                    <button onClick={toggleMute} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors" title={isMuted ? "Réactiver le son" : "Couper le son"}>
+                                        {isMuted ? (
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                            </svg>
+                                        )}
+                                    </button>
+                                    <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors" title="Plus d'options">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                         </svg>
-                                    )}
-                                </button>
-                                <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                                    </svg>
-                                </button>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Premium Info */}
-                <div className="relative  p-8 md:p-10 backdrop-blur-3xl bg-background/85 border border-white/5 overflow-hidden">
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
-                        <div className="relative w-32 h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                {/* Info Container */}
+                <div className="relative p-4 sm:p-6 md:p-8 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
+                    {/* Decoration Background */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
+                        <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
+                            <ShareButton
+                                title={channel.title}
+                                text={`Écoutez ${channel.title} sur CRTV Web`}
+                                className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share"
+                                iconClassName="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110"
+                            />
+                        </div>
+
+                        {/* Channel Logo */}
+                        <div className="relative w-24 h-16 sm:w-32 sm:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                             <SafeImage
                                 src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
                                 alt={channel.title}
@@ -534,41 +502,46 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                 className="object-contain brightness-110 drop-shadow-md"
                             />
                         </div>
-                        <div className="flex-1 text-center md:text-left space-y-4">
-                            <div className="flex items-center justify-center md:justify-start gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1">
-                                    <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
-                                    <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-                                    <span className="text-[16px] font-bold ">{channel.title}</span>
-                                </div>
-                            </div>
-                            <p className="text-sm md:text-base text-foreground/50 leading-relaxed max-w-3xl mx-auto md:mx-0">
-                                {channel.desc || (
-                                    Object.entries(RADIO_FALLBACK_DATA).find(([key]) =>
-                                        channel.title.toLowerCase().includes(key) || (channel.slug && channel.slug.toLowerCase().includes(key))
-                                    )?.[1].desc || t('fallback.desc')
-                                )}
-                            </p>
 
-                            {/* Footer Program Info */}
-                            <div className="pt-4 mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
-                                <span className="text-red-600">{currentProgramTitle}</span>
-                                <span className="text-foreground">|</span>
-                                <span className="text-foreground/40">PRÉSENTÉ PAR : <span className="text-foreground/70">{currentPresenter}</span></span>
+                        {/* Content */}
+                        <div className="flex-1 w-full text-center md:text-left space-y-4">
+                            {/* Header: Status + Title */}
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full w-fit">
+                                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
+                                    <span className="text-[8px] font-bold uppercase tracking-widest">Live</span>
+                                </div>
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-black w-full uppercase tracking-tighter drop-shadow-sm pr-10 md:pr-0">
+                                    {channel.title}
+                                </h2>
                             </div>
                         </div>
+                    </div>
+                    {/* Description */}
+                    <div className="max-w-3xl pt-4 pb-8">
+                        <p className="text-sm md:text-base text-foreground/50 leading-relaxed font-medium">
+                            {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
+                        </p>
+                    </div>
 
-                        {/* Large Share Button */}
-                        <button onClick={handleShare} className="hidden md:flex w-12 h-12 bg-foreground/25 hover:bg-foreground/95 rounded-lg border border-white/10 items-center justify-center text-white/60 hover:text-white transition-all">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                        </button>
+                    {/* Program Info (New addition matching image) */}
+                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border-t border-foreground/30">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                                {"RADIO EN DIRECT"}
+                            </span>
+                        </div>
+                        <div className="hidden md:block w-px h-4 bg-foreground/30" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">DIFFUSÉ SUR :</span>
+                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                {channel.title || "RADIO EN DIRECT"}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <audio ref={audioRef} src={streamUrl} preload="metadata" className="hidden" />
+                <audio ref={audioRef} src={streamUrl || undefined} preload="metadata" className="hidden" />
             </div>
             <div className="w-full lg:w-[30%] sticky top-24 h-fit">
                 <AdBannerV />

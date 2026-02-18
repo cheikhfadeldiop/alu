@@ -23,9 +23,9 @@ export function MapLocation({
     title,
     address,
     zoom = 15,
-    height = "500px",
+    height = "min(350px, 50vh)",
 }: MapLocationProps) {
-    const t = useTranslations("map");
+    const t = useTranslations("pages.map");
     const mapRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -160,7 +160,7 @@ export function MapLocation({
     return (
         <div className="w-full space-y-4">
             {/* Map Container */}
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10">
+            <div className="relative w-full overflow-hidden rounded-sm bg-muted/5 border border-foreground/10" style={{ height }}>
                 {/* Loading State */}
                 {isLoading && (
                     <div
@@ -206,68 +206,7 @@ export function MapLocation({
                 {/* Map */}
                 <div ref={mapRef} style={{ height, width: "100%", zIndex: 0 }} />
 
-                {/* Floating Action Buttons */}
-                <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-[1000]">
-                    <button
-                        onClick={handleDirections}
-                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
-                        title={t("common.itinerary")}
-                    >
-                        <svg
-                            className="w-5 h-5 text-green-600 group-hover:text-green-700"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                            />
-                        </svg>
-                    </button>
 
-                    <button
-                        onClick={handleCopyCoordinates}
-                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
-                        title="Copier les coordonnées"
-                    >
-                        <svg
-                            className="w-5 h-5 text-red-600 group-hover:text-red-700"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                            />
-                        </svg>
-                    </button>
-
-                    <button
-                        onClick={handleViewOnOSM}
-                        className="p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-white/10 group"
-                        title={t("common.viewOSM")}
-                    >
-                        <svg
-                            className="w-5 h-5 text-blue-600 group-hover:text-blue-700"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                        </svg>
-                    </button>
-                </div>
             </div>
 
             {/* Powered by OpenStreetMap */}

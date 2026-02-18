@@ -10,6 +10,7 @@ export const SITE_CONFIG = {
     officialName: "Cameroon Radio Television",
     tagline: "L'organisme public camerounais de radio-télévision",
     description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://crtv.cm', // Added for social metadata
 
     // URL & API Configurations de teste celui de larts
     api: {
@@ -21,15 +22,16 @@ export const SITE_CONFIG = {
         // Refresh Controller (Client-side cache management)
         cache: {
             ttl: {
+                /*
                 static: 0, // 24h (App details, terms)
                 standard: 0,     // 5 min (News, Replays)
                 dynamic: 0,      // 2 min (EPG, Adverts)
                 realtime: 0,         // 30 sec (Live status)
-                /*
+                */
                 static: 1000 * 60 * 60 * 24, // 24h (App details, terms)
                 standard: 1000 * 60 * 5,     // 5 min (News, Replays)
                 dynamic: 1000 * 60 * 2,      // 2 min (EPG, Adverts)
-                realtime: 1000 * 30,         // 30 sec (Live status)*/
+                realtime: 1000 * 30,         // 30 sec (Live status)
             }
         }
     },
@@ -53,11 +55,10 @@ export const SITE_CONFIG = {
     // Contact & Logistics
     contact: {
         address: 'MBALLA II, Yaoundé, Cameroun.',
-        phones: [
-            '(+237) 222 214 088',
-            '(+237) 222 214 047'
-        ],
+        phones: '(+237) 222 214 088',
+        fax: '(+237) 222 214 047',
         email: 'contact@crtv.cm',
+        whatsapp: '237222214088',
         map: {
             latitude: 3.866667,
             longitude: 11.516667,
@@ -120,3 +121,46 @@ export const SITE_CONFIG = {
         { id: '50006', slug: 'crtv-sport', name: 'CRTV SPORT', logo: "https://cdn.tve.static.acan.group/images/channel_1731344621.png" },
     ]
 };
+
+{/*
+    salut.... tu peux analyse le code entier objectivement et crre un fichier md de manier struturer pour deceller les faille et point faire et tout l'aspect non profetionne de tout les page et de maniere global de la page.. par rapport au point fort du code... je doit je corriger et les presenter a mon developper senior donc je comppte sur toit
+    
+    🔁 Comment envoyer tes modifications au repo principal
+
+Tu fais tes modifications
+
+Tu fais :
+
+git add .
+git commit -m "modifications"
+git push
+
+
+Sur GitHub → bouton "Compare & Pull Request"
+
+Tu crées une Pull Request vers acangroup/crtv-web
+
+Le propriétaire accepte → et ça fusionne
+
+👉 C’est la méthode standard en entreprise.
+
+🔄 Comment récupérer les mises à jour du repo principal
+
+Si le repo original change, tu dois le synchroniser.
+
+Dans ton projet :
+
+git remote add upstream https://github.com/acangroup/crtv-web.git
+git fetch upstream
+git merge upstream/main
+
+
+Ou plus simple :
+
+Sur GitHub → bouton “Sync fork”
+    
+    */}
+
+
+
+

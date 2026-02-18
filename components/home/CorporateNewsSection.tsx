@@ -20,14 +20,14 @@ export function CorporateNewsSection({ posts, title, title2 }: CorporateNewsSect
     return (
         <section className="space-y-6 ">
             <div className="flex items-center justify-between">
-                <SectionTitle title={title} title2={title2} actionLabel='' actionHref="/news" />
+                <SectionTitle title={title} title2={title2} actionLabel='' actionHref="/corporate" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {posts.slice(0, 3).map((post) => (
                     <Link
                         key={post.id}
-                        href={`/news?id=${post.id}`}
+                        href={`/corporate?id=${post.id}`}
                         className="group   backdrop-blur-sm bg-background/30 border border-gray-100 dark:border-muted/30 rounded-2xl p-8 flex flex-col h-full hover:shadow-xl hover:border-[color:var(--accent)]/20 transition-all duration-300"
                     >
                         {/* Communiqué Label */}

@@ -66,7 +66,7 @@ export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialE
                         <Link
                             key={index}
                             href={`/live?channel=${channel.slug}`}
-                            className="group relative flex flex-col w-[260px] sm:w-[250px] h-[220px] 
+                            className="group relative flex flex-col w-[220px] sm:w-[270px] h-[180px] sm:h-[220px] 
                                 overflow-hidden rounded-xl border border-white/5
                                 text-left transition-all duration-300 
                                 hover:scale-[1.02]"

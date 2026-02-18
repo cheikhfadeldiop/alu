@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Carousel } from "../ui/Carousel";
 import { SliderVideoItem } from "../../types/api";
@@ -13,11 +13,11 @@ interface ShortsCarouselProps {
 
 export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCarouselProps) {
     return (
-        <section className="space-y-0">
+        <section className="space-y-2 md:space-y-4">
             <SectionTitle title={title} title2={title2} actionLabel={actionLabel} className="font-bold" actionHref="/replay" />
             <Carousel itemClassName="w-[250px] " >
                 {videos.map((video, index) => (
-                    <Link key={index} href={`/playback/${video.slug}`} className="group block">
+                    <Link key={index} href={`/replay/${video.slug}`} className="group block">
                         <div className="relative w-[250px] h-[298px] overflow-hidden bg-gray-200 mb-2
                         hover:scale-[1.02] transition-all ">
                             <SafeImage
@@ -62,7 +62,7 @@ export function ShortsCarousel({ videos, title, title2, actionLabel }: ShortsCar
                                 {video.time}
                             </span>
                             {video.date && (
-                                <span className="">•{"   "}{ new Date(video.date).toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) ?? video.date}</span>
+                                <span className="">•{"   "}{new Date(video.date).toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) ?? video.date}</span>
                             )}
                         </div>
                     </Link>

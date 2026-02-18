@@ -24,7 +24,7 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="crtv-page-enter space-y-12 max-w-[1400px] mx-auto px-4 py-8">
+    <div className="crtv-page-enter space-y-8 md:space-y-12 max-w-[1400px] mx-auto px-4 py-8">
       {/* WordPress News Section
       <Suspense fallback={<WordPressNewsShimmer />}>
         <WordPressNewsWrapper />
@@ -57,13 +57,13 @@ export default function HomePage() {
        */}
 
 
-  
+
       {/* Regional Categories  */}
       <Suspense fallback={<RegionalCategoriesShimmer />}>
         <RegionalCategoriesWrapper />
       </Suspense>
 
-    {/* Promo d'antenne */}
+      {/* Promo d'antenne */}
       <Suspense fallback={<div className="h-40 bg-muted/5 animate-pulse rounded-lg" />}>
         <PromoAntenneWrapper />
       </Suspense>

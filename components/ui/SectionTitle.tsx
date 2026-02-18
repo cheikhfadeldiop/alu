@@ -28,16 +28,16 @@ export function SectionTitle({
       <h2
         className={
           uppercase
-            ? "text-sm tracking-widest text-foreground sm:text-base " + className
-            : "text-base font-semibold tracking-wide text-foreground " + className
+            ? "text-xs sm:text-sm tracking-widest text-foreground " + className
+            : "text-sm sm:text-base font-semibold tracking-wide text-foreground " + className
         }
       >
         {uppercase ? title.toUpperCase() : title}
       </h2>
       <h1 className={
         uppercase2
-          ? "text-sm font-bold tracking-widest text-[color:var(--accent)] sm:text-base"
-          : "text-base font-semibold tracking-wide text-foreground"
+          ? "text-xs sm:text-sm font-bold tracking-widest text-[color:var(--accent)] sm:text-base"
+          : "text-sm sm:text-base font-semibold tracking-wide text-foreground"
       }
       >
         {uppercase2 ? title2?.toUpperCase() : title2}</h1>

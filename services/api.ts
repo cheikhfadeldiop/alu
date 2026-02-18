@@ -40,8 +40,8 @@ export function mapVODToSliderItem(item: any, channelLogo?: string): SliderVideo
     return {
         title: item.title || "",
         desc: item.desc || "",
-        logo: item.image || item.logo || "",
-        logo_url: item.image_url || item.logo_url || "",
+        logo: ensureAbsoluteUrl(item.image || item.logo),
+        logo_url: ensureAbsoluteUrl(item.image_url || item.logo_url),
         video_url: ensureAbsoluteUrl(item.video_url),
         feed_url: ensureAbsoluteUrl(item.feed_url || item.video_url),
         stream_url: ensureAbsoluteUrl(item.stream_url),
@@ -62,6 +62,14 @@ export function ensureAbsoluteUrl(url: string | undefined): string {
     if (!url || url === "null") return "";
     if (url.startsWith('http')) return url;
     return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+export function getSiteAbsoluteUrl(path: string): string {
+    if (!path) return "";
+    if (path.startsWith('http')) return path;
+    const siteUrl = SITE_CONFIG.siteUrl.endsWith('/') ? SITE_CONFIG.siteUrl.slice(0, -1) : SITE_CONFIG.siteUrl;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${siteUrl}${cleanPath}`;
 }
 
 /**

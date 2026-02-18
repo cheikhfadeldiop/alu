@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { WordPressPost } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
@@ -16,6 +16,7 @@ interface WordPressCategoryColumnProps {
 
 import { ensureAbsoluteUrl } from "@/services/api";
 import dynamic from "next/dynamic";
+import { describe } from "node:test";
 
 export function WordPressCategoryColumn({ title, title2, items, enter, categorySlug, type }: WordPressCategoryColumnProps) {
     if (!items || items.length === 0) return null;
@@ -27,13 +28,14 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                 id: item.id,
                 title: item.title.rendered,
                 image: ensureAbsoluteUrl(item.acan_image_url || item._embedded?.['wp:featuredmedia']?.[0]?.source_url) || SITE_CONFIG.theme.placeholders.news,
-                link: `/news/${item.id}`,
+                link: `/news?id=${item.id}`,
                 date: item.date,
                 author: SITE_CONFIG.strings.editorialTeam
+                
             };
         }
         // SliderVideoItem (Replays) mapping
-        if (item.video_url || (item.slug && !item.type)) {
+        if (item.video_url || item.type === 'vod' || categorySlug === 'replays' || (item.slug && !item.type)) {
             return {
                 id: item.slug,
                 title: item.title,
@@ -125,6 +127,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                         <div className="flex items-center gap-2 text-[11px] text-gray-500">
                             {featured.date && (
                                 <>
+                                
                                     <span>{formatDate(featured.date)}</span>
                                     <span className="w-1.5 h-1.5 bg-[color:var(--success)] rounded-full" />
                                 </>

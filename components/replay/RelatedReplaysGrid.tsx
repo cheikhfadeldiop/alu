@@ -86,8 +86,8 @@ export function RelatedReplaysGrid({ initialReplays, currentSlug, relatedItemsUr
     return (
         <section className="w-full max-w-[1400px] mx-auto px-4">
             <SectionTitle
-                title={t("latestReplays") || "DERNIERS"}
-                title2={t("replays") || "REPLAYS"}
+                title="REPLAYS"
+                title2=""
                 actionIcon={true}
             />
 
@@ -172,7 +172,7 @@ function ReplayCard({ video, onClick }: ReplayCardProps) {
 
             {/* Text Content */}
             <div className="space-y-2">
-                <h4 className="font-bold text-sm line-clamp-2 leading-snug text-foreground group-hover:text-white transition-colors">
+                <h4 className="font-bold text-sm line-clamp-2 leading-snug  transition-colors">
                     {video.title}
                 </h4>
 

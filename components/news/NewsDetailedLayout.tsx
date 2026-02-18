@@ -3,6 +3,7 @@ import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
 import { Link } from "@/i18n/navigation";
+import { ShareButton } from "../ui/ShareButton";
 import { AdBannerV } from "../ui/AdBannerV";
 
 interface NewsDetailedLayoutProps {
@@ -12,7 +13,7 @@ interface NewsDetailedLayoutProps {
 }
 
 export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: NewsDetailedLayoutProps) {
-    if (!featuredItem) return null;
+    if (!featuredItem || !featuredItem.title) return null;
 
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -22,7 +23,44 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
         });
     };
 
-    // ... paragraphs logic ...
+    // Function to format content, highlight words, and split long paragraphs
+    const formatContent = (html: string) => {
+        let processed = html;
+
+        // 1. Highlight sensitive/important keywords in red
+        const keywords = ["CRTV", "Paul Biya", "Président", "République", "Décision", "Décret", "Cameroun", "Nomination", "Gouvernement", "Ministre", "Sécurité", "Urgent"];
+        keywords.forEach(word => {
+            const regex = new RegExp(`(${word})`, "gi");
+            processed = processed.replace(regex, '<span class="text-[color:var(--accent)] font-bold">$1</span>');
+        });
+
+        // 2. Sentence splitting: Insert a break after every 3 sentences in long text blocks
+        let sentenceCount = 0;
+        processed = processed.replace(/(\.\s+)([A-Z])/g, (match, p1, p2) => {
+            sentenceCount++;
+            if (sentenceCount % 3 === 0) {
+                return `${p1}<br/><br/>${p2}`;
+            }
+            return match;
+        });
+
+        return processed;
+    };
+
+    // Extract citations (blockquotes) if they exist
+    const extractCitation = (html: string) => {
+        const match = html.match(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/i);
+        if (match) {
+            return {
+                citation: match[1],
+                cleanHtml: html.replace(match[0], '')
+            };
+        }
+        return { citation: null, cleanHtml: html };
+    };
+
+    const { citation, cleanHtml } = extractCitation(featuredItem.content?.rendered || "");
+
     const getParagraphs = (html: string) => {
         if (!html) return [];
         const matches = html.match(/<p[^>]*>([\s\S]*?)<\/p>/gi);
@@ -32,15 +70,18 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
         return matches.map(p => p.trim()).filter(p => p.length > 20);
     };
 
-    const paragraphs = getParagraphs(featuredItem.content?.rendered || "");
+    const paragraphs = getParagraphs(cleanHtml);
 
-    const block1 = paragraphs.slice(0, 2).join("");
-    const quoteTxt = paragraphs[2] || paragraphs[0];
-    const block2 = paragraphs.slice(3, 5).join("");
-    const highlightTxt = paragraphs.slice(5, 7).join("");
-    const block3 = paragraphs.slice(7).join("");
+    // If no blockquote was found, we take the 3rd paragraph as a "fallback" quote
+    const finalQuote = citation || (paragraphs.length > 2 ? paragraphs[2] : "");
+    const remainingParagraphs = citation ? paragraphs : paragraphs.filter((_, i) => i !== 2);
 
-    const highlightTitle = (featuredItem.title.rendered).split(' ').slice(0, 4).join(' ') + "...";
+    const block1 = remainingParagraphs.slice(0, 2).join("");
+    const block2 = remainingParagraphs.slice(2, 4).join("");
+    const highlightTxt = remainingParagraphs.slice(4, 6).join("");
+    const block3 = remainingParagraphs.slice(6).join("");
+
+    const highlightTitle = (featuredItem.title?.rendered || "").split(' ').slice(0, 4).join(' ') + "...";
 
     const displaySideItems = sideItems.slice(0, 5);
 
@@ -59,7 +100,7 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/5 shadow-2xl rounded-[2px] group">
                     <SafeImage
                         src={featuredItem.acan_image_url || SITE_CONFIG.theme.placeholders.news}
-                        alt={featuredItem.title.rendered}
+                        alt={featuredItem.title?.rendered || "News"}
                         fill
                         priority
                         className="object-cover"
@@ -68,36 +109,49 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
 
                 <div className="space-y-4 border-b border-foreground/30">
                     <h1 className="text-3xl md:text-4xl font-black leading-tight text-foreground tracking-tighter">
-                        {decodeHtmlEntities(featuredItem.title.rendered)}
+                        {decodeHtmlEntities(featuredItem.title?.rendered || "")}
                     </h1>
 
-                    <div className="flex items-center gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 pb-4">
-                        <span>{formatDate(featuredItem.date)}</span>
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                        <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 pb-4">
+                        <div className="flex items-center gap-4">
+                            <span>{formatDate(featuredItem.date)}</span>
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                            <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                        </div>
+                        <ShareButton
+                            title={decodeHtmlEntities(featuredItem.title?.rendered || "")}
+                            text={`Lisez cet article sur CRTV Web : ${decodeHtmlEntities(featuredItem.title?.rendered || "")}`}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-foreground/10 hover:bg-foreground/5 transition-colors text-[10px]"
+                        >
+                            <span>PARTAGER</span>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                        </ShareButton>
                     </div>
                 </div>
 
                 <div className="space-y-10 text-justify text-foreground/80 leading-[1.8] text-base md:text-[17px]">
-                    {block1 && <div className="prose-p:mb-6" dangerouslySetInnerHTML={{ __html: block1 }} />}
-                    {quoteTxt && (
+                    {block1 && <div className="prose-p:mb-10 text-justify" dangerouslySetInnerHTML={{ __html: formatContent(block1) }} />}
+                    {finalQuote && (
                         <div className="flex justify-end w-full py-4">
-                            <div className="w-[85%] md:w-[75%] border border-orange-400/60 p-8 md:p-12 relative">
-                                <p className="text-lg md:text-xl italic font-medium text-center text-foreground/90 leading-relaxed"
-                                    dangerouslySetInnerHTML={{ __html: quoteTxt.replace(/<p[^>]*>/i, '').replace(/<\/p>/i, '') }} />
+                            <div className="w-[85%] md:w-[75%] border-2 border-yellow-400 p-1 md:p-8 relative bg-yellow-400/5">
+                                <p className="text-base md:text-[18px] italic text-center text-foreground leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: formatContent(finalQuote.replace(/<p[^>]*>/i, '').replace(/<\/p>/i, '')) }} />
+                                <div className="absolute -top-4 -left-4 text-4xl text-yellow-500 font-serif opacity-50">"</div>
                             </div>
                         </div>
                     )}
-                    {block2 && <div className="prose-p:mb-6" dangerouslySetInnerHTML={{ __html: block2 }} />}
+                    {block2 && <div className="prose-p:mb-10 text-justify" dangerouslySetInnerHTML={{ __html: formatContent(block2) }} />}
                     {highlightTxt && (
                         <div className="flex justify-end w-full py-4">
                             <div className="w-[85%] md:w-[75%] bg-background/90 p-8 md:p-10 border-l-[3px] border-[#a1232b] relative shadow-sm">
                                 <h4 className="text-lg font-black text-foreground mb-4 leading-tight">{decodeHtmlEntities(highlightTitle)}</h4>
-                                <div className="text-sm md:text-base italic opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: highlightTxt }} />
+                                <div className="text-xm md:text-base italic opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatContent(highlightTxt) }} />
                             </div>
                         </div>
                     )}
-                    {block3 && <div className="prose-p:mb-6 opacity-90" dangerouslySetInnerHTML={{ __html: block3 }} />}
+                    {block3 && <div className="prose-p:mb-10 opacity-90" dangerouslySetInnerHTML={{ __html: formatContent(block3) }} />}
                 </div>
             </div>
 

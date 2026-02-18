@@ -1,11 +1,11 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { Carousel } from "../../../components/ui/Carousel";
 import { MediaCard } from "../../../components/ui/MediaCard";
 import { SectionTitle } from "../../../components/ui/SectionTitle";
 
-export default function PlaybackIndexPage() {
-  const t = useTranslations("nav");
+export default async function PlaybackIndexPage() {
+  const t = await getTranslations("nav");
 
   return (
     <div className="crtv-page-enter space-y-10">
@@ -17,7 +17,7 @@ export default function PlaybackIndexPage() {
           {Array.from({ length: 6 }).map((_, i) => (
             <MediaCard
               key={i}
-              href={`/playback/p-${i + 1}`}
+              href={`/replay/p-${i + 1}`}
               title={`Lecture vidéo ${i + 1}`}
               imageSrc="/assets/placeholders/news_wide.png"
               meta="Replay • 28 min"
@@ -33,7 +33,7 @@ export default function PlaybackIndexPage() {
           {Array.from({ length: 12 }).map((_, i) => (
             <MediaCard
               key={i}
-              href={`/playback/p-${i + 10}`}
+              href={`/replay/p-${i + 10}`}
               title={`Vidéo ${i + 10}`}
               imageSrc={
                 i % 2 === 0
