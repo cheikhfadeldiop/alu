@@ -373,7 +373,7 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         </svg>
                     </div>
 
-                    <div className="relative z-10 flex flex-col items-center justify-center pt-24 pb-12 px-6 text-center">
+                    <div className="relative z-10 flex flex-col items-center justify-center pt-12 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 text-center">
                         {/*<div className=" mt-[-35px] flex flex-col items-center bg-white/10 backdrop-blur-sm w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
                             <div className="mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-white/20">
                                 <SafeImage
@@ -393,7 +393,7 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         <div className="relative w-44 h-44 mb-0 " />
 
                         {/* Circular Player Control */}
-                        <div className="relative w-64 h-64">
+                        <div className="relative w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64">
                             {/* ... SVG Circle Logic ... */}
                             <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
@@ -411,15 +411,15 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                             </svg>
 
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="relative w-48 h-48 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl flex items-center justify-center">
-                                    <div className="flex items-center gap-4">
+                                <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl flex items-center justify-center">
+                                    <div className="flex items-center gap-2 sm:gap-4">
                                         {/* Prev Button */}
                                         <button
                                             onClick={onPrevChannel}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onPrevChannel ? 'cursor-not-allowed opacity-50' : ''}`}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onPrevChannel ? 'cursor-not-allowed opacity-50' : ''}`}
                                             disabled={!onPrevChannel}
                                         >
-                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" transform="scale(-1, 1) translate(-20, 0)" />
 
                                             </svg>
@@ -429,16 +429,16 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                         <button
                                             onClick={handlePlayPause}
                                             disabled={loading || isStreamDead}
-                                            className="w-16 h-16 flex items-center justify-center rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                            className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                                         >
                                             {loading && !isStreamDead ? (
-                                                <div className="w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                                                <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                                             ) : isPlaying ? (
-                                                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                                                 </svg>
                                             ) : (
-                                                <svg className="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg className="w-6 h-6 sm:w-8 sm:h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                                                 </svg>
                                             )}
@@ -447,10 +447,10 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                         {/* Next Button */}
                                         <button
                                             onClick={onNextChannel}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onNextChannel ? 'cursor-not-allowed opacity-50' : ''}`}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ${!onNextChannel ? 'cursor-not-allowed opacity-50' : ''}`}
                                             disabled={!onNextChannel}
                                         >
-                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" transform="scale(-1, 1) translate(-20, 0)" />
                                             </svg>
                                         </button>
@@ -460,7 +460,7 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         </div>
                         <div className="relative w-44 h-24 mt-0 " />
                         {/* Meta Info Row */}
-                        <div className="w-full max-w-3xl mx-auto mt-6 pt-6 border-t border-white/10 flex items-center justify-between gap-6">
+                        <div className="w-full max-w-3xl mx-auto mt-6 pt-6 border-t border-white/10 flex flex-wrap items-center justify-center sm:justify-between gap-4 sm:gap-6">
                             <div className="hidden md:flex items-end gap-1 w-1/4 h-12">
                                 {Array.from({ length: 20 }).map((_, i) => (
                                     <div key={i} className="w-1 rounded-full bg-white/30" style={{ height: `${isActuallyPlaying ? 10 + ((i * 7) % 40) : 10}px`, animation: isActuallyPlaying ? `crtvWave ${900 + (i % 7) * 120}ms ease-in-out ${(i % 9) * 60}ms infinite alternate` : 'none' }} />
@@ -495,26 +495,26 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                             </div>
 
                             {/* Right: Actions */}
-                            <div className="flex items-center gap-3 shrink-0">
-                                <button onClick={handleShare} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                <button onClick={handleShare} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                     </svg>
                                 </button>
-                                <button onClick={toggleMute} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                                <button onClick={toggleMute} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
                                     {isMuted ? (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                                         </svg>
                                     ) : (
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                         </svg>
                                     )}
                                 </button>
-                                <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                     </svg>
                                 </button>
@@ -523,15 +523,24 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                     </div>
                 </div>
 
-                {/* Premium Info */}
-                <div className="relative p-8 md:p-10  backdrop-blur-3xl  bg-secondary    border border-white/5 overflow-hidden group/info">
+                {/* Info Container */}
+                <div className="relative p-5 sm:p-8 md:p-10 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
                     {/* Decoration Background */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
 
-                    <div className="relative z-10 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
+                        {/* Share Button - Top Right Mobile/Desktop */}
+                        <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
+                            <button className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share">
+                                <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </button>
+                        </div>
+
                         {/* Channel Logo */}
-                        <div className="relative w-32 h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                        <div className="relative w-24 h-16 sm:w-32 sm:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                             <SafeImage
                                 src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
                                 alt={channel.title}
@@ -541,30 +550,17 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 text-center md:text-left justify-center items-center space-y-4">
+                        <div className="flex-1 w-full text-center md:text-left space-y-4">
                             {/* Header: Status + Title */}
-                            <div className="flex items-center justify-center md:justify-start gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1">
-                                    <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
-                                    <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full w-fit">
+                                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
+                                    <span className="text-[8px] font-bold uppercase tracking-widest">Live</span>
                                 </div>
-                                <h2 className="text-2xl  w-[70%] md:text-3xl font-black  uppercase tracking-tighter drop-shadow-sm">
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-black w-full uppercase tracking-tighter drop-shadow-sm pr-10 md:pr-0">
                                     {channel.title}
                                 </h2>
                             </div>
-
-
-                        </div>
-
-
-                        {/* Share Button (Top Right Desktop) */}
-                        <div className="absolute top-0 right-0 p-4 shrink-0">
-                            <button className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300  group/share">
-                                <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                            </button>
                         </div>
                     </div>
                     {/* Description */}
@@ -575,17 +571,17 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                     </div>
 
                     {/* Program Info (New addition matching image) */}
-                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border-t border-foreground/30">
+                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border-t border-foreground/30">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
-                                {"RADIO EN DIRECT"}
+                            <span className="text-[10px] sm:text-xs font-bold text-red-500 uppercase tracking-widest">
+                                {"JOURNAL EN DIRECT"}
                             </span>
                         </div>
                         <div className="hidden md:block w-px h-4 bg-foreground/30" />
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">DIFFUSÉ SUR :</span>
-                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
-                                {channel.title || "RADIO EN DIRECT"}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[9px] sm:text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
+                            <span className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider">
+                                {channel.title || "JOURNAL EN DIRECT"}
                             </span>
                         </div>
                     </div>

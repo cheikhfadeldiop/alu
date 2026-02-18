@@ -41,18 +41,18 @@ export function LiveSelectionCarousel({
 
 
     return (
-        <div className="w-full space-y-6">
-            <div className="flex items-center justify-between px-1">
-                <div className="flex items-center  ">
+        <div className="w-full space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+                <div className="flex items-center ">
                     <SectionTitle title={tt("title")} title2={tt("titleSuffix")} />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     {(["ALL", "TV", "RADIO"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`h-9 rounded-[20px] border border-[color:var(--border)] px-4 text-sm font-bold tracking-wide transition-all uppercase ${activeTab === tab
-                                ? "border-red-500"
+                            className={`h-8 sm:h-9 rounded-[20px] border border-[color:var(--border)] px-3 sm:px-4 text-xs sm:text-sm font-bold tracking-wide transition-all uppercase ${activeTab === tab
+                                ? "border-red-500 bg-red-500/5"
                                 : "border-transparent hover:border-[color:var(--accent)] hover:text-foreground"
                                 }`}
                         >
@@ -91,7 +91,7 @@ export function LiveSelectionCarousel({
                         <button
                             key={channelKey}
                             onClick={() => onSelectChannel(channel)}
-                            className={`group relative flex flex-col m-3 shrink-0 w-[260px] sm:w-[300px] h-[220px] overflow-hidden rounded-2xl bg-background/35 backdrop-blur-sm text-left transition-all duration-300 border-2 hover:translate-y-1 hover:scale-[1.02] ${isSelected ? "border-[color:var(--accent)] scale-[1.02]" : "border-transparent hover:border-[color:var(--accent)]"}`}
+                            className={`group relative flex flex-col m-2 sm:m-3 shrink-0 w-[220px] sm:w-[300px] h-[180px] sm:h-[220px] overflow-hidden rounded-2xl bg-background/35 backdrop-blur-sm text-left transition-all duration-300 border-2 hover:translate-y-1 hover:scale-[1.02] ${isSelected ? "border-[color:var(--accent)] scale-[1.02]" : "border-transparent hover:border-[color:var(--accent)]"}`}
                         >
                             <div className="relative h-[65%] w-full bg-background/20 ">
                                 <SafeImage
@@ -108,7 +108,7 @@ export function LiveSelectionCarousel({
                                     </div>
                                 )}
 
-                               {isSelected &&( <div className="absolute top-2 right-2 px-2 py-1 bg-white text-black text-[12px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-1.5 shadow-lg">
+                                {isSelected && (<div className="absolute top-2 right-2 px-2 py-1 bg-white text-black text-[12px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-1.5 shadow-lg">
                                     <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
                                     {t("live")}
                                 </div>)}
@@ -120,11 +120,11 @@ export function LiveSelectionCarousel({
                                 </div>
                             </div>
 
-                            <div className="h-[35%] w-full bg-background/5 backdrop-blur-sm px-4 py-3 flex flex-col justify-between border-t border-white/5">
+                            <div className="h-[35%] w-full bg-background/5 backdrop-blur-sm px-3 py-2 sm:px-4 sm:py-3 flex flex-col justify-between border-t border-white/5">
                                 <div className="space-x-2">
                                     <div className="flex items-center justify-between gap-4">
 
-                                        <h3 className=" w-[40%]font-bold text-sm tracking-wide line-clamp-1 group-hover:text-[color:var(--accent)] transition-colors">{channel.title}</h3>
+                                        <h3 className="w-[40%] font-bold text-xs sm:text-sm tracking-wide line-clamp-1 group-hover:text-[color:var(--accent)] transition-colors">{channel.title}</h3>
                                         <div className="w-[60%] h-1 bg-black/20 rounded-full overflow-hidden">
                                             <div className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-1000" style={{ width: `${progressPercentage}%` }} />
                                         </div>
@@ -132,18 +132,18 @@ export function LiveSelectionCarousel({
 
                                 </div>
 
-                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400  ">
+                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400">
                                     {/* Calendar Icon */}
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', })}</span>
-                                    <span className="text-gray-400 dark:text-white/90  text-xs">-</span>
+                                    <span className="text-gray-500 text-[10px] sm:text-sm line-clamp-1">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', })}</span>
+                                    <span className="text-gray-400 dark:text-white/90 text-xs">-</span>
                                     {/* Clock Icon */}
-                                    <svg className="w-5 h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.end_time || new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <span className="text-gray-500 text-[10px] sm:text-sm">{currentProgram?.end_time || new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                             </div>
                         </button>

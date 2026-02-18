@@ -23,7 +23,7 @@ export function MapLocation({
     title,
     address,
     zoom = 15,
-    height = "500px",
+    height = "min(350px, 50vh)",
 }: MapLocationProps) {
     const t = useTranslations("pages.map");
     const mapRef = useRef<HTMLDivElement>(null);
@@ -160,7 +160,7 @@ export function MapLocation({
     return (
         <div className="w-full space-y-4">
             {/* Map Container */}
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10">
+            <div className="relative w-full overflow-hidden rounded-sm bg-muted/5 border border-foreground/10" style={{ height }}>
                 {/* Loading State */}
                 {isLoading && (
                     <div

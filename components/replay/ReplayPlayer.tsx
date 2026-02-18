@@ -408,15 +408,24 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                     )}
                 </div>
 
-                {/* Info Container - Duplicated from Live Page Design */}
-                <div className="relative p-8 md:p-10  backdrop-blur-3xl  bg-secondary    border border-white/5 overflow-hidden group/info">
+                {/* Info Container */}
+                <div className="relative p-5 sm:p-8 md:p-10 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
                     {/* Decoration Background */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
 
-                    <div className="relative z-10 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
+                        {/* Share Button - Top Right Mobile/Desktop */}
+                        <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
+                            <button className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share">
+                                <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </button>
+                        </div>
+
                         {/* Channel Logo */}
-                        <div className="relative w-32 h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+                        <div className="relative w-24 h-16 sm:w-32 sm:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
                             <SafeImage
                                 src={video.channel_logo || video.logo || "/assets/placeholders/radio_icon_sur_card.png"}
                                 alt={video.title}
@@ -426,30 +435,17 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1  text-center md:text-left justify-center items-center space-y-4">
+                        <div className="flex-1 w-full text-center md:text-left space-y-4">
                             {/* Header: Status + Title */}
-                            <div className="flex items-center justify-center md:justify-start gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1">
-                                    <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
-                                    <svg color="red" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full w-fit">
+                                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
+                                    <span className="text-[8px] font-bold uppercase tracking-widest">Replay</span>
                                 </div>
-                                <h2 className="text-2xl  w-[70%] md:text-3xl font-black  uppercase tracking-tighter drop-shadow-sm">
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-black w-full uppercase tracking-tighter drop-shadow-sm pr-10 md:pr-0">
                                     {video.title}
                                 </h2>
                             </div>
-
-
-                        </div>
-
-
-                        {/* Share Button (Top Right Desktop) */}
-                        <div className="absolute top-0 right-0 p-4 shrink-0">
-                            <button className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300  group/share">
-                                <svg className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                            </button>
                         </div>
                     </div>
                     {/* Description */}
@@ -460,16 +456,16 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                     </div>
 
                     {/* Program Info (New addition matching image) */}
-                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border-t border-foreground/30">
+                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border-t border-foreground/30">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                            <span className="text-[10px] sm:text-xs font-bold text-red-500 uppercase tracking-widest">
                                 {"REPLAY"}
                             </span>
                         </div>
                         <div className="hidden md:block w-px h-4 bg-foreground/30" />
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
-                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[9px] sm:text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
+                            <span className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider">
                                 {video.title || "Replay"}
                             </span>
                         </div>

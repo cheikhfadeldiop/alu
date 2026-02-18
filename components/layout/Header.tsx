@@ -7,6 +7,19 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 import { Link, usePathname, useRouter } from "../../i18n/navigation";
+function IconMenu(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M4 6h16M4 12h16M4 18h16"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function IconX(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" {...props}>
@@ -240,6 +253,7 @@ export function Header() {
 
   const [isLangDropdownOpen, setIsLangDropdownOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -305,8 +319,8 @@ export function Header() {
         className={`overflow-hidden transition-all duration-200 ease-out will-change-[height,opacity,transform] ${isScrolled ? "h-0 opacity-0 -translate-y-2 pointer-events-none" : "h-[40px] opacity-100 translate-y-0"
           }`}
       >
-        <div className="mx-auto flex max-w-[1400px] justify-end px-8 py-2">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-[1400px] justify-end px-4 sm:px-8 py-2">
+          <div className="hidden sm:flex items-center gap-2">
             {[
               { icon: IconFacebook, href: SITE_CONFIG.social.facebook, label: "Facebook" },
               { icon: IconInstagram, href: SITE_CONFIG.social.instagram, label: "Instagram" },
@@ -329,7 +343,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-8 transition-all duration-200 ease-out will-change-[height] ${isScrolled ? "h-16" : "h-20"
+      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-4 sm:px-8 transition-all duration-200 ease-out will-change-[height] ${isScrolled ? "h-16" : "h-20"
         }`}>
         {/* Logo */}
         <div className="flex items-center ">
@@ -345,8 +359,8 @@ export function Header() {
           </Link>
         </div>
 
-        {/* Navigation - Fond transparent gris en light, noir en dark */}
-        <nav className="flex items-center gap-1 rounded-full p-1 bg-foreground/5 backdrop-blur-sm">
+        {/* Navigation - Desktop */}
+        <nav className="hidden lg:flex items-center gap-1 rounded-full p-1 bg-foreground/5 backdrop-blur-sm">
           {navItems.map((item) => {
             const active =
               item.href === "/"
@@ -430,8 +444,8 @@ export function Header() {
             )}
           </div>
 
-          {/* Theme Selector - Fond transparent gris en light, noir en dark */}
-          <div className="relative inline-flex h-8 items-center rounded-lg border border-gray-400/50 py-5
+          {/* Theme Selector - Desktop */}
+          <div className="hidden sm:inline-flex h-8 items-center rounded-lg border border-gray-400/50 py-5
           ">
             {/* Sliding background */}
             {mounted && (
@@ -468,8 +482,126 @@ export function Header() {
               );
             })}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            className="flex lg:hidden h-10 w-10 items-center justify-center rounded-full bg-foreground/5 text-foreground transition-colors hover:bg-foreground/10"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Menu"
+          >
+            {isMobileMenuOpen ? (
+              <IconX className="h-6 w-6" />
+            ) : (
+              <IconMenu className="h-6 w-6" />
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-[280px] bg-background p-6 shadow-2xl transition-transform duration-300">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between mb-8">
+                <SafeImage
+                  src={SITE_CONFIG.theme.placeholders.logo}
+                  alt="CRTV"
+                  width={60}
+                  height={60}
+                  className="h-8 w-16 grayscale brightness-0 dark:invert"
+                />
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-full hover:bg-foreground/5"
+                >
+                  <IconX className="h-6 w-6" />
+                </button>
+              </div>
+
+              <nav className="flex flex-col gap-2">
+                {navItems.map((item) => {
+                  const active =
+                    item.href === "/"
+                      ? pathname === "/"
+                      : pathname.startsWith(item.href);
+                  return (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={[
+                        "flex items-center gap-4 rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200",
+                        active
+                          ? "bg-[color:var(--accent)] text-white shadow-lg shadow-[color:var(--accent)]/20"
+                          : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              <div className="mt-auto pt-8 border-t border-foreground/10">
+                <div className="flex flex-col gap-6">
+                  {/* Theme Selector - Mobile */}
+                  <div className="flex flex-col gap-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-foreground/40 px-2">
+                      Theme
+                    </span>
+                    <div className="grid grid-cols-3 gap-2 bg-foreground/5 p-1 rounded-xl">
+                      {themeOptions.map((option) => {
+                        const Icon = option.icon;
+                        const isActive = mounted && theme === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => setTheme(option.value)}
+                            className={[
+                              "flex flex-col items-center gap-1.5 py-3 rounded-lg transition-all",
+                              isActive
+                                ? "bg-background text-foreground shadow-sm"
+                                : "text-foreground/40 hover:text-foreground/70"
+                            ].join(" ")}
+                          >
+                            <Icon className="h-5 w-5" />
+                            <span className="text-[10px] font-bold uppercase tracking-tight">{option.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center gap-4">
+                    {[
+                      { icon: IconFacebook, href: SITE_CONFIG.social.facebook },
+                      { icon: IconInstagram, href: SITE_CONFIG.social.instagram },
+                      { icon: IconX, href: SITE_CONFIG.social.twitter },
+                      { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.phones}` },
+                      { icon: IconYouTube, href: SITE_CONFIG.social.youtube },
+                    ].map((social, idx) => (
+                      <a
+                        key={idx}
+                        href={social.href}
+                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-foreground/5 text-foreground/60"
+                      >
+                        <social.icon className="h-5 w-5" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </header>
   );

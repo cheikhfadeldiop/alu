@@ -88,7 +88,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
         >
             <div className="max-w-[1400px] mx-auto px-4">
                 <SectionTitle
-                    title={t("pages.replay.latest")+" "+t("pages.replay.editions")}
+                    title={t("pages.replay.latest") + " " + t("pages.replay.editions")}
                     title2=""
                     actionIcon={true}
                     className="font-bold"
@@ -124,7 +124,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                     {videos.map((video: SliderVideoItem, idx: number) => (
                         <div
                             key={`${video.slug}-${idx}`}
-                            className="shrink-0 w-[240px] sm:w-[320px] lg:w-[400px]"
+                            className="shrink-0 w-[180px] sm:w-[320px] lg:w-[400px]"
                             style={{ scrollSnapAlign: "start" }}
                         >
                             <MediaCard
