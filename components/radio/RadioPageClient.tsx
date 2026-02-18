@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { LiveSelectionCarousel } from "../live/LiveSelectionCarousel";
 import { RadioPlayerSection } from "./RadioPlayerSection";
 import { UpcomingProgramsTimeline } from "./UpcomingProgramsTimeline";
@@ -81,7 +82,7 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
     }
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-8 md:space-y-12">
             {/* 1. Carousel with Tabs - Shows both radios and TV channels */}
             <LiveSelectionCarousel
                 channels={allChannels}
@@ -108,7 +109,7 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
 
             <AdBanner />
 
-            <div className="space-y-16">
+            <div className="space-y-10 md:space-y-16">
                 {/* 3. Audios Section */}
                 <RadioAudiosSection items={audiosData} promoPrograms={promoPrograms} />
 

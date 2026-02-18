@@ -3,6 +3,7 @@ import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
 import { Link } from "@/i18n/navigation";
+import { ShareButton } from "../ui/ShareButton";
 import { AdBannerV } from "../ui/AdBannerV";
 
 interface NewsDetailedLayoutProps {
@@ -111,10 +112,22 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
                         {decodeHtmlEntities(featuredItem.title?.rendered || "")}
                     </h1>
 
-                    <div className="flex items-center gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 pb-4">
-                        <span>{formatDate(featuredItem.date)}</span>
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                        <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 pb-4">
+                        <div className="flex items-center gap-4">
+                            <span>{formatDate(featuredItem.date)}</span>
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                            <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                        </div>
+                        <ShareButton
+                            title={decodeHtmlEntities(featuredItem.title?.rendered || "")}
+                            text={`Lisez cet article sur CRTV Web : ${decodeHtmlEntities(featuredItem.title?.rendered || "")}`}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-foreground/10 hover:bg-foreground/5 transition-colors text-[10px]"
+                        >
+                            <span>PARTAGER</span>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                        </ShareButton>
                     </div>
                 </div>
 

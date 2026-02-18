@@ -24,7 +24,7 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
         }}
       />
 
-      <main className="relative z-10 py-10">
+      <main className="relative z-10 pb-10">
         <PageContainer>{children}</PageContainer>
       </main>
     </div>

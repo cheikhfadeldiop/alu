@@ -14,7 +14,7 @@ export function RegionalCategoriesSection({
     const t = useTranslations("pages.home");
 
     return (
-        <section className="py-6">
+        <section className="py-2 md:py-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <WordPressCategoryColumn
                     title={t("journalsRadio")}

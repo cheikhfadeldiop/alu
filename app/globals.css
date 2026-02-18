@@ -147,4 +147,3 @@ input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   @apply bg-red-600 rounded-full shadow-lg;
 }
-

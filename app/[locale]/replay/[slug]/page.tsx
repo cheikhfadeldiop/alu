@@ -5,6 +5,9 @@ import { ReplayPlayerShimmer } from "@/components/ui/shimmer/ReplayShimmers";
 import { RelatedReplaysGrid } from "@/components/replay/RelatedReplaysGrid";
 import { AdBannerV } from "@/components/ui/AdBannerV";
 import { BackButton } from "@/components/ui/BackButton";
+import { Metadata } from "next";
+import { SITE_CONFIG } from "@/constants/site-config";
+import { getSiteAbsoluteUrl, ensureAbsoluteUrl } from "@/services/api";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -41,7 +44,7 @@ async function ReplayContent({ slug }: { slug: string }) {
     const video = selectedVideo ?? undefined;
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-8 md:space-y-12">
             {/* Player and Ad Banner Section - Side by Side */}
             <div className="max-w-[1400px] mx-auto px-4">
                 <div className="flex flex-col lg:flex-row gap-6">
@@ -63,6 +66,37 @@ async function ReplayContent({ slug }: { slug: string }) {
             <RelatedReplaysGrid initialReplays={relatedReplays} currentSlug={slug} relatedItemsUrl={selectedVideo?.relatedItems} />
         </div>
     );
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const video = await findReplayBySlug(slug).catch(() => null);
+
+    if (!video) return { title: "Replay - CRTV" };
+
+    const imageUrl = ensureAbsoluteUrl(video.logo_url || video.logo) || getSiteAbsoluteUrl(SITE_CONFIG.theme.placeholders.video);
+
+    return {
+        title: `${video.title} - CRTV Replay`,
+        description: video.desc || "Regardez ce replay sur CRTV Web",
+        openGraph: {
+            title: video.title,
+            description: video.desc || "Regardez ce replay sur CRTV Web",
+            images: [{
+                url: imageUrl,
+                width: 1200,
+                height: 630,
+                alt: video.title
+            }],
+            type: 'video.other',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: video.title,
+            description: video.desc || "Regardez ce replay sur CRTV Web",
+            images: [imageUrl],
+        }
+    };
 }
 
 export default async function ReplaySlugPage({ params }: PageProps) {

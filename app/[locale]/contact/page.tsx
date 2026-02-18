@@ -46,7 +46,7 @@ export default function ContactPage() {
   const tc = useTranslations("common");
 
   return (
-    <div className="crtv-page-enter space-y-10">
+    <div className="crtv-page-enter space-y-8 md:space-y-12">
 
       {/* Hero: Header Gradient Premium */}
       <section className="relative overflow-hidden p-10 md:p-14 text-center group">

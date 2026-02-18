@@ -16,6 +16,7 @@ interface WordPressCategoryColumnProps {
 
 import { ensureAbsoluteUrl } from "@/services/api";
 import dynamic from "next/dynamic";
+import { describe } from "node:test";
 
 export function WordPressCategoryColumn({ title, title2, items, enter, categorySlug, type }: WordPressCategoryColumnProps) {
     if (!items || items.length === 0) return null;
@@ -30,6 +31,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                 link: `/news?id=${item.id}`,
                 date: item.date,
                 author: SITE_CONFIG.strings.editorialTeam
+                
             };
         }
         // SliderVideoItem (Replays) mapping
@@ -125,6 +127,7 @@ export function WordPressCategoryColumn({ title, title2, items, enter, categoryS
                         <div className="flex items-center gap-2 text-[11px] text-gray-500">
                             {featured.date && (
                                 <>
+                                
                                     <span>{formatDate(featured.date)}</span>
                                     <span className="w-1.5 h-1.5 bg-[color:var(--success)] rounded-full" />
                                 </>

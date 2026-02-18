@@ -119,7 +119,7 @@ export function Footer() {
                 { icon: IconFacebook, href: SITE_CONFIG.social.facebook, label: "Facebook" },
                 { icon: IconInstagram, href: SITE_CONFIG.social.instagram, label: "Instagram" },
                 { icon: IconX, href: SITE_CONFIG.social.twitter, label: "X" },
-                { icon: IconWhatsApp, href: "https://wa.me/237222214088", label: "WhatsApp" },
+                { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.whatsapp}`, label: "WhatsApp" },
                 { icon: IconYouTube, href: SITE_CONFIG.social.youtube, label: "YouTube" },
               ].map((social, idx) => (
                 <a
@@ -128,7 +128,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                className="h-8 w-8 flex items-center justify-center rounded-full bg-foreground/80 text-background/90 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
+                  className="h-8 w-8 flex items-center justify-center rounded-full bg-foreground/80 text-background/90 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
                 >
                   <social.icon className="h-5 w-5" />
                 </a>

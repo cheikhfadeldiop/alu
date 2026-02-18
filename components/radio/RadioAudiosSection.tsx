@@ -41,7 +41,7 @@ export function RadioAudiosSection({ items = [], promoPrograms = [] }: RadioAudi
     };
 
     return (
-        <section className="space-y-8 pt-12 pb-16">
+        <section className="space-y-6 md:space-y-8 py-8 md:py-12">
             <SectionTitle title="AUDIOS" actionHref="/radio/audios" className="text-xl" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

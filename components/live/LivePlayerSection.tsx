@@ -7,6 +7,7 @@ import { LiveChannel } from "../../types/api";
 import { ensureAbsoluteUrl } from "../../services/api";
 import { SafeImage } from "../ui/SafeImage";
 import { AdBannerV } from "../ui/AdBannerV";
+import { ShareButton } from "../ui/ShareButton";
 
 interface LivePlayerSectionProps {
     channel: LiveChannel;
@@ -366,19 +367,19 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
                 </div>
 
                 {/* Info Container */}
-                <div className="relative p-5 sm:p-8 md:p-10 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
+                <div className="relative p-4 sm:p-6 md:p-8 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
                     {/* Decoration Background */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
-                        {/* Share Button - Top Right Mobile/Desktop */}
                         <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
-                            <button className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share">
-                                <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                            </button>
+                            <ShareButton
+                                title={channel.title}
+                                text={`Regardez ${channel.title} en direct sur CRTV Web`}
+                                className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share"
+                                iconClassName="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110"
+                            />
                         </div>
 
                         {/* Channel Logo */}

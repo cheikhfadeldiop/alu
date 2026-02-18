@@ -84,7 +84,7 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
 
     if (selectedArticle) {
         return (
-            <div className={`max-w-[1400px] mx-auto px-4 py-12 transition-opacity duration-300 ${isArticleLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`max-w-[1400px] mx-auto px-4 py-8 md:py-12 transition-opacity duration-300 ${isArticleLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                 <CorporateNewsDetail
                     article={selectedArticle}
                     relatedPosts={initialPosts}
@@ -95,7 +95,7 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto px-4 py-12 space-y-12">
+        <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 space-y-8 md:space-y-12">
             {/* Ad Banner - Top */}
             <div className="w-full">
                 <AdBanner />

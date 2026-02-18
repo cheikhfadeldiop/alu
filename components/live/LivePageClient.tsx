@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { LiveSelectionCarousel } from "./LiveSelectionCarousel";
 import { LivePlayerSection } from "./LivePlayerSection";
 import { EPGScheduleView } from "./EPGScheduleView";
@@ -17,6 +18,7 @@ interface LivePageClientProps {
 
 export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageClientProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
 
@@ -62,8 +64,9 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
         if (channel.type === 'RADIO') {
             router.push(`/radio?channel=${channel.id}`);
         } else {
-            // If it's a TV channel, update the player
+            // If it's a TV channel, update the player and URL
             setSelectedChannel(channel);
+            router.replace(`${pathname}?channel=${channel.id}`, { scroll: false });
         }
     };
 
@@ -72,7 +75,7 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 md:space-y-12">
             {/* 1. Carousel with Tabs */}
             <LiveSelectionCarousel
                 channels={initialChannels}

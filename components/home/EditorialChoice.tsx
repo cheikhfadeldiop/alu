@@ -38,7 +38,7 @@ export function EditorialChoice({ items, title, title2, actionLabel }: Editorial
     };
 
     return (
-        <section className="space-y-6 ">
+        <section className="space-y-4 md:space-y-6">
             <div className="flex items-center justify-between ">
                 <SectionTitle title={title + " " + title2} title2='' actionHref={'/news'} className="font-bold" />
                 <Link href="/news" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 decoration-gray-300">

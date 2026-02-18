@@ -320,12 +320,12 @@ export function Header() {
           }`}
       >
         <div className="mx-auto flex max-w-[1400px] justify-end px-4 sm:px-8 py-2">
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 ">
             {[
               { icon: IconFacebook, href: SITE_CONFIG.social.facebook, label: "Facebook" },
               { icon: IconInstagram, href: SITE_CONFIG.social.instagram, label: "Instagram" },
               { icon: IconX, href: SITE_CONFIG.social.twitter, label: "X" },
-              { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.phones}`, label: "WhatsApp" },
+              { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.whatsapp}`, label: "WhatsApp" },
               { icon: IconYouTube, href: SITE_CONFIG.social.youtube, label: "YouTube" },
             ].map((social, idx) => (
               <a
@@ -334,16 +334,16 @@ export function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="h-8 w-8 flex items-center justify-center rounded-full bg-foreground/80 text-background/90 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
+                className="h-8 w-8  flex items-center justify-center rounded-full bg-foreground/80 text-background/90 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
               >
-                <social.icon className="h-4 w-4" />
+                <social.icon className="h-6 w-5" />
               </a>
             ))}
           </div>
         </div>
       </div>
 
-      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-4 sm:px-8 transition-all duration-200 ease-out will-change-[height] ${isScrolled ? "h-16" : "h-20"
+      <div className={` mx-auto flex max-w-[1400px] items-center justify-between px-4 sm:px-8 transition-all duration-200 ease-out will-change-[height] mt-2
         }`}>
         {/* Logo */}
         <div className="flex items-center ">
@@ -396,7 +396,7 @@ export function Header() {
         </nav>
 
         {/* Right section */}
-        <div className="flex items-center gap-2 ">
+        <div className="flex items-center gap-2  ">
           {/* Language Dropdown - Fond transparent gris en light, noir en dark */}
           <div className="relative">
             <button
@@ -584,7 +584,7 @@ export function Header() {
                       { icon: IconFacebook, href: SITE_CONFIG.social.facebook },
                       { icon: IconInstagram, href: SITE_CONFIG.social.instagram },
                       { icon: IconX, href: SITE_CONFIG.social.twitter },
-                      { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.phones}` },
+                      { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.whatsapp}` },
                       { icon: IconYouTube, href: SITE_CONFIG.social.youtube },
                     ].map((social, idx) => (
                       <a

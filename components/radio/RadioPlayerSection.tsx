@@ -7,6 +7,7 @@ import { LiveChannel, EPGItem } from "../../types/api";
 import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
 import { AdBannerV } from "../ui/AdBannerV";
+import { ShareButton } from "../ui/ShareButton";
 
 interface RadioPlayerSectionProps {
     channel: LiveChannel;
@@ -261,45 +262,6 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
         setIsMuted(!isMuted);
     };
 
-    const handleShare = async () => {
-        if (typeof window === 'undefined') return;
-
-        const shareData = {
-            title: channel.title,
-            text: `Écoutez ${channel.title} sur CRTV Web`,
-            url: window.location.href,
-        };
-
-        try {
-            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                await navigator.share(shareData);
-            } else if (navigator.clipboard) {
-                await navigator.clipboard.writeText(window.location.href);
-                // Ideally, show a toast notification here
-                alert(tCommon('linkCopied') || "Lien copié !");
-            } else {
-                // Fallback for browsers without clipboard API or non-secure contexts
-                const textArea = document.createElement("textarea");
-                textArea.value = window.location.href;
-                // Avoid scrolling to bottom
-                textArea.style.top = "0";
-                textArea.style.left = "0";
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    alert(tCommon('linkCopied') || "Lien copié !");
-                } catch (err) {
-                    console.error('Fallback: Oops, unable to copy', err);
-                }
-                document.body.removeChild(textArea);
-            }
-        } catch (err) {
-            console.error('Share failed:', err);
-        }
-    };
 
     const frequency = channel.desc?.match(/(\d+\.?\d*)\s*(FM|MHz)/i)?.[0] || "FM";
     const currentProgramTitle = currentProgram?.program_title ||
@@ -373,24 +335,9 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                         </svg>
                     </div>
 
-                    <div className="relative z-10 flex flex-col items-center justify-center pt-12 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 text-center">
-                        {/*<div className=" mt-[-35px] flex flex-col items-center bg-white/10 backdrop-blur-sm w-[250px] h-[200px] pt-5 pb-5 rounded-b-4xl">
-                            <div className="mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-white/20">
-                                <SafeImage
-                                    src={channel.logo_url || channel.logo || channel.hd_logo || "/assets/placeholders/radio_icon_sur_card.png"}
-                                    alt={channel.title}
-                                    fill
-                                    className="object-contain bg-black"
-                                />
-                            </div>
+                    <div className="relative z-10 flex flex-col items-center justify-center pt-8 sm:pt-16 pb-4 sm:pb-8 px-4 sm:px-6 text-center">
 
-                            <div className="text-4xl font-bold text-white mb-8 tracking-tight mt-4">
-                                {frequency}
-                            </div>
-                        </div>
-                        */}
-
-                        <div className="relative w-44 h-44 mb-0 " />
+                        <div className="relative w-44 h-12 mb-0 " />
 
                         {/* Circular Player Control */}
                         <div className="relative w-36 h-36 xs:w-44 xs:h-44 sm:w-64 sm:h-64">
@@ -458,85 +405,92 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                                 </div>
                             </div>
                         </div>
-                        <div className="relative w-44 h-24 mt-0 " />
+                        <div className="relative w-44 h-12 mt-0 " />
                         {/* Meta Info Row */}
-                        <div className="w-full max-w-3xl mx-auto mt-6 pt-6 border-t border-white/10 flex flex-wrap items-center justify-center sm:justify-between gap-4 sm:gap-6">
-                            <div className="hidden md:flex items-end gap-1 w-1/4 h-12">
-                                {Array.from({ length: 20 }).map((_, i) => (
-                                    <div key={i} className="w-1 rounded-full bg-white/30" style={{ height: `${isActuallyPlaying ? 10 + ((i * 7) % 40) : 10}px`, animation: isActuallyPlaying ? `crtvWave ${900 + (i % 7) * 120}ms ease-in-out ${(i % 9) * 60}ms infinite alternate` : 'none' }} />
-                                ))}
-                            </div>
-
-                            {/* Center: Title & Info */}
-                            <div className="flex-1 flex flex-col items-center justify-center overflow-hidden px-4">
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h3 className="text-white text-lg font-medium truncate max-w-full">
-                                        {currentProgramTitle}
-                                    </h3>
-                                    <span className="shrink-0 flex items-center gap-1.5 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">
-                                        <span className={`w-1.5 h-1.5 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`} />
-                                        <span className="text-[10px] uppercase font-bold text-red-100 tracking-wider">On air</span>
-                                    </span>
+                        <div className="w-full max-w-4xl mx-auto mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                                {/* Left: Animation - Hidden on very small mobile, shown on SM+ */}
+                                <div className="hidden sm:flex items-end gap-1 w-24 h-8 shrink-0">
+                                    {Array.from({ length: 12 }).map((_, i) => (
+                                        <div key={i} className="w-1 rounded-full bg-white/30" style={{ height: `${isActuallyPlaying ? 5 + ((i * 7) % 25) : 5}px`, animation: isActuallyPlaying ? `crtvWave ${700 + (i % 5) * 100}ms ease-in-out ${(i % 7) * 50}ms infinite alternate` : 'none' }} />
+                                    ))}
                                 </div>
-                                <div className="flex items-center gap-4 text-xs text-white/50">
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>{new Date().toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+
+                                {/* Center: Title & Info */}
+                                <div className="flex-1 flex flex-col items-center justify-center overflow-hidden w-full px-2">
+                                    <div className="flex items-center gap-3 mb-1 max-w-full">
+                                        <h3 className="text-white text-base sm:text-lg font-medium truncate">
+                                            {currentProgramTitle}
+                                        </h3>
+                                        <span className="shrink-0 flex items-center gap-1.5 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">
+                                            <span className={`w-1.5 h-1.5 rounded-full ${isActuallyPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`} />
+                                            <span className="text-[10px] uppercase font-bold text-red-100 tracking-wider">Live</span>
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <div className="flex items-center gap-4 text-[10px] sm:text-xs text-white/50">
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="capitalize">{new Date().toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>{new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Right: Actions */}
-                            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                                <button onClick={handleShare} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                </button>
-                                <button onClick={toggleMute} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    {isMuted ? (
+                                {/* Right: Actions */}
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                    <ShareButton
+                                        title={channel.title}
+                                        text={`Écoutez ${channel.title} sur CRTV Web`}
+                                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
                                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                         </svg>
-                                    ) : (
+                                    </ShareButton>
+                                    <button onClick={toggleMute} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors" title={isMuted ? "Réactiver le son" : "Couper le son"}>
+                                        {isMuted ? (
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                            </svg>
+                                        )}
+                                    </button>
+                                    <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors" title="Plus d'options">
                                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                         </svg>
-                                    )}
-                                </button>
-                                <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
-                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                                    </svg>
-                                </button>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Info Container */}
-                <div className="relative p-5 sm:p-8 md:p-10 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
+                <div className="relative p-4 sm:p-6 md:p-8 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
                     {/* Decoration Background */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
-                        {/* Share Button - Top Right Mobile/Desktop */}
                         <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
-                            <button className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share">
-                                <svg className="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                            </button>
+                            <ShareButton
+                                title={channel.title}
+                                text={`Écoutez ${channel.title} sur CRTV Web`}
+                                className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share"
+                                iconClassName="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110"
+                            />
                         </div>
 
                         {/* Channel Logo */}
@@ -573,15 +527,15 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
                     {/* Program Info (New addition matching image) */}
                     <div className="pt-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border-t border-foreground/30">
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] sm:text-xs font-bold text-red-500 uppercase tracking-widest">
-                                {"JOURNAL EN DIRECT"}
+                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                                {"RADIO EN DIRECT"}
                             </span>
                         </div>
                         <div className="hidden md:block w-px h-4 bg-foreground/30" />
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[9px] sm:text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
-                            <span className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider">
-                                {channel.title || "JOURNAL EN DIRECT"}
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-foreground/40 uppercase tracking-widest">DIFFUSÉ SUR :</span>
+                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                {channel.title || "RADIO EN DIRECT"}
                             </span>
                         </div>
                     </div>
