@@ -22,7 +22,44 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
         });
     };
 
-    // ... paragraphs logic ...
+    // Function to format content, highlight words, and split long paragraphs
+    const formatContent = (html: string) => {
+        let processed = html;
+
+        // 1. Highlight sensitive/important keywords in red
+        const keywords = ["CRTV", "Paul Biya", "Président", "République", "Décision", "Décret", "Cameroun", "Nomination", "Gouvernement", "Ministre", "Sécurité", "Urgent"];
+        keywords.forEach(word => {
+            const regex = new RegExp(`(${word})`, "gi");
+            processed = processed.replace(regex, '<span class="text-[color:var(--accent)] font-bold">$1</span>');
+        });
+
+        // 2. Sentence splitting: Insert a break after every 3 sentences in long text blocks
+        let sentenceCount = 0;
+        processed = processed.replace(/(\.\s+)([A-Z])/g, (match, p1, p2) => {
+            sentenceCount++;
+            if (sentenceCount % 3 === 0) {
+                return `${p1}<br/><br/>${p2}`;
+            }
+            return match;
+        });
+
+        return processed;
+    };
+
+    // Extract citations (blockquotes) if they exist
+    const extractCitation = (html: string) => {
+        const match = html.match(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/i);
+        if (match) {
+            return {
+                citation: match[1],
+                cleanHtml: html.replace(match[0], '')
+            };
+        }
+        return { citation: null, cleanHtml: html };
+    };
+
+    const { citation, cleanHtml } = extractCitation(featuredItem.content?.rendered || "");
+
     const getParagraphs = (html: string) => {
         if (!html) return [];
         const matches = html.match(/<p[^>]*>([\s\S]*?)<\/p>/gi);
@@ -32,13 +69,16 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
         return matches.map(p => p.trim()).filter(p => p.length > 20);
     };
 
-    const paragraphs = getParagraphs(featuredItem.content?.rendered || "");
+    const paragraphs = getParagraphs(cleanHtml);
 
-    const block1 = paragraphs.slice(0, 2).join("");
-    const quoteTxt = paragraphs[2] || paragraphs[0];
-    const block2 = paragraphs.slice(3, 5).join("");
-    const highlightTxt = paragraphs.slice(5, 7).join("");
-    const block3 = paragraphs.slice(7).join("");
+    // If no blockquote was found, we take the 3rd paragraph as a "fallback" quote
+    const finalQuote = citation || (paragraphs.length > 2 ? paragraphs[2] : "");
+    const remainingParagraphs = citation ? paragraphs : paragraphs.filter((_, i) => i !== 2);
+
+    const block1 = remainingParagraphs.slice(0, 2).join("");
+    const block2 = remainingParagraphs.slice(2, 4).join("");
+    const highlightTxt = remainingParagraphs.slice(4, 6).join("");
+    const block3 = remainingParagraphs.slice(6).join("");
 
     const highlightTitle = (featuredItem.title.rendered).split(' ').slice(0, 4).join(' ') + "...";
 
@@ -79,25 +119,26 @@ export function NewsDetailedLayout({ featuredItem, sideItems, onItemClick }: New
                 </div>
 
                 <div className="space-y-10 text-justify text-foreground/80 leading-[1.8] text-base md:text-[17px]">
-                    {block1 && <div className="prose-p:mb-6" dangerouslySetInnerHTML={{ __html: block1 }} />}
-                    {quoteTxt && (
+                    {block1 && <div className="prose-p:mb-10 text-justify" dangerouslySetInnerHTML={{ __html: formatContent(block1) }} />}
+                    {finalQuote && (
                         <div className="flex justify-end w-full py-4">
-                            <div className="w-[85%] md:w-[75%] border border-orange-400/60 p-8 md:p-12 relative">
-                                <p className="text-lg md:text-xl italic font-medium text-center text-foreground/90 leading-relaxed"
-                                    dangerouslySetInnerHTML={{ __html: quoteTxt.replace(/<p[^>]*>/i, '').replace(/<\/p>/i, '') }} />
+                            <div className="w-[85%] md:w-[75%] border-2 border-yellow-400 p-1 md:p-8 relative bg-yellow-400/5">
+                                <p className="text-base md:text-[18px] italic text-center text-foreground leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: formatContent(finalQuote.replace(/<p[^>]*>/i, '').replace(/<\/p>/i, '')) }} />
+                                <div className="absolute -top-4 -left-4 text-4xl text-yellow-500 font-serif opacity-50">"</div>
                             </div>
                         </div>
                     )}
-                    {block2 && <div className="prose-p:mb-6" dangerouslySetInnerHTML={{ __html: block2 }} />}
+                    {block2 && <div className="prose-p:mb-10 text-justify" dangerouslySetInnerHTML={{ __html: formatContent(block2) }} />}
                     {highlightTxt && (
                         <div className="flex justify-end w-full py-4">
                             <div className="w-[85%] md:w-[75%] bg-background/90 p-8 md:p-10 border-l-[3px] border-[#a1232b] relative shadow-sm">
                                 <h4 className="text-lg font-black text-foreground mb-4 leading-tight">{decodeHtmlEntities(highlightTitle)}</h4>
-                                <div className="text-sm md:text-base italic opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: highlightTxt }} />
+                                <div className="text-xm md:text-base italic opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatContent(highlightTxt) }} />
                             </div>
                         </div>
                     )}
-                    {block3 && <div className="prose-p:mb-6 opacity-90" dangerouslySetInnerHTML={{ __html: block3 }} />}
+                    {block3 && <div className="prose-p:mb-10 opacity-90" dangerouslySetInnerHTML={{ __html: formatContent(block3) }} />}
                 </div>
             </div>
 

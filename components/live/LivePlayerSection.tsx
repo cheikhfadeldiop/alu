@@ -296,13 +296,7 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
                             </button>
                         )}
 
-                        {/* Live Badge (Top Right) */}
-                        <div className="absolute top-6 right-6 z-30">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-lg shadow-xl animate-pulse">
-                                <span className="w-2 h-2 bg-white rounded-full" />
-                                <span className="text-[10px] font-black text-white uppercase tracking-widest">EN DIRECT</span>
-                            </div>
-                        </div>
+
                     </div>
 
                     {/* CONTROLS AREA */}

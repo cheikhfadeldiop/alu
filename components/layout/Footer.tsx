@@ -72,6 +72,14 @@ function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+function IconWhatsApp(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12.031 21.196c-1.642 0-3.351-.433-4.731-1.246l-0.339-.2-4.043 1.06 1.08-3.939-.219-.348c-0.88-1.396-1.344-3.08-1.344-4.792 0-4.904 4.092-8.892 8.59-8.892 2.179 0 4.228.848 5.767 2.388s2.387 3.588 2.387 5.767c0 4.904-4.092 8.892-8.59 8.892zM12.031 2a11.109 11.109 0 0 0-9.824 5.922 11.39 11.39 0 0 0-0.342 9.426l-1.865 6.802 7.042-1.846a11.025 11.025 0 0 0 5.011 1.201h0.007c6.046 0 11.064-4.887 11.064-10.892 0-2.894-1.127-5.614-3.176-7.663a11.077 11.077 0 0 0-7.917-3.15zM17.024 13.912c-0.274-.137-1.621-.8-1.872-.891s-.433-.137-.617.137-.708.891-.868 1.073-.32.206-.594.069a7.482 7.482 0 0 1-2.204-1.355 8.242 8.242 0 0 1-1.525-1.898c-.16-.274-.017-.423.12-.559.123-.122.274-.32.411-.48s.183-.274.274-.457.046-.343-.023-.48-.617-1.485-.845-2.034c-.223-.537-.44-.463-.617-.472s-.365-.011-.561-.011-.515.074-.785.372-.103 1.052.103 2.103c.515 1.052 1.487 2.012 2.656 2.677a11.842 11.842 0 0 0 5.253 1.554c1.1.067 2.34-.14 3.013-.274.457-.091.731-.549.731-1 0-.152-.008-.312-.023-.483-.023-.274-.114-.503-.389-.636z" />
+    </svg>
+  );
+}
+
 import { SITE_CONFIG } from "@/constants/site-config";
 import { Link } from "@/i18n/navigation";
 
@@ -82,222 +90,127 @@ export function Footer() {
   return (
     <footer className="w-full border-t border-[color:var(--border)] bg-foreground/3 backdrop-blur-sm  ">
       <div className="mx-auto max-w-[1440px] px-6 py-12 sm:px-8 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
-          <div className="space-y-4 sm:pr-10 gap-10">
-            <div className="flex items-center gap-3  min-w-[150px]  ">
-              <SafeImage
-                src={SITE_CONFIG.theme.placeholders.logo}
-                alt="CRTV"
-                width={154}
-                height={34}
-                className="object-contain rounded-sm"
-              />
-            </div>
-            <p className="max-w-xs text-sm text-[color:var(--muted)]">
-              {t("footer.description")}
-            </p>
-            <p className="max-w-xs text-sm text-[color:var(--muted)]">
-              {t("footer.short_description")}
-            </p>
-
-            <div className="flex items-center gap-3 min-w-[235px]  ">
-              <a
-                href={SITE_CONFIG.apps.googlePlay}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Column 1: Office info */}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <Link href="/" className="inline-block">
                 <SafeImage
-                  src="/assets/backgrounds/store.webp"
-                  alt="CRTV on Google Play"
-                  width={135}
-                  height={40}
-                  className="h-11 w-full rounded-sm"
+                  src={SITE_CONFIG.theme.placeholders.logo}
+                  alt="CRTV"
+                  width={154}
+                  height={34}
+                  className="object-contain"
                 />
-              </a>
-
-
-              <a
-                href={SITE_CONFIG.apps.appleStore}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SafeImage
-                  src="/assets/backgrounds/apple.png"
-                  alt="CRTV on App Store"
-                  width={235}
-                  height={40}
-                  className="h-11 w-full rounded-sm"
-                />
-              </a>
+              </Link>
+              <div className="text-[12px] font-bold text-foreground/80 leading-relaxed uppercase max-w-[200px]">
+                Office de Radiodiffusion Télévision Camerounaise
+              </div>
             </div>
 
-            <div className="flex items-center gap-5 text-[color:var(--muted)]">
-              <a
-                href={SITE_CONFIG.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                <IconFacebook className="h-7 w-7" />
-              </a>
-              <a
-                href={SITE_CONFIG.social.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                <IconX className="h-7 w-7" />
-              </a>
-              <a
-                href={SITE_CONFIG.social.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                <IconYouTube className="h-7 w-7" />
-              </a>
-              <a
-                href={SITE_CONFIG.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                <IconLinkedIn className="h-7 w-7" />
-              </a>
-              <a
-                href={SITE_CONFIG.social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                <IconInstagram className="h-7 w-7" />
-              </a>
-              <a
-                href={SITE_CONFIG.social.tiktok}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] hover:text-background hover:bg-foreground hover:border-white transition-all"
-              >
-                {/* Fallback for TikTok icon since it's not defined, or I can add one */}
-                <svg className="h-8   w-6" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.01 1.62 4.2 1.13 1.33 2.77 2.13 4.49 2.19v3.86a11.583 11.583 0 01-5.32-1.35c.03 4.1.02 8.21.03 12.31 0 2.25-.87 4.41-2.45 6.01-1.84 1.83-4.48 2.62-6.95 2.15-2.61-.41-4.88-2.26-5.83-4.72-1.12-2.73-.65-6 1.15-8.23 1.41-1.83 3.73-2.85 6.05-2.6v3.9c-1.2-.18-2.44.22-3.32 1.05-.85.76-1.28 1.94-1.13 3.07.11 1.25.96 2.37 2.11 2.85.96.42 2.06.39 2.98-.12.87-.45 1.48-1.36 1.61-2.33.04-1.16.03-2.32.03-3.48V0l.02.02z" />
-                </svg>
-              </a>
+            <div className="space-y-1 text-[13px] text-foreground/60">
+              <p>Tel: {SITE_CONFIG.contact.phones}</p>
+              <p>Fax: {SITE_CONFIG.contact.fax}</p>
+              <p>BP / PO BOX : 1634 Yaoundé</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {[
+                { icon: IconFacebook, href: SITE_CONFIG.social.facebook, label: "Facebook" },
+                { icon: IconInstagram, href: SITE_CONFIG.social.instagram, label: "Instagram" },
+                { icon: IconX, href: SITE_CONFIG.social.twitter, label: "X" },
+                { icon: IconWhatsApp, href: "https://wa.me/237222214088", label: "WhatsApp" },
+                { icon: IconYouTube, href: SITE_CONFIG.social.youtube, label: "YouTube" },
+              ].map((social, idx) => (
+                <a
+                  key={idx}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-foreground/10 text-foreground/60 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
+                >
+                  <social.icon className="h-5 w-5" />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="text-sm font-semibold">{t("footer.about")}</div>
-            <ul className="space-y-2 text-sm text-[color:var(--muted)]">
-              <li>
-                <Link href="/about" className="hover:text-foreground">
-                  {t("footer.links.about")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-foreground">
-                  {t("footer.links.crtvCameroon")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-foreground">
-                  {t("footer.links.helpCenters")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-foreground">
-                  {t("footer.links.contact")}
-                </Link>
-              </li>
-
+          {/* Column 2: Ressources */}
+          <div className="space-y-6">
+            <h3 className="text-[14px] font-black uppercase tracking-widest text-foreground/40">
+              {t("footer.resources")}
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { href: "/", label: t("nav.home") },
+                { href: "/live", label: t("nav.live") },
+                { href: "/replay", label: t("nav.replay") },
+                { href: "/radio", label: t("nav.radio") },
+                { href: "/news", label: t("nav.news") },
+                { href: "/corporate", label: t("nav.corporate") },
+                { href: "/contact", label: t("nav.contact") },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link href={link.href} className="text-[14px] font-medium text-foreground/60 hover:text-[color:var(--accent)] transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <div className="text-sm font-semibold">{t("footer.resources")}</div>
-            <ul className="space-y-2 text-sm text-[color:var(--muted)]">
-              <li>
-                <Link href="/live" className="hover:text-foreground">
-                  {t("footer.links.tv")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/news" className="hover:text-foreground">
-                  {t("footer.links.news")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/radio" className="hover:text-foreground">
-                  {t("footer.links.radio")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/replay" className="hover:text-foreground">
-                  {t("footer.links.replay")}
-                </Link>
-              </li>
-
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <div className="text-sm font-semibold">
+          {/* Column 3: Commitments */}
+          <div className="space-y-6">
+            <h3 className="text-[14px] font-black uppercase tracking-widest text-foreground/40">
               {t("footer.commitments")}
-            </div>
-            <ul className="space-y-2 text-sm text-[color:var(--muted)]">
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { href: "/commitments", label: t("footer.links.quality") },
+                { href: "/terms", label: t("footer.links.terms") },
+                { href: "/privacy", label: t("footer.links.data") },
+                { href: "/advertising", label: t("footer.links.legal") }, // Using legal/advertising for Partenariat if needed or just adding it
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link href={link.href} className="text-[14px] font-medium text-foreground/60 hover:text-[color:var(--accent)] transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
               <li>
-                <Link href="/commitments" className="hover:text-foreground">
-                  {t("footer.links.quality")}
+                <Link href="/contact" className="text-[14px] font-medium text-foreground/60 hover:text-[color:var(--accent)] transition-colors">
+                  Partenariat
                 </Link>
               </li>
-              <li>
-                <Link href="/terms" className="hover:text-foreground">
-                  {t("footer.links.terms")}
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/privacy" className="hover:text-foreground">
-                  {t("footer.links.data")}
-                </Link>
-              </li>
-
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <div className="text-sm font-semibold">{t("footer.other")}</div>
-            <ul className="space-y-2 text-sm text-[color:var(--muted)]">
-              <li>
-                <Link href="/legal" className="hover:text-foreground">
-                  {t("footer.links.legal")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/advertising" className="hover:text-foreground">
-                  {t("footer.links.ads")}
-                </Link>
-              </li>
-
-            </ul>
+          {/* Column 4: Apps */}
+          <div className="space-y-6">
+            <h3 className="text-[14px] font-black uppercase tracking-widest text-foreground/40">
+              Download our apps from
+            </h3>
+            <div className="flex flex-col gap-4">
+              <a href={SITE_CONFIG.apps.appleStore} target="_blank" rel="noopener noreferrer" className="block w-[180px]">
+                <SafeImage src="/assets/backgrounds/apple.png" alt="App Store" width={180} height={54} className="w-full" />
+              </a>
+              <a href={SITE_CONFIG.apps.googlePlay} target="_blank" rel="noopener noreferrer" className="block w-[180px]">
+                <SafeImage src="/assets/backgrounds/store.webp" alt="Google Play" width={180} height={54} className="w-full" />
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-[color:var(--muted)]">
-            <Link href="/" className="hover:text-foreground">{t("footer.strip.crtv")}</Link>
-            <Link href="/live?channel=crtv-sport" className="hover:text-foreground">{t("footer.strip.crtvSport")}</Link>
-            <Link href="/radio?channel=poste-national" className="hover:text-foreground">{t("footer.strip.posteNational")}</Link>
-            <Link href="/live" className="hover:text-foreground">{t("footer.strip.crtvReligion")}</Link>
-            <Link href="/live?channel=crtv-news" className="hover:text-foreground">{t("footer.strip.crtvNews")}</Link>
+        <div className="mt-20   space-y-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-[12px] font-black uppercase tracking-widest text-foreground/40">
+            <Link href="/" className="hover:text-[color:var(--accent)] transition-colors">{t("footer.strip.crtv")}</Link>
+            <Link href="/live?channel=crtv-sport" className="hover:text-[color:var(--accent)] transition-colors">{t("footer.strip.crtvSport")}</Link>
+            <Link href="/radio?channel=poste-national" className="hover:text-[color:var(--accent)] transition-colors">{t("footer.strip.posteNational")}</Link>
+            <Link href="/live" className="hover:text-[color:var(--accent)] transition-colors">{t("footer.strip.crtvReligion")}</Link>
+            <Link href="/live?channel=crtv-news" className="hover:text-[color:var(--accent)] transition-colors">{t("footer.strip.crtvNews")}</Link>
           </div>
-          <p className="text-center text-xs text-[color:var(--muted)]  border-t border-[color:var(--border)] pt-6">
+          <p className=" pt-5 border-t border-foreground/5 text-center text-[11px] font-medium text-foreground/30">
             {t("footer.copyright")}
           </p>
         </div>

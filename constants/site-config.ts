@@ -53,10 +53,8 @@ export const SITE_CONFIG = {
     // Contact & Logistics
     contact: {
         address: 'MBALLA II, Yaoundé, Cameroun.',
-        phones: [
-            '(+237) 222 214 088',
-            '(+237) 222 214 047'
-        ],
+        phones: '(+237) 222 214 088',
+        fax: '(+237) 222 214 047',
         email: 'contact@crtv.cm',
         map: {
             latitude: 3.866667,

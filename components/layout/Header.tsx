@@ -183,7 +183,7 @@ export function Header() {
     { key: "live", href: "/live", label: t("nav.live"), icon: IconLive },
     { key: "replay", href: "/replay", label: t("nav.replay"), icon: IconVideo },
     { key: "radio", href: "/radio", label: t("nav.radio"), icon: IconAudio },
-    { key: "corporate", href: "/news2", label: t("nav.corporate"), icon: IconCorporate },
+    { key: "corporate", href: "/corporate", label: t("nav.corporate"), icon: IconCorporate },
     { key: "contact", href: "/contact", label: t("nav.contact"), icon: IconContact },
   ];
 

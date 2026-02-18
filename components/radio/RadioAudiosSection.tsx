@@ -64,21 +64,20 @@ export function RadioAudiosSection({ items = [], promoPrograms = [] }: RadioAudi
                 ))}
             </div>
 
-            {visibleCount < displayItems.length && (
-                <div className="flex justify-center pt-8">
-                    <button
-                        onClick={handleLoadMore}
-                        className="group relative flex items-center gap-2 px-8 py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10"
-                    >
-                        <span className="text-sm font-medium uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">
-                            {t("loadMore") || "Charger +"}
-                        </span>
-                        <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
-                </div>
-            )}
+            {
+                // visibleCount <
+                displayItems.length && (
+                    <div className="flex justify-center pt-8">
+                        <button
+                            onClick={handleLoadMore}
+                            className="group relative flex items-center gap-2 px-8 py-2.5 rounded-full border border-foreground/45 hover:border-red-500 transition-all duration-300 bg-white/5 hover:bg-white/10"
+                        >
+                            <span className="text-sm font-medium uppercase tracking-widest  group-hover:text-red-500 transition-colors">
+                                {t("loadMore") || "Charger"}
+                            </span>
+                        </button>
+                    </div>
+                )}
         </section>
     );
 }

@@ -309,7 +309,7 @@ export function RadioPlayerSection({ channel, currentProgram, onNextChannel, onP
 
     return (
         <div className="flex flex-col lg:flex-row justify-between gap-8">
-            <div className="w-full lg:w-[68%] h-auto space-y-4">
+            <div className="w-full lg:w-[68%] h-auto ">
                 {/* Main Player Container */}
                 <div className=" relative  bg-white/30 dark:bg-black/50 backdrop-blur-2xl border border-gray-200 dark:border-white/10">
                     {/* ... content ... */}
