@@ -7,6 +7,73 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 import { Link, usePathname, useRouter } from "../../i18n/navigation";
+function IconX(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M6 18 18 6M6 6l12 12"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconFacebook(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M14 8h2V5h-2c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.2l.8-3H13V9c0-.6.4-1 1-1Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconInstagram(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M17.5 6.5h.01"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconYouTube(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M22.56 6.44a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.62.44a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .44 5.31 2.78 2.78 0 0 0 1.94 2c1.74.44 8.62.44 8.62.44s6.88 0 8.62-.44a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .44-5.31 29 29 0 0 0-.44-5.31Z"
+        fill="currentColor"
+      />
+      <path d="m9.5 15.02 6.02-3.27-6.02-3.27v6.54Z" fill="#fff" />
+    </svg>
+  );
+}
+
+function IconWhatsApp(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12.031 21.196c-1.642 0-3.351-.433-4.731-1.246l-0.339-.2-4.043 1.06 1.08-3.939-.219-.348c-0.88-1.396-1.344-3.08-1.344-4.792 0-4.904 4.092-8.892 8.59-8.892 2.179 0 4.228.848 5.767 2.388s2.387 3.588 2.387 5.767c0 4.904-4.092 8.892-8.59 8.892zM12.031 2a11.109 11.109 0 0 0-9.824 5.922 11.39 11.39 0 0 0-0.342 9.426l-1.865 6.802 7.042-1.846a11.025 11.025 0 0 0 5.011 1.201h0.007c6.046 0 11.064-4.887 11.064-10.892 0-2.894-1.127-5.614-3.176-7.663a11.077 11.077 0 0 0-7.917-3.15zM17.024 13.912c-0.274-.137-1.621-.8-1.872-.891s-.433-.137-.617.137-.708.891-.868 1.073-.32.206-.594.069a7.482 7.482 0 0 1-2.204-1.355 8.242 8.242 0 0 1-1.525-1.898c-.16-.274-.017-.423.12-.559.123-.122.274-.32.411-.48s.183-.274.274-.457.046-.343-.023-.48-.617-1.485-.845-2.034c-.223-.537-.44-.463-.617-.472s-.365-.011-.561-.011-.515.074-.785.372-.103 1.052.103 2.103c.515 1.052 1.487 2.012 2.656 2.677a11.842 11.842 0 0 0 5.253 1.554c1.1.067 2.34-.14 3.013-.274.457-.091.731-.549.731-1 0-.152-.008-.312-.023-.483-.023-.274-.114-.503-.389-.636z" />
+    </svg>
+  );
+}
+
 import { FlagStripe } from "./FlagStripe";
 
 type NavItem = {
@@ -172,9 +239,17 @@ export function Header() {
   const [mounted, setMounted] = React.useState(false);
 
   const [isLangDropdownOpen, setIsLangDropdownOpen] = React.useState(false);
+  const [isScrolled, setIsScrolled] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navItems: NavItem[] = [
@@ -203,12 +278,41 @@ export function Header() {
 
   return (
 
-    <header className="sticky top-0 z-50 w-full">
-      <div>
-        <FlagStripe />
+    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ease-in-out 
+      }`}>
+      <FlagStripe />
+
+      {/* Scrollable Top Part - Optimized for performance */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[height,opacity,transform] ${isScrolled ? "h-0 opacity-0 -translate-y-2 pointer-events-none" : "h-[40px] opacity-100 translate-y-0"
+          }`}
+      >
+        <div className="mx-auto flex max-w-[1400px] justify-end px-8 py-2">
+          <div className="flex items-center gap-2">
+            {[
+              { icon: IconFacebook, href: SITE_CONFIG.social.facebook, label: "Facebook" },
+              { icon: IconInstagram, href: SITE_CONFIG.social.instagram, label: "Instagram" },
+              { icon: IconX, href: SITE_CONFIG.social.twitter, label: "X" },
+              { icon: IconWhatsApp, href: `https://wa.me/${SITE_CONFIG.contact.phones}`, label: "WhatsApp" },
+              { icon: IconYouTube, href: SITE_CONFIG.social.youtube, label: "YouTube" },
+            ].map((social, idx) => (
+              <a
+                key={idx}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.label}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-foreground/80 text-background/90 hover:bg-[color:var(--accent)] hover:text-white transition-all duration-300"
+              >
+                <social.icon className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-8">
+      <div className={`mx-auto flex max-w-[1400px] items-center justify-between px-8 transition-all duration-300 ease-in-out ${isScrolled ? "h-16" : "h-20"
+        }`}>
         {/* Logo */}
         <div className="flex items-center ">
           <Link href="/" className="flex items-center gap-2">
