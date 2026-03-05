@@ -174,16 +174,19 @@ export function CrossedNavigationSection({ data: initialData }: CrossedNavigatio
                 </div>
 
                 <div className="flex flex-col items-center w-full md:w-auto z-40" style={{ gap: `${16 * scale}px` }}>
-                    <div className="relative bg-foreground/5 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-white/5 " style={{ padding: `${16 * scale}px` }}>
-                        <div className="relative flex items-center justify-center bg-black/40 rounded-full border-2 md:border-4 border-white/5 " style={{ width: `${140 * scale}px`, height: `${140 * scale}px` }}>
+                    <div className="relative bg-surface/50 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-border shadow-2xl" style={{ padding: `${16 * scale}px` }}>
+                        <div className="relative flex items-center justify-center bg-background/40 rounded-full border-4 border-border/50 " style={{ width: `${140 * scale}px`, height: `${140 * scale}px` }}>
                             <div className="grid grid-cols-3 grid-rows-3 relative z-10" style={{ gap: `${4 * scale}px`, width: `${110 * scale}px`, height: `${110 * scale}px` }}>
                                 <div /><NavButton direction="up" onClick={() => navigate('up')} scale={scale} /><div />
-                                <NavButton direction="left" onClick={() => navigate('left')} scale={scale} /><div className="flex items-center justify-center"><div className="rounded-full bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.8)] border border-white/20" style={{ width: `${16 * scale}px`, height: `${16 * scale}px` }} /></div><NavButton direction="right" onClick={() => navigate('right')} scale={scale} />
+                                <NavButton direction="left" onClick={() => navigate('left')} scale={scale} /><div className="flex items-center justify-center"><div className="rounded-full bg-accent shadow-[0_0_20px_rgba(209,56,45,0.8)] border border-white/20" style={{ width: `${16 * scale}px`, height: `${16 * scale}px` }} /></div><NavButton direction="right" onClick={() => navigate('right')} scale={scale} />
                                 <div /><NavButton direction="down" onClick={() => navigate('down')} scale={scale} /><div />
                             </div>
                         </div>
                     </div>
-                    <h4 className="font-black italic tracking-tighter uppercase flex items-center" style={{ fontSize: `${12 * scale}px`, gap: `${8 * scale}px` }}><span className="rounded-full bg-red-600 animate-ping" style={{ width: `${6 * scale}px`, height: `${6 * scale}px` }} />{activeChannel.title}</h4>
+                    <h4 className="b4 font-black italic tracking-tight uppercase flex items-center text-foreground" style={{ gap: `${8 * scale}px` }}>
+                        <span className="rounded-full bg-accent animate-ping" style={{ width: `${6 * scale}px`, height: `${6 * scale}px` }} />
+                        {activeChannel.title}
+                    </h4>
                 </div>
             </div>
         </section>
@@ -194,8 +197,8 @@ function NavButton({ direction, onClick, scale }: { direction: 'up' | 'down' | '
     const arrows = { up: "M5 15l7-7 7 7", down: "M19 9l-7 7-7-7", left: "M15 19l-7-7 7-7", right: "M9 5l7 7-7 7" };
     const posClasses = { up: "col-start-2 row-start-1 bg-gradient-to-b", down: "col-start-2 row-start-3 bg-gradient-to-t", left: "col-start-1 row-start-2 bg-gradient-to-r", right: "col-start-3 row-start-2 bg-gradient-to-l" };
     return (
-        <button onClick={onClick} className={`flex items-center justify-center ${posClasses[direction]} from-white/10 to-transparent hover:from-red-600 hover:to-red-800 transition-all duration-300 rounded-xl border border-white/5 group shadow-lg active:scale-90`}>
-            <svg className="text-white/34 group-hover:text-white transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: `${24 * scale}px`, height: `${24 * scale}px` }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={arrows[direction]} /></svg>
+        <button onClick={onClick} className={`flex items-center justify-center ${posClasses[direction]} from-white/10 to-transparent hover:from-accent hover:to-accent/80 transition-all duration-300 rounded-xl border border-white/5 group shadow-lg active:scale-90`}>
+            <svg className="text-white/40 group-hover:text-white transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: `${24 * scale}px`, height: `${24 * scale}px` }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={arrows[direction]} /></svg>
         </button>
     );
 }
@@ -203,23 +206,27 @@ function NavButton({ direction, onClick, scale }: { direction: 'up' | 'down' | '
 function VideoItem({ video, scale, width }: { video: SliderVideoItem, scale: number, width: string }) {
     const t = useTranslations("common");
     return (
-        <Link href={`/replay/${video.slug}`} className="shrink-0 group block" style={{ width, gap: `${12 * scale}px`, display: 'flex', flexDirection: 'column' }}>
-            <div className="relative aspect-video overflow-hidden rounded-2xl bg-white/5 shadow-2xl border border-white/5">
+        <Link href={`/replay/${video.slug || (video as any).id}`} className="shrink-0 group block" style={{ width, gap: `${12 * scale}px`, display: 'flex', flexDirection: 'column' }}>
+            <div className="relative aspect-video overflow-hidden rounded-2xl bg-surface shadow-2xl border border-border group-hover:border-accent/30 transition-all duration-500">
                 <SafeImage src={video.logo_url || video.logo} alt={video.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, 300px" />
-                <div className="absolute inset-x-0 top-0 p-2 flex justify-between items-start pointer-events-none">
-                    <div className="font-black text-white border border-white/10 uppercase tracking-tighter shadow-xl bg-red-600/90 backdrop-blur-md" style={{ padding: `${2 * scale}px ${6 * scale}px`, fontSize: `${7 * scale}px`, borderRadius: `${2 * scale}px` }}>{video.date}</div>
+                <div className="absolute inset-x-0 top-0 p-3 flex justify-between items-start pointer-events-none">
+                    <div className="font-black text-white border border-white/10 uppercase tracking-tighter shadow-xl bg-accent/90 backdrop-blur-md" style={{ padding: `${3 * scale}px ${8 * scale}px`, fontSize: `${8 * scale}px`, borderRadius: `${4 * scale}px` }}>{video.date}</div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="rounded-full border-2 border-white/50 flex items-center justify-center backdrop-blur-md scale-75 group-hover:scale-100 transition-transform" style={{ width: `${40 * scale}px`, height: `${40 * scale}px` }}>
-                        <div className="w-0 h-0 border-t-transparent border-white border-b-transparent" style={{ borderTopWidth: `${6 * scale}px`, borderBottomWidth: `${6 * scale}px`, borderLeftWidth: `${10 * scale}px`, marginLeft: `${2 * scale}px` }} />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="rounded-full bg-accent flex items-center justify-center shadow-lg scale-75 group-hover:scale-100 transition-transform duration-500" style={{ width: `${48 * scale}px`, height: `${48 * scale}px` }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style={{ width: `${24 * scale}px`, height: `${24 * scale}px`, marginLeft: `${2 * scale}px` }}>
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
                     </div>
                 </div>
             </div>
-            <div style={{ gap: `${4 * scale}px`, display: 'flex', flexDirection: 'column', padding: `0 ${4 * scale}px` }}>
-                <h4 className="font-black leading-tight line-clamp-2 group-hover:text-red-500 transition-colors uppercase tracking-tight" style={{ fontSize: `${11 * scale}px` }}>{video.title}</h4>
-                <div className="flex items-center font-black text-foreground/30 uppercase tracking-widest group-hover:text-foreground/50 transition-colors" style={{ gap: `${6 * scale}px`, fontSize: `${7 * scale}px` }}>
-                    <span className="text-red-600">{t("replayTag")}</span>
-                    <span className="rounded-full bg-foreground/20" style={{ width: `${3 * scale}px`, height: `${3 * scale}px` }} />
+            <div style={{ gap: `${6 * scale}px`, display: 'flex', flexDirection: 'column', padding: `0 ${4 * scale}px` }}>
+                <h4 className="b3 font-black leading-tight line-clamp-2 group-hover:text-accent transition-colors uppercase tracking-tight">
+                    {video.title}
+                </h4>
+                <div className="flex items-center font-black text-muted uppercase tracking-[0.2em] group-hover:text-foreground transition-colors" style={{ gap: `${8 * scale}px`, fontSize: `${8 * scale}px` }}>
+                    <span className="text-accent">{t("replayTag")}</span>
+                    <span className="w-1 h-1 rounded-full bg-border" />
                     <span className="line-clamp-1">{video.desc || `CRTV ${t("archives")}`}</span>
                 </div>
             </div>

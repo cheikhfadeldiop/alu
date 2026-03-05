@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'actu.crtv.cm',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'actu.rts.sn',
         pathname: '/**',
       },

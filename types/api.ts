@@ -152,6 +152,7 @@ export interface SliderVideosResponse {
 }
 
 export interface SliderVideoItem {
+    id: string;
     title: string;
     desc: string;
     type: string;
@@ -171,6 +172,28 @@ export interface SliderVideoItem {
     android_url?: string;
     web_url?: string;
     webdetail_url?: string;
+}
+
+// Playlist Types (New for Short Videos)
+export interface PlaylistResponse {
+    details: {
+        title: string;
+        desc: string;
+        type: string;
+        slug: string;
+        chaine_name: string;
+        chaine_logo: string;
+        subitems: {
+            data: SliderVideoItem[];
+            pagination: {
+                next_page_url: string | null;
+                previous_page_url: string | null;
+            }
+        }
+    };
+    links: {
+        [key: string]: string;
+    };
 }
 
 // Featured Content Types
@@ -318,6 +341,7 @@ export interface AODItem {
     title: string;
     desc: string;
     image: string;
+    logo: string;
     image_url: string;
     audio_url: string;
     duration: string;

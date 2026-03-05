@@ -23,6 +23,8 @@ import type {
     FlashNewsResponse,
     AffichesResponse,
     SliderVideoItem,
+    PlaylistResponse,
+    AODItem,
 } from '../types/api';
 
 export type { SliderVideoItem } from '../types/api';
@@ -38,6 +40,7 @@ const APP_ID = SITE_CONFIG.api.appId;
  */
 export function mapVODToSliderItem(item: any, channelLogo?: string): SliderVideoItem {
     return {
+        id: item.id || "",
         title: item.title || "",
         desc: item.desc || "",
         logo: ensureAbsoluteUrl(item.image || item.logo),
@@ -50,7 +53,7 @@ export function mapVODToSliderItem(item: any, channelLogo?: string): SliderVideo
         webdetail_url: ensureAbsoluteUrl(item.webdetail_url),
         date: item.published_at || item.date || "",
         time: item.duration || item.time || "",
-        slug: item.slug || "",
+        slug: item.slug || item.id || String(Math.random()),
         type: item.type || "vod",
         views: item.views || "0",
         relatedItems: item.relatedItems || "",
@@ -77,7 +80,8 @@ export function getSiteAbsoluteUrl(path: string): string {
  */
 async function fetchAPI<T>(endpoint: string): Promise<T> {
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+        const response = await fetch(url, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -88,7 +92,25 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
             throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json();
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            // Attempt to recover from common API response corruption (trailing text)
+            const cleanText = text.trim();
+            const lastBrace = cleanText.lastIndexOf('}');
+            const lastBracket = cleanText.lastIndexOf(']');
+            const lastIndex = Math.max(lastBrace, lastBracket);
+
+            if (lastIndex !== -1) {
+                try {
+                    return JSON.parse(cleanText.substring(0, lastIndex + 1));
+                } catch (innerError) {
+                    throw e; // throw original error if recovery fails
+                }
+            }
+            throw e;
+        }
     } catch (error) {
         console.error(`Failed to fetch ${endpoint}:`, error);
         throw error;
@@ -264,6 +286,49 @@ export async function getSliderVideos(): Promise<SliderVideosResponse> {
 }
 
 /**
+ * Get short videos from the new playlist endpoint
+ * @param groupeCode - The group code (defaults to APP_ID)
+ * @param channelSlug - Optional channel slug to filter by
+ */
+export async function getShortVideos(groupeCode: string = APP_ID, channelSlug?: string): Promise<SliderVideosResponse> {
+    const baseUrl = `/details/playlist/short-videos/${groupeCode}`;
+    const url = channelSlug ? `${baseUrl}?channel=${channelSlug}` : `${baseUrl}`;
+
+    try {
+        const res = await fetchAPI<PlaylistResponse>(url);
+        const rawItems = res.details?.subitems?.data || [];
+
+        // Fallback to slider videos if list is empty
+        if (rawItems.length === 0) {
+            console.log("Shorts playlist is empty, falling back to slider videos...");
+            return getSliderVideos();
+        }
+
+        // Map to consistent SliderVideoItem format
+        const items: SliderVideoItem[] = rawItems.map(item => ({
+            id: item.id?.toString() || "",
+            title: (item as any).titre || item.title || "",
+            desc: (item as any).desc || (item as any).description || "",
+            type: "vod",
+            views: (item as any).views || "0",
+            logo: (item as any).image || item.logo || "",
+            logo_url: (item as any).image_url || item.logo_url || (item as any).image || "",
+            video_url: (item as any).lien || item.video_url || "",
+            feed_url: (item as any).lien || (item as any).feed_url || "",
+            relatedItems: (item as any).relatedItems || "",
+            date: (item as any).date || "",
+            time: (item as any).time || "",
+            slug: item.slug || item.id?.toString() || ""
+        }));
+
+        return { allitems: items };
+    } catch (error) {
+        console.error("Error fetching short videos, falling back to slider videos:", error);
+        return getSliderVideos().catch(() => ({ allitems: [] }));
+    }
+}
+
+/**
  * Get featured content (À la une)
  */
 export async function getAlaune(): Promise<AlauneResponse> {
@@ -358,18 +423,22 @@ export async function getLatestAggregateReplays(limit: number = 20): Promise<Sli
         // 3. Deduplicate by slug and sort by date
         const seenSlugs = new Set();
         const uniqueItems = allItems.filter(item => {
-            if (!item || !item.slug || seenSlugs.has(item.slug)) return false;
-            seenSlugs.add(item.slug);
+            const itemSlug = String(item?.slug || item?.id || "");
+            if (!item || !itemSlug || seenSlugs.has(itemSlug)) return false;
+            seenSlugs.add(itemSlug);
             return true;
         });
 
+        // Robust date parsing for sorting
+        const parseDate = (d: any) => {
+            if (!d) return 0;
+            const date = new Date(d);
+            return isNaN(date.getTime()) ? 0 : date.getTime();
+        };
+
         // Sort by date (descending)
         return uniqueItems
-            .sort((a, b) => {
-                const dateA = new Date(a.date).getTime();
-                const dateB = new Date(b.date).getTime();
-                return dateB - dateA;
-            })
+            .sort((a, b) => parseDate(b.date) - parseDate(a.date))
             .slice(0, limit);
     } catch (error) {
         console.error("Error fetching latest aggregate replays:", error);
@@ -378,22 +447,21 @@ export async function getLatestAggregateReplays(limit: number = 20): Promise<Sli
 }
 
 /**
- * Fallback search for a specific replay by slug
+ * Robust search for a specific replay by identifier (slug or id)
  */
-export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | null> {
+export async function findReplay(identifier: string): Promise<SliderVideoItem | null> {
+    if (!identifier) return null;
     try {
         // 1. Try initial aggregate list (Latest)
         const initial = await getLatestAggregateReplays();
-        let found = initial.find(v => v.slug === slug);
+        let found = initial.find(v => v.slug === identifier || v.id === identifier);
         if (found) return found;
 
         // 2. Try matching a SHOW (Category) directly
-        // This is important for the EmissionsSlider where items are categories
         const showsRes = await getVODShows();
         const shows = showsRes.allitems || [];
-        const showMatch = shows.find(s => s.slug === slug);
+        const showMatch = shows.find(s => s.slug === identifier || s.id === identifier);
         if (showMatch) {
-            // Find the first video of this show to play it
             if (showMatch.relatedItems && showMatch.relatedItems !== "null") {
                 const archives = await getRelatedItems(showMatch.relatedItems).catch(() => []);
                 if (archives.length > 0) {
@@ -410,7 +478,7 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
         for (const channel of allChannels) {
             try {
                 const replays = await getAlauneByChannel(channel.id);
-                found = (replays.allitems || []).find(v => v.slug === slug);
+                found = (replays.allitems || []).find(v => v.slug === identifier || v.id === identifier);
                 if (found) {
                     return {
                         ...found,
@@ -421,7 +489,7 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
         }
 
         // 4. Try matching by TITLE (as last resort fallback for slug)
-        found = shows.find(s => s.title.toLowerCase().replace(/\s+/g, '-') === slug);
+        found = shows.find(s => s.title.toLowerCase().replace(/\s+/g, '-') === identifier);
         if (found) {
             if (found.relatedItems && found.relatedItems !== "null") {
                 const archives = await getRelatedItems(found.relatedItems).catch(() => []);
@@ -431,12 +499,15 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
         }
 
         // 5. ULTIMATE FALLBACK: Search through items INSIDE shows
-        // Search top 40 shows (aggressive)
         for (const show of shows.slice(0, 40)) {
             if (show.feed_url && show.feed_url !== "null") {
                 try {
                     const showItems = await getVODItems(show.feed_url.split('/').slice(-2, -1)[0] || "");
-                    const item = (showItems.allitems || []).find(v => v.slug === slug || v.title.toLowerCase().replace(/\s+/g, '-') === slug);
+                    const item = (showItems.allitems || []).find(v =>
+                        v.slug === identifier ||
+                        v.id === identifier ||
+                        v.title.toLowerCase().replace(/\s+/g, '-') === identifier
+                    );
                     if (item) {
                         return mapVODToSliderItem(item, show.chaine_logo || show.channel_logo);
                     }
@@ -446,7 +517,7 @@ export async function findReplayBySlug(slug: string): Promise<SliderVideoItem | 
 
         return null;
     } catch (error) {
-        console.error("Error finding replay by slug:", error);
+        console.error("Error finding replay:", error);
         return null;
     }
 }
@@ -580,11 +651,131 @@ export async function getAODChannels(): Promise<VODChannelsResponse> {
 
 /**
  * Get latest AOD items
+ * @param limit - Number of items to fetch
  */
-export async function getLatestAOD(): Promise<AODItemsResponse> {
-    const res = await fetchAPI<AODItemsResponse>(`/latestaoditemsByGroupe/${APP_ID}/json`);
-    console.log("getLatestAOD Response:", res?.allitems?.length);
-    return res;
+export async function getLatestAOD(limit: number = 20): Promise<AODItemsResponse> {
+    try {
+        let allAggregatedItems: any[] = [];
+
+        // 1. Try to get latest from the group (often only returns 1 or 2 items)
+        try {
+            const res = await fetchAPI<AODItemsResponse>(`/latestaoditemsByGroupe/${APP_ID}/json`);
+            if (res && res.allitems) {
+                allAggregatedItems = [...res.allitems];
+            }
+        } catch (e) {
+            console.error("Latest AOD fetch failed:", e);
+        }
+
+        // 2. To get more (like the 10+ items the user wants), we MUST visit each radio
+        // This ensures we get the "LE 13H DU POSTE NATIONAL" and others mentioned by the user
+        try {
+            const channelsRes = await fetchAPI<any>(`/listChannelsAOD/${APP_ID}/json`);
+            // The API returns an array where the first item contains the radios list
+            const radioLists = channelsRes.allitems?.[0]?.list_channels_AOD_by_radio || [];
+
+            // Fetch from all available radios to be thorough
+            const radiosPromises = radioLists.map(async (radio: any) => {
+                if (!radio.list_channels_AOD_By_radio) return [];
+
+                // Clean the endpoint URL
+                const endpoint = radio.list_channels_AOD_By_radio.replace(API_BASE_URL, '');
+                const showsRes = await fetchAPI<any>(endpoint).catch(() => ({ allitems: [] }));
+                const shows = showsRes.allitems || [];
+
+                // Fetch from the top 5 latest shows for this radio
+                const showsPromises = shows.slice(0, 5).map(async (show: any) => {
+                    if (!show.feed_url) return [];
+                    const feedEndpoint = show.feed_url.replace(API_BASE_URL, '');
+                    const itemsRes = await fetchAPI<any>(feedEndpoint).catch(() => ({ allitems: [] }));
+                    const items = itemsRes.allitems || [];
+
+                    return items.map((item: any) => ({
+                        ...item,
+                        radio: item.radio || show.radio || radio.radio_name || "CRTV",
+                        showLogo: item.showLogo || show.logo || radio.radio_sdLogo || "",
+                        showName: item.showName || show.title || "",
+                    }));
+                });
+
+                const showResults = await Promise.all(showsPromises);
+                return showResults.flat();
+            });
+
+            const radioResults = await Promise.all(radiosPromises);
+            allAggregatedItems = [...allAggregatedItems, ...radioResults.flat()];
+        } catch (aggErr) {
+            console.error("Secondary AOD aggregation failed:", aggErr);
+        }
+
+        // 3. Map to consistent format
+        const mappedItems = allAggregatedItems.map((item: any) => {
+            const id = String(item.id || item.slug || Math.random());
+            const slug = item.slug || id;
+            return {
+                ...item,
+                id,
+                slug,
+                title: item.title || item.titre || "",
+                desc: item.desc || item.description || "",
+                image: item.logo || item.image || item.showLogo || item.logo_url || "",
+                logo: item.logo || item.showLogo || item.logo_url || "",
+                image_url: item.logo || item.image_url || item.showLogo || "",
+                audio_url: item.radio_url || item.audio_url || item.audio || item.lien || item.stream_url || "",
+                channel_name: item.showName || item.channel_name || item.radio || "CRTV",
+                published_at: item.date || item.published_at || new Date().toISOString(),
+                type: 'audio'
+            };
+        });
+
+        // 4. Deduplicate and Sort
+        const seenSlugs = new Set();
+        const uniqueItems = mappedItems
+            .filter((item: any) => {
+                const itemSlug = String(item.slug);
+                if (!item || !itemSlug || seenSlugs.has(itemSlug)) return false;
+                seenSlugs.add(itemSlug);
+                return true;
+            });
+
+        // Robust date parsing for sorting
+        const parseDate = (d: any) => {
+            if (!d) return 0;
+            const date = new Date(d);
+            return isNaN(date.getTime()) ? 0 : date.getTime();
+        };
+
+        // Sort by date (descending)
+        const sortedItems = uniqueItems.sort((a, b) => parseDate(b.published_at) - parseDate(a.published_at));
+
+        return { allitems: sortedItems.slice(0, limit) };
+    } catch (error) {
+        console.error("Error in getLatestAOD:", error);
+        return { allitems: [] };
+    }
+}
+
+/**
+ * Find a specific audio by slug or ID
+ */
+export async function findAudio(identifier: string): Promise<AODItem | null> {
+    if (!identifier) return null;
+    try {
+        // 1. Check latest AOD items first
+        const latest = await getLatestAOD(100);
+        const found = latest.allitems.find(a => a.slug === identifier || a.id === identifier);
+        if (found) return found;
+
+        // 2. If not found, try searching by title-slug match
+        const searchSlug = identifier.toLowerCase().replace(/\s+/g, '-');
+        const foundByTitle = latest.allitems.find(a => a.title.toLowerCase().replace(/\s+/g, '-') === searchSlug);
+        if (foundByTitle) return foundByTitle;
+
+        return null;
+    } catch (error) {
+        console.error("Error finding audio:", error);
+        return null;
+    }
 }
 
 /**
@@ -691,10 +882,37 @@ export async function getWordPressPosts(
 
 /**
  * Get a single WordPress post by ID
- * @param postId - The ID of the post
  */
 export async function getWordPressPostById(postId: string | number): Promise<import('../types/api').WordPressPost> {
     return fetchWordPressAPI<import('../types/api').WordPressPost>(`/posts/${postId}?_embed=wp:featuredmedia,wp:term`);
+}
+
+/**
+ * Get a single WordPress post by slug
+ * Note: WP API returns an array for slug filter, so we take the first item
+ */
+export async function getWordPressPostBySlug(slug: string): Promise<import('../types/api').WordPressPost | null> {
+    const results = await fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?slug=${slug}&_embed=wp:featuredmedia,wp:term`);
+    return results && results.length > 0 ? results[0] : null;
+}
+
+/**
+ * Robust fetcher that handles either ID or Slug
+ */
+export async function getWordPressPost(identifier: string | number): Promise<import('../types/api').WordPressPost | null> {
+    if (!identifier) return null;
+
+    // If it's a number or a string that looks like a number, try ID first
+    if (!isNaN(Number(identifier))) {
+        try {
+            return await getWordPressPostById(identifier);
+        } catch (e) {
+            // Fallback to slug if ID fails (might be a numeric slug)
+            return await getWordPressPostBySlug(identifier.toString());
+        }
+    }
+
+    return await getWordPressPostBySlug(identifier.toString());
 }
 
 /**

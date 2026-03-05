@@ -24,30 +24,30 @@ export function SectionTitle({
   className?: string;
 }) {
   return (
-    <div className={`flex items-center gap-3 pb-6 ${className}`}>
+    <div className={`flex items-center gap-m pb-l ${className}`}>
       <h2
         className={
           uppercase
-            ? "text-xs sm:text-sm tracking-widest text-foreground " + className
-            : "text-sm sm:text-base font-semibold tracking-wide text-foreground " + className
+            ? "b1 tracking-widest text-foreground " + className
+            : "b1 font-semibold tracking-wide text-foreground " + className
         }
       >
         {uppercase ? title.toUpperCase() : title}
       </h2>
       <h1 className={
         uppercase2
-          ? "text-xs sm:text-sm font-bold tracking-widest text-[color:var(--accent)] sm:text-base"
-          : "text-sm sm:text-base font-semibold tracking-wide text-foreground"
+          ? "b1 font-bold tracking-widest text-accent"
+          : "b1 font-semibold tracking-wide text-foreground"
       }
       >
         {uppercase2 ? title2?.toUpperCase() : title2}</h1>
       {actionIcon && title ? (
         <Link
           href={actionHref || "#"}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--muted)] hover:text-foreground"
+          className="inline-flex items-center gap-xxs b4 font-semibold text-muted hover:text-accent transition-colors"
         >
           {actionLabel}
-          <div className="text-gray-400">
+          <div className="opacity-90 group-hover:opacity-100 transition-opacity">
             <SafeImage
               src={SITE_CONFIG.theme.placeholders.arrow}
               alt=""

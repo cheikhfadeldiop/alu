@@ -31,14 +31,14 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
     // Default to first radio or radio from URL parameter
     const getDefaultRadio = () => {
         if (channelParam) {
-            const paramRadio = initialRadios.find(r => (r.id || r.slug) === channelParam);
+            const paramRadio = initialRadios.find(r => r.slug === channelParam || r.id === channelParam);
             if (paramRadio) return paramRadio;
         }
         return initialRadios[0];
     };
 
     const [selectedRadio, setSelectedRadio] = useState<LiveChannel>(getDefaultRadio());
-    const [selectedCarouselId, setSelectedCarouselId] = useState<string>((getDefaultRadio()?.id || getDefaultRadio()?.slug) || '');
+    const [selectedCarouselId, setSelectedCarouselId] = useState<string>((getDefaultRadio()?.slug || getDefaultRadio()?.id) || '');
 
     // Current EPG items for all channels (for carousel info)
     const currentPrograms = useMemo(() => {
@@ -48,17 +48,17 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
     // Update selected radio when URL parameter changes
     useEffect(() => {
         if (channelParam) {
-            const paramRadio = initialRadios.find(r => (r.id || r.slug) === channelParam);
+            const paramRadio = initialRadios.find(r => r.slug === channelParam || r.id === channelParam);
             if (paramRadio) {
                 setSelectedRadio(paramRadio);
-                setSelectedCarouselId(paramRadio.id || paramRadio.slug);
+                setSelectedCarouselId(paramRadio.slug || paramRadio.id);
             }
         }
     }, [channelParam, initialRadios]);
 
     // Handle channel/radio selection
     const handleItemSelect = (item: LiveChannel) => {
-        const itemKey = item.id || item.slug;
+        const itemKey = item.slug || item.id;
         setSelectedCarouselId(itemKey);
 
         // If it's a TV channel, navigate to live page with this channel
@@ -96,12 +96,12 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
                 channel={selectedRadio}
                 currentProgram={currentRadioProgram}
                 onNextChannel={() => {
-                    const currentIndex = initialRadios.findIndex(r => (r.id || r.slug) === (selectedRadio.id || selectedRadio.slug));
+                    const currentIndex = initialRadios.findIndex(r => (r.slug || r.id) === (selectedRadio.slug || selectedRadio.id));
                     const nextIndex = (currentIndex + 1) % initialRadios.length;
                     handleItemSelect(initialRadios[nextIndex]);
                 }}
                 onPrevChannel={() => {
-                    const currentIndex = initialRadios.findIndex(r => (r.id || r.slug) === (selectedRadio.id || selectedRadio.slug));
+                    const currentIndex = initialRadios.findIndex(r => (r.slug || r.id) === (selectedRadio.slug || selectedRadio.id));
                     const prevIndex = (currentIndex - 1 + initialRadios.length) % initialRadios.length;
                     handleItemSelect(initialRadios[prevIndex]);
                 }}

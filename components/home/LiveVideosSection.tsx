@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
 import { useSliderVideos, useLiveChannels, useChannelResolver } from "@/hooks/useData";
 import { ensureAbsoluteUrl } from "@/services/api";
+import { getPostAuthor, formatDate } from "@/utils/text";
 
 interface LiveVideosSectionProps {
     videos: SliderVideoItem[];
@@ -61,7 +62,7 @@ export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionPr
                         const channelLogo = resolveLogo(featuredVideo);
                         return (
                             <Link
-                                href={`/replay/${featuredVideo.slug}`}
+                                href={`/replay/${featuredVideo.slug || (featuredVideo as any).id}`}
                                 className="group relative block w-full overflow-hidden 
                                 hover:scale-[1.02] transition-all   "
                             >
@@ -101,9 +102,9 @@ export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionPr
 
                                 {/* Description Band - Below Image */}
                                 <div className="relative p-4 sm:p-6 bg-background z-10 sm:-mt-10 mx-4 sm:mx-10 md:mx-20 shadow-xl rounded-lg">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time}</span>
-                                        <span className="text-xs text-[color:var(--accent)] font-semibold">{tc("toWatchNow")}</span>
+                                    <div className="flex items-center justify-between gap-2 mb-2 w-full">
+                                        <span className="text-xs text-[color:var(--accent)] font-semibold">{featuredVideo.time || formatDate(featuredVideo.date)}</span>
+                                        <span className="text-xs text-[color:var(--accent)] font-bold uppercase">{getPostAuthor(featuredVideo)}</span>
                                     </div>
                                     <h3 className="text-base sm:text-lg font-bold mb-2 ">
                                         {featuredVideo.title}
@@ -131,7 +132,7 @@ export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionPr
                             return (
                                 <Link
                                     key={`${video.slug}-${index}`}
-                                    href={`/replay/${video.slug}`}
+                                    href={`/replay/${video.slug || (video as any).id}`}
                                     className="group flex gap-3 hover:bg-muted/10 p-2 transition-colors w-full
                                     hover:scale-[1.02] transition-all "
                                 >
@@ -182,10 +183,9 @@ export function DernieresEditions({ videos: initialVideos }: LiveVideosSectionPr
                                         </h4>
 
                                         {/* Meta Info */}
-                                        <div className="flex items-center gap-2 text-xs">
-                                            <span className="text-[color:var(--accent)] font-semibold">{tc("replayTag")}</span>
-                                            <span className="text-[color:var(--accent)] ">•</span>
-                                            <span className="text-[color:var(--accent)] dark:text-[color:var(--accent)]">{video.date}</span>
+                                        <div className="flex items-center justify-between w-full text-xs">
+                                            <span className="text-[color:var(--accent)] font-bold uppercase">{getPostAuthor(video)}</span>
+                                            <span className="text-[color:var(--accent)] dark:text-[color:var(--accent)]">{formatDate(video.date)}</span>
                                         </div>
                                     </div>
                                 </Link>

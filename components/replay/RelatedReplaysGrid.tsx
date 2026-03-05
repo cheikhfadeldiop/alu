@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { formatDate } from "@/utils/text";
 
 interface RelatedReplaysGridProps {
     initialReplays: SliderVideoItem[];
@@ -92,7 +93,7 @@ export function RelatedReplaysGrid({ initialReplays, currentSlug, relatedItemsUr
             />
 
             {/* 4x2 Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {filteredReplays.slice(0, visibleCount).map((video, idx) => (
                     <ReplayCard
                         key={`${video.slug}-${idx}`}
@@ -136,7 +137,7 @@ function ReplayCard({ video, onClick }: ReplayCardProps) {
     return (
         <button
             onClick={onClick}
-            className="group block space-y-4 hover:scale-105 transition-transform hover:z-10 text-left w-full"
+            className="group block space-y-2 lg:space-y-4 hover:scale-105 transition-transform hover:z-10 text-left w-full"
         >
             <div className="relative aspect-video overflow-hidden rounded-sm bg-white/5 border border-white/5">
                 <SafeImage
@@ -148,44 +149,44 @@ function ReplayCard({ video, onClick }: ReplayCardProps) {
                 />
 
                 {/* Play Icon Overlay */}
-                <div className="absolute bottom-3 left-3 z-20">
+                <div className="absolute bottom-2 left-2 lg:bottom-3 lg:left-3 z-20">
                     <Image
                         src="/assets/placeholders/play_overlay.png"
                         alt="Play"
-                        width={32}
-                        height={32}
+                        width={24}
+                        height={24}
+                        className="lg:w-8 lg:h-8"
                     />
                 </div>
 
                 {/* Channel Logo */}
                 {channelLogo && (
-                    <div className="absolute bottom-2 right-2 z-20 w-12 h-10 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md overflow-hidden">
+                    <div className="absolute top-3 right-3 z-20 w-12 h-8  transform group-hover:scale-110 transition-transform duration-500">
                         <SafeImage
                             src={channelLogo}
                             alt="Channel"
                             fill
-                            className="object-contain p-0.5"
+                            className="object-contain"
                         />
                     </div>
                 )}
             </div>
 
             {/* Text Content */}
-            <div className="space-y-2">
-                <h4 className="font-bold text-sm line-clamp-2 leading-snug  transition-colors">
+            <div className="space-y-1 lg:space-y-2">
+                <h4 className="font-bold text-[11px] lg:text-sm line-clamp-2 leading-tight lg:leading-snug transition-colors">
                     {video.title}
                 </h4>
 
                 {/* Metadata */}
-                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight">
+                <div className="flex items-center justify-between w-full gap-1.5 lg:gap-3 text-[9px] lg:text-[10px] font-bold uppercase tracking-tight">
                     <span className="flex items-center gap-1 text-foreground/40">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-2.5 h-2.5 lg:w-3 lg:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {video.time || "2min 27s"}
+                        {formatDate(video.date)}
                     </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/20"></span>
-                    <span className="text-foreground/40">{video.date}</span>
+                    <span className="text-foreground/40">{formatDate(video.time)}</span>
                 </div>
             </div>
         </button>

@@ -3,7 +3,6 @@ export * from './LiveChannelsGrid';
 export * from './ShortsCarousel';
 export * from './EditorialChoice';
 export * from './CategorySection';
-export * from './RegionalNews';
 export * from './RegionalCategoriesSection';
 export * from './CategoryWithAdSection';
 export * from './CorporateNewsSection';

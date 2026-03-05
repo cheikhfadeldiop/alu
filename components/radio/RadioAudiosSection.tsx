@@ -5,6 +5,7 @@ import { AODItem, FullEPGProgram } from "../../types/api";
 import { MediaCard } from "../ui/MediaCard";
 import { SectionTitle } from "../ui/SectionTitle";
 import { useTranslations } from "next-intl";
+import { formatDate } from "@/utils/text";
 
 interface RadioAudiosSectionProps {
     items: AODItem[];
@@ -41,43 +42,44 @@ export function RadioAudiosSection({ items = [], promoPrograms = [] }: RadioAudi
     };
 
     return (
-        <section className="space-y-6 md:space-y-8 py-8 md:py-12">
-            <SectionTitle title="AUDIOS" actionHref="/radio/audios" className="text-xl" />
+        <section className="space-y-8 sm:space-y-12 py-8 sm:py-16">
+            <SectionTitle
+                title="AUDIOS"
+                actionHref="/radio/audios"
+                className="h4 font-black italic tracking-tighter"
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
                 {displayItems.slice(0, visibleCount).map((item) => (
                     <MediaCard
                         key={item.id}
-                        href="#"
+                        href={`/audio/${item.slug || item.id}`}
                         title={item.title}
-                        imageSrc={item.image_url || item.image || "/assets/placeholders/radio_icon_sur_card.png"}
-                        meta={new Date(item.published_at).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })}
+                        imageSrc={item.logo || item.image || "/assets/placeholders/radio_icon_sur_card.png"}
+                        meta={formatDate(item.published_at)}
+                        author={item.category || item.channel_name || "Audio"}
                         aspect="1/1"
                         showPlayIcon={false}
                         showAudioIcon={true}
                         target={false}
-                        onClick={() => {
-                            // Handler for playing audio (can be extended)
-                            console.log("Open audio", item);
-                        }}
+                        className="rounded-sm overflow-hidden shadow-sm"
                     />
                 ))}
             </div>
 
-            {
-                // visibleCount <
-                displayItems.length && (
-                    <div className="flex justify-center pt-8">
-                        <button
-                            onClick={handleLoadMore}
-                            className="group relative flex items-center gap-2 px-8 py-2.5 rounded-full border border-foreground/45 hover:border-red-500 transition-all duration-300 bg-white/5 hover:bg-white/10"
-                        >
-                            <span className="text-sm font-medium uppercase tracking-widest  group-hover:text-red-500 transition-colors">
-                                {t("loadMore") || "Charger"}
-                            </span>
-                        </button>
-                    </div>
-                )}
+            {visibleCount < displayItems.length && (
+                <div className="flex justify-center pt-8">
+                    <button
+                        onClick={handleLoadMore}
+                        className="group relative flex items-center gap-3 px-8 sm:px-10 py-3 rounded-xl border border-border hover:border-accent transition-all duration-300 bg-surface/50 hover:bg-surface-2 shadow-sm"
+                    >
+                        <span className="text-xs sm:b4 font-black uppercase tracking-widest text-muted group-hover:text-accent transition-colors">
+                            {t("loadMore") || "Tout voir"}
+                        </span>
+
+                    </button>
+                </div>
+            )}
         </section>
     );
 }

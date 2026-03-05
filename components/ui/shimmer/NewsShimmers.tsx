@@ -72,3 +72,79 @@ export function ReplaySectionShimmer() {
         </div>
     );
 }
+
+export function NewsDetailShimmer() {
+    return (
+        <div className="flex flex-col lg:flex-row justify-center items-start w-full gap-6 lg:gap-[38px] max-w-[1446px] mx-auto">
+            {/* Left Column (Main Article) */}
+            <div className="flex flex-col items-start w-full lg:w-[830px] lg:flex-shrink-0 bg-background sm:px-[34px] py-4 sm:py-[15px] pb-6 sm:pb-[39px] gap-4 sm:gap-6">
+                <div className="flex flex-col items-end w-full gap-6 sm:gap-[47px]">
+                    {/* Image Placeholder */}
+                    <Skeleton className="relative w-full aspect-video lg:aspect-[822/533] rounded-sm" />
+
+                    {/* Content Meta */}
+                    <div className="flex flex-col items-start w-full gap-2 sm:gap-[10px]">
+                        <Skeleton className="h-10 w-full rounded-md" />
+                        <Skeleton className="h-10 w-3/4 rounded-md" />
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-3 sm:gap-4 mt-4">
+                            <div className="flex gap-4">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-4 w-24" />
+                            </div>
+                            <div className="flex gap-2">
+                                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="w-8 h-8 rounded-md" />)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Body Text Blocks */}
+                <div className="w-full space-y-8 mt-8">
+                    <div className="space-y-3">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </div>
+                    <div className="space-y-3">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-4/6" />
+                    </div>
+
+                    {/* Fake Blockquote */}
+                    <div className="w-full max-w-[611px] mx-auto bg-accent/5 p-6 border-l-4 border-accent">
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+
+                    <div className="space-y-3">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Column (Sidebar) */}
+            <div className="flex flex-col items-start w-full lg:w-[578px] lg:flex-shrink-0 gap-8">
+                <div className="w-full border-b border-muted/10 pb-4">
+                    <Skeleton className="h-8 w-40" />
+                </div>
+                <div className="w-full space-y-6">
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="flex gap-4">
+                            <div className="flex-1 space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-3 w-24 mt-2" />
+                            </div>
+                            <Skeleton className="w-24 h-24 rounded-md flex-shrink-0" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -6,6 +6,7 @@ import { MediaCard } from "../ui/MediaCard";
 import { SectionTitle } from "../ui/SectionTitle";
 import { useReplayFetcher } from "../../hooks/useReplayFetcher";
 import { useTranslations } from "next-intl";
+import { getPostAuthor, formatDate } from "../../utils/text";
 
 interface DernieresEditionsCarouselProps {
     videos: SliderVideoItem[];
@@ -116,7 +117,7 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                 <div
                     ref={scrollerRef}
                     onScroll={handleScroll}
-                    className="flex gap-6 overflow-x-auto pb-10 px-4 md:px-[calc((100vw-1400px)/2+1rem)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scroll-smooth"
+                    className="flex gap-6 overflow-x-auto  px-4 md:px-[calc(max(0px,100%-1400px)/2+1rem)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scroll-smooth"
                     style={{
                         scrollSnapType: "x mandatory",
                     }}
@@ -124,25 +125,27 @@ export function DernieresEditionsCarousel({ videos: initialVideos, liveChannels 
                     {videos.map((video: SliderVideoItem, idx: number) => (
                         <div
                             key={`${video.slug}-${idx}`}
-                            className="shrink-0 w-[180px] sm:w-[320px] lg:w-[400px]"
+                            className="shrink-0 w-[180px] sm:w-[280px] lg:w-[340px]"
                             style={{ scrollSnapAlign: "start" }}
                         >
                             <MediaCard
-                                href={`/replay/${video.slug}`}
+                                href={`/replay/${video.slug || (video as any).id}`}
                                 title={video.title}
+
                                 target={false}
                                 imageSrc={video.logo_url}
-                                meta={`${video.date} • ${video.time || 'Replay'}`}
+                                //meta={formatDate(video.date)}
                                 aspect="16/9"
-                                showPlayIcon
+                               // showPlayIcon
                                 channelLogo={video.channel_logo}
+                                author={getPostAuthor(video)}
                             />
                         </div>
                     ))}
                 </div>
 
                 {/* Progress Bar Indicator: 20% width background, moving red bar */}
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-2">
                     <div className="w-1/5 min-w-[150px] h-[2px] bg-foreground/10 relative rounded-full overflow-hidden">
                         <div
                             className="absolute top-0 left-0 h-full bg-[color:var(--accent)] transition-all duration-150 rounded-full"

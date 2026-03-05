@@ -29,6 +29,12 @@ export function SafeImage({
     const [isLoading, setIsLoading] = React.useState(true);
     const [hasError, setHasError] = React.useState(false);
 
+    // Identify if we should bypass Next.js optimization for this domain
+    const isProblematicDomain = typeof src === 'string' && (
+        src.includes('actu.crtv.cm') ||
+        src.includes('rtsactu.acan.group')
+    );
+
     React.useEffect(() => {
         setImgSrc(src);
         setHasError(false);
@@ -70,12 +76,13 @@ export function SafeImage({
                 alt={alt || "CRTV Content"}
                 fill={fill}
                 priority={priority}
+                unoptimized={isProblematicDomain || (props as any).unoptimized}
                 className={[
                     className,
                     "transition-opacity duration-500 ease-out",
                     hasError ? "object-contain p-12 opacity-50" : "opacity-100"
                 ].join(" ")}
-                onLoadingComplete={handleLoadingComplete}
+                onLoad={handleLoadingComplete}
                 onError={handleError}
             />
         </div>

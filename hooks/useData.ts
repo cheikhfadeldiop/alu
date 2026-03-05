@@ -25,9 +25,10 @@ const FETCHER_MAP = {
     },
     wordpressCategories: api.getWordPressCategories,
     wordpressPost: (key: string) => {
-        const [, postId] = key.split(':');
-        return api.getWordPressPostById(postId);
-    }
+        const [, identifier] = key.split(':');
+        return api.getWordPressPost(identifier);
+    },
+    epgAll: api.getEPGAll
 };
 
 /**
@@ -51,7 +52,7 @@ export function useData<T>(
                 return await api.getWordPressPosts(key[1] as any, key[2] as any);
             }
             if (fetcherKey === 'wordpressPost' && Array.isArray(key)) {
-                return await api.getWordPressPostById(key[1] as any);
+                return await api.getWordPressPost(key[1] as any);
             }
             // Default: call fetcher with the full string key
             return await (fetcherFn as any)(swrKey);
@@ -105,6 +106,10 @@ export function useVODShows(fallbackData?: import("@/types/api").SliderVideosRes
 
 export function useWordPressCategories(fallbackData?: import("@/types/api").WordPressCategory[]) {
     return useData<import("@/types/api").WordPressCategory[]>("wordpressCategories", "static", fallbackData);
+}
+
+export function useEPGAll(fallbackData?: import("@/types/api").FullEPGChannel[]) {
+    return useData<import("@/types/api").FullEPGChannel[]>("epgAll", "dynamic", fallbackData);
 }
 
 /**

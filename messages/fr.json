@@ -4,6 +4,7 @@
     "news": "Info",
     "replay": "Vidéos",
     "radio": "Radio",
+    "audio": "Audio",
     "live": "Live",
     "corporate": "Corporate news",
     "contact": "Nous contacter"
@@ -204,7 +205,7 @@
       "intro": "Contactez notre équipe pour en savoir plus, partager votre projet ou explorer des opportunités de partenariat.",
       "address": "Adresse",
       "phone": "Téléphone",
-      "fax":"Fax",
+      "fax": "Fax",
       "formTitle": "Veuillez remplir les champs ci-dessous",
       "firstName": "Prénom",
       "lastName": "Nom de famille",

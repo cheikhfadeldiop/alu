@@ -120,13 +120,13 @@ export function CorporateNewsDetail({ article, relatedPosts, onBack }: Corporate
                     <div className="space-y-6">
                         {relatedPosts.slice(0, 5).map((post) => (
                             <Link
-                                key={post.id}
-                                href={`/corporate?id=${post.id}`}
+                                key={post.slug}
+                                href={`/corporate?slug=${post.slug || post.id}`}
                                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                                 className={`block p-6 rounded-2xl border transition-all duration-300 group
-                                ${post.id === article.id
+                                ${post.slug === article.slug
                                         ? "border-[color:var(--accent)] bg-[color:var(--accent)]/5"
-                                        : "border-muted/20 hover:border-[color:var(--accent)]/30 hover:bg-muted/5"}
+                                        : "border-neutral-300/30 hover:border-[color:var(--accent)]/30 hover:bg-muted/5"}
                                 `}
                             >
                                 <div className="text-[color:var(--accent)] text-[10px] font-black uppercase tracking-widest mb-2">

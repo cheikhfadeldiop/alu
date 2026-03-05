@@ -19,179 +19,208 @@ interface VirtualParent {
 }
 
 export function NewsTabs({ onFilterChange }: NewsTabsProps) {
-    // Categories fetched via SWR below
     const [activeGroupId, setActiveGroupId] = useState<string>(VIRTUAL_PARENTS[0].id);
     const [activeSubId, setActiveSubId] = useState<number | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [scrollProgress, setScrollProgress] = useState(0);
 
-    // Track scroll progress for the subtle indicator
-    const handleScroll = () => {
-        if (!scrollRef.current) return;
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        const totalScroll = scrollWidth - clientWidth;
-        if (totalScroll <= 0) {
-            setScrollProgress(0);
-            return;
-        }
-        setScrollProgress((scrollLeft / totalScroll) * 100);
-    };
-
-    // Helper to find which group a category belongs to
     const getGroupForCategory = (category: WordPressCategory): string => {
         const slug = (category.slug || "").toLowerCase();
         const name = (category.name || "").toLowerCase();
-
-        // 1. Check explicit matchIds (ID or Parent ID)
         for (const group of VIRTUAL_PARENTS) {
             if (group.matchIds.includes(category.id) || group.matchIds.includes(category.parent)) {
                 return group.id;
             }
         }
-
-        // 2. Check keywords in slug or name
         for (const group of VIRTUAL_PARENTS) {
             if (group.keywords.some(k => slug.includes(k) || name.includes(k))) {
                 return group.id;
             }
         }
-
-        // 3. Fallback to "a-la-une"
         return "a-la-une";
     };
 
-    // 1. Fetch Categories via SWR (Cached)
     const { data: rawCategories = [], isLoading } = useWordPressCategories();
 
-    // 2. Filter valid categories
     const categories = useMemo(() => {
         return rawCategories.filter(c =>
-            c.count > 0 &&
-            c._links &&
-            c._links["wp:post_type"]
+            c.count > 0 && c._links && c._links["wp:post_type"]
         );
     }, [rawCategories]);
 
     useEffect(() => {
-        // Only run initial setup when categories are loaded and valid
         if (categories.length > 0 && activeGroupId === VIRTUAL_PARENTS[0].id && !activeSubId) {
             const firstGroup = VIRTUAL_PARENTS[0];
             const members = categories.filter(c => getGroupForCategory(c) === firstGroup.id);
-
             if (members.length > 0) {
-                const firstId = members[0].id;
-                setActiveSubId(firstId);
+                setActiveSubId(members[0].id);
             }
-            // No need to call onFilterChange here as NewsPage defaults to A La Une
         }
     }, [categories, activeGroupId, activeSubId]);
 
     const currentSubCategories = useMemo(() => {
-        const group = VIRTUAL_PARENTS.find(g => g.id === activeGroupId);
-        if (!group) return [];
         return categories.filter(c => getGroupForCategory(c) === activeGroupId);
     }, [categories, activeGroupId]);
 
     const handleGroupClick = (group: VirtualParent) => {
         setActiveGroupId(group.id);
         const members = categories.filter(c => getGroupForCategory(c) === group.id);
-
         if (members.length > 0) {
-            const firstId = members[0].id;
-            const firstName = members[0].name;
-            setActiveSubId(firstId);
-            // Pass ONLY the specific category ID to ensure different content per tab
-            onFilterChange(`${firstId}`, firstName);
+            setActiveSubId(members[0].id);
+            onFilterChange(`${members[0].id}`, members[0].name);
         } else {
             setActiveSubId(null);
-            // Fallback to group roots if no subcategories exist
             onFilterChange(`${group.matchIds.join(",")}`, group.name);
         }
-
-        // Reset scroll position and progress when group changes
-        if (scrollRef.current) {
-            scrollRef.current.scrollLeft = 0;
-            setScrollProgress(0);
-        }
+        if (scrollRef.current) scrollRef.current.scrollLeft = 0;
     };
 
     const handleSubClick = (subId: number) => {
         const sub = categories.find(c => c.id === subId);
         setActiveSubId(subId);
-        // Pass ONLY the specific category ID for strict filtering
         onFilterChange(`${subId}`, sub?.name || "");
     };
-
 
     if (isLoading && categories.length === 0) return <TabsShimmer />;
 
     return (
-        <div className="w-full space-y-4 py-6">
-            {/* Row 1: Virtual Parent Groups */}
-            <div className="flex border-b border-gray-100 dark:border-muted/20 pb-0 overflow-x-auto no-scrollbar">
-                <div className="flex gap-8 min-w-max">
-                    {VIRTUAL_PARENTS.map((group) => (
-                        <button
-                            key={group.id}
-                            onClick={() => handleGroupClick(group)}
-                            className={`pb-3 text-2xl font-bold transition-all relative uppercase ${activeGroupId === group.id
-                                ? "text-foreground"
-                                : "text-gray-400 hover:text-foreground/30"
-                                }`}
-                        >
-                            {decodeHtmlEntities(group.name)}
-                            {activeGroupId === group.id && (
-                                <div className="absolute bottom-0 left-0 w-full h-1 bg-[color:var(--success)] rounded-t-full" />
-                            )}
-                        </button>
-                    ))}
+        // Container: flex col, justify-center, items-start, padding: 10px, gap-[10px]
+        // w-full, bg: #FFFFFF, border-radius: 10px
+        <div
+            className="flex flex-col justify-center items-start lg:items-center w-full max-w-[1440px] mx-auto min-h-[100px] sm:min-h-[151px] p-[10px_0] sm:p-[10px]"
+            style={{ gap: 10, borderRadius: 10 }}
+        >
+            {/* Frame 427318788: flex col, items-start, padding: 0 15px, gap: 1px */}
+            <div
+                className="flex flex-col items-start w-full"
+                style={{ padding: "0 15px", gap: 1 }}
+            >
+                <div
+                    className="flex flex-row items-center justify-start overflow-x-auto no-scrollbar w-full gap-5 sm:gap-[70px]"
+                    style={{ height: 43 }}
+                >
+                    {VIRTUAL_PARENTS.map((group) => {
+                        const isActive = activeGroupId === group.id;
+                        return (
+                            <button
+                                key={group.id}
+                                onClick={() => handleGroupClick(group)}
+                                className="flex flex-row justify-center items-center flex-shrink-0 transition-colors"
+                                style={{
+                                    height: 39,
+                                    borderBottom: isActive
+                                        ? "4px solid var(--success)"
+                                        : "4px solid transparent",
+                                    background: "none",
+                                    outline: "none",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                <span
+                                    className="flex items-center font-inter whitespace-nowrap uppercase text-base sm:text-[22px]"
+                                    style={{
+                                        fontWeight: 700,
+                                        lineHeight: "1.2",
+                                        color: isActive ? "#333333" : "#606060",
+                                    }}>
+                                    {decodeHtmlEntities(group.name)}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
-            </div>
 
-            {/* Row 2: Real WordPress Categories (Sub-tabs) with subtle scroll indicator */}
-            <div className="relative group">
                 <div
                     ref={scrollRef}
-                    onScroll={handleScroll}
-                    className="flex items-center gap-3 overflow-x-auto no-scrollbar py-3"
+                    className="flex flex-row items-center justify-start w-full overflow-x-auto no-scrollbar gap-2.5 sm:gap-[21px]"
+                    style={{
+                        height: 54,
+                        borderTop: "1px solid var(--border)",
+                    }}
                 >
-                    <div className="flex items-center gap-3 min-w-max">
-                        {currentSubCategories.map((tab, index) => (
-                            <div key={tab.id} className="flex items-center">
+                    {currentSubCategories.map((tab, index) => {
+                        const isActive = activeSubId === tab.id;
+                        const isLast = index === currentSubCategories.length - 1;
+                        return (
+                            <div key={tab.id} className="flex flex-row items-center flex-shrink-0 gap-2.5 sm:gap-[21px]">
                                 <button
                                     onClick={() => handleSubClick(tab.id)}
-                                    className={`text-[13px] font-bold tracking-wider transition-colors uppercase ${activeSubId === tab.id
-                                        ? "text-[color:var(--accent)]"
-                                        : "text-gray-500 hover:text-foreground"
-                                        }`}
+                                    className="flex flex-row justify-center items-center flex-shrink-0 transition-colors px-1 sm:px-2 w-auto min-w-[70px] sm:min-w-[110px]"
+                                    style={{
+                                        height: 28,
+                                        background: "none",
+                                        outline: "none",
+                                        cursor: "pointer",
+                                    }}
                                 >
-                                    {decodeHtmlEntities(tab.name)}
+                                    <span
+                                        className="b4 flex items-center justify-center text-center uppercase"
+                                        style={{
+                                            fontWeight: isActive ? 700 : 400,
+                                            fontSize: 12,
+                                            lineHeight: "18px",
+                                            letterSpacing: "-0.165px",
+                                            color: isActive ? "#F80000" : "#606060",
+                                            height: 18,
+                                        }}>
+                                        {decodeHtmlEntities(tab.name)}
+                                    </span>
                                 </button>
-                                {index < currentSubCategories.length - 1 && (
-                                    <span className="ml-3 text-[10px] text-gray-300">◆</span>
+
+                                {/* Diamant séparateur: 7×7px, #D2D2D2, rotate(-135deg) */}
+                                {!isLast && (
+                                    <div
+                                        className="flex-shrink-0"
+                                        style={{
+                                            width: 7,
+                                            height: 7,
+                                            background: "#D2D2D2",
+                                            transform: "rotate(-135deg)",
+                                        }}
+                                    />
                                 )}
                             </div>
-                        ))}
-                        {currentSubCategories.length === 0 && (
-                            <span className="text-[13px] font-bold text-gray-400 italic">
-                                Aucune sous-catégorie
-                            </span>
-                        )}
-                    </div>
-                </div>
+                        );
+                    })}
 
-                {/* Subtle Red Scroll Indicator Bar */}
-                {scrollRef.current && scrollRef.current.scrollWidth > scrollRef.current.clientWidth && (
-                    <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gray-100 dark:bg-muted/10 overflow-hidden">
+                    {/* "..." si trop de catégories */}
+                    {currentSubCategories.length > 7 && (
+                        // Frame 48096357: w-[56px], h-[28px]
                         <div
-                            className="h-full bg-[color:var(--accent)]/60 transition-all duration-150 ease-out rounded-full"
-                            style={{
-                                width: `${(scrollRef.current.clientWidth / scrollRef.current.scrollWidth) * 100}%`,
-                                transform: `translateX(${(scrollProgress * (scrollRef.current.clientWidth - (scrollRef.current.clientWidth / scrollRef.current.scrollWidth) * scrollRef.current.clientWidth)) / 100}px)`
-                            }}
-                        />
-                    </div>
-                )}
+                            className="flex flex-row justify-center items-center flex-shrink-0"
+                            style={{ width: 56, height: 28 }}
+                        >
+                            <span style={{
+                                fontFamily: "DM Sans",
+                                fontWeight: 400,
+                                fontSize: 12,
+                                lineHeight: "18px",
+                                letterSpacing: "-0.165px",
+                                textTransform: "uppercase",
+                                textAlign: "center",
+                                color: "#000000",
+                                width: 56,
+                                height: 18,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}>
+                                ...
+                            </span>
+                        </div>
+                    )}
+
+                    {currentSubCategories.length === 0 && (
+                        <span style={{
+                            fontFamily: "DM Sans",
+                            fontWeight: 400,
+                            fontSize: 12,
+                            color: "#606060",
+                        }}>
+                            Aucune sous-catégorie
+                        </span>
+                    )}
+
+                </div>
             </div>
         </div>
     );

@@ -35,7 +35,7 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
     const [scrollLeft, setScrollLeft] = useState(0);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const CARD_WIDTH = viewportWidth > 0 && viewportWidth < 640 ? 280 : 400;
+    const CARD_WIDTH = viewportWidth > 0 && viewportWidth < 640 ? 200 : 400;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -138,31 +138,39 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
     const brandLogo = currentChannelLogo || epgData[0]?.logo || SITE_CONFIG.theme.placeholders.logo;
 
     return (
-        <div className="w-full space-y-10 py-10 relative overflow-hidden">
+        <div className="w-full space-y-6 sm:space-y-10 py-6 sm:py-10 relative overflow-hidden">
             {/* Title Header */}
-            <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 pt-2">
-                <h2 className="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">{t("upNext")}</h2>
-                <div className="relative w-5 h-5 sm:w-6 sm:h-6">
+            <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-8 pt-2">
+                <h2 className="text-lg sm:text-2xl font-black tracking-tighter uppercase italic">{t("upNext")}</h2>
+                <div className="relative w-4 h-4 sm:w-6 sm:h-6">
                     <Image src={SITE_CONFIG.theme.placeholders.arrow} alt="" fill className="object-contain" />
                 </div>
             </div>
 
             {/* Main Timeline Component */}
-            <div className="flex px-4 items-stretch gap-1">
-                {/* Fixed Channel Logo Block */}
-                <div className="hidden sm:flex w-32 md:w-44 h-[120px] md:h-[135px] shrink-0 aspect-square items-end justify-center p-4 bg-foreground/10 backdrop-blur-md border border-white/5 relative z-30 self-end">
+            <div className="flex flex-col sm:flex-row px-4 sm:px-8 items-stretch gap-4 sm:gap-1">
+                {/* Channel Logo Block - Visible on desktop, adapted for mobile if needed */}
+                <div className="hidden lg:flex w-36 xl:w-44 h-[120px] md:h-[135px] shrink-0 aspect-square items-end justify-center p-4 bg-foreground/10 backdrop-blur-md border border-white/5 relative z-30 self-end rounded-l-2xl">
                     <div className="relative w-full h-full">
                         <SafeImage src={brandLogo} alt="Channel" fill className="object-contain" />
                     </div>
                 </div>
 
+                {/* Mobile Channel Badge */}
+                <div className="lg:hidden flex items-center gap-3 mb-2 px-2">
+                    <div className="relative w-10 h-10 shrink-0">
+                        <SafeImage src={brandLogo} alt="Channel" fill className="object-contain" />
+                    </div>
+                    <span className="text-xs font-bold text-foreground/60 uppercase tracking-widest">{epgData[0]?.titre}</span>
+                </div>
+
                 {/* Right Content Engine */}
                 <div className="flex-1 min-w-0 flex flex-col justify-end">
                     {/* Top Row: Navigation + Ticks */}
-                    <div className="flex items-center h-10 mb-1 relative">
+                    <div className="flex items-center h-10 mb-2 sm:mb-1 relative">
                         <button
                             onClick={() => scroll("left")}
-                            className="bg-foreground/5 p-1 rounded-lg border border-white/5 text-foreground/40 hover:text-[color:var(--accent)] transition-all transform active:scale-95 mr-2"
+                            className="bg-foreground/5 p-1.5 sm:p-1 rounded-lg border border-white/5 text-foreground/40 hover:text-[color:var(--accent)] transition-all transform active:scale-95 mr-2"
                         >
                             <ChevronLeftIcon />
                         </button>
@@ -175,12 +183,12 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
                                 {allPrograms.map((program, index) => (
                                     <div key={`ticks-${index}`} style={{ width: CARD_WIDTH }} className="flex-shrink-0 relative h-full flex items-end pb-1 pr-1">
                                         <div className="absolute left-1 bottom-0 ml-4 sm:ml-10 flex flex-col items-center">
-                                            <span className="text-[11px] sm:text-[13px] font-bold text-foreground">{program.startTime}</span>
-                                            <div className="w-px h-6 bg-foreground" />
+                                            <span className="text-[10px] sm:text-[13px] font-bold text-foreground opacity-60 sm:opacity-100">{program.startTime}</span>
+                                            <div className="w-px h-4 sm:h-6 bg-foreground/40 sm:bg-foreground" />
                                         </div>
-                                        <div className="absolute right-2 bottom-0 mr-10 sm:mr-20 flex flex-col items-center">
-                                            <span className="text-[11px] sm:text-[13px] font-bold text-foreground">{program.endTime}</span>
-                                            <div className="w-px h-6 bg-foreground" />
+                                        <div className="absolute right-2 bottom-0 mr-4 sm:mr-20 flex flex-col items-center">
+                                            <span className="text-[10px] sm:text-[13px] font-bold text-foreground opacity-60 sm:opacity-100">{program.endTime}</span>
+                                            <div className="w-px h-4 sm:h-6 bg-foreground/40 sm:bg-foreground" />
                                         </div>
                                     </div>
                                 ))}
@@ -189,7 +197,7 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
 
                         <button
                             onClick={() => scroll("right")}
-                            className="bg-foreground/5 p-1 rounded-lg border border-white/5 text-foreground/40 hover:text-[color:var(--accent)] transition-all transform active:scale-95 ml-2"
+                            className="bg-foreground/5 p-1.5 sm:p-1 rounded-lg border border-white/5 text-foreground/40 hover:text-[color:var(--accent)] transition-all transform active:scale-95 ml-2"
                         >
                             <ChevronRightIcon />
                         </button>
@@ -212,34 +220,39 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
                                         style={{ width: CARD_WIDTH }}
                                         className={`flex-shrink-0 p-4 sm:p-5 relative group flex items-center transition-all duration-300 border backdrop-blur-sm ${isLive
                                             ? 'bg-[color:var(--accent)]/10 border-[color:var(--accent)]/30 shadow-[0_0_40px_rgba(209,18,31,0.15)]'
-                                            : 'bg-foreground/10 border-white/5 hover:bg-[color:var(--accent)]/5'
-                                            }`}
+                                            : 'bg-foreground/5 border-white/5 hover:bg-[color:var(--accent)]/5'
+                                            } ${index === 0 && 'sm:rounded-tl-none'} last:rounded-r-2xl`}
                                     >
-                                        <div className="flex gap-4 sm:gap-6 w-full items-center">
-                                            <div className="relative w-24 sm:w-40 aspect-video shrink-0 bg-foreground/10 overflow-hidden shadow-xl border border-white/5">
+                                        <div className="flex gap-3 sm:gap-6 w-full items-center">
+                                            <div className="relative w-16 sm:w-32 xl:w-40 aspect-video shrink-0 bg-foreground/10 overflow-hidden shadow-xl border border-white/5 rounded-lg sm:rounded-none">
                                                 <SafeImage
                                                     src={program.logo || SITE_CONFIG.theme.placeholders.video}
                                                     alt=""
                                                     fill
-                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                                                 />
                                             </div>
 
                                             <div className="flex flex-col justify-center min-w-0">
-                                                <p className={`text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] mb-1 animate-pulse ${isLive ? 'text-red-500' : 'text-red-500'}`}>
-                                                    {isLive ? 'Actuellement' : 'À venir'}
-                                                </p>
-                                                <p className="text-[10px] sm:text-[12px] font-bold text-foreground/50 mb-0.5 sm:mb-1">
+                                                <div className="flex items-center gap-1.5 mb-1">
+                                                    {isLive && (
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                                                    )}
+                                                    <p className={`text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${isLive ? 'text-red-500' : 'text-foreground/40'}`}>
+                                                        {isLive ? 'En Direct' : 'À venir'}
+                                                    </p>
+                                                </div>
+                                                <p className="text-[10px] sm:text-[12px] font-medium text-foreground/50 mb-0.5 sm:mb-1">
                                                     {program.startTime} - {program.endTime}
                                                 </p>
-                                                <h3 className="text-[13px] sm:text-[16px] font-black text-foreground leading-tight line-clamp-2">
+                                                <h3 className="text-[12px] sm:text-[16px] font-black text-foreground leading-tight line-clamp-1 sm:line-clamp-2">
                                                     {program.title}
                                                 </h3>
                                             </div>
                                         </div>
 
                                         {isLive && (
-                                            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-foreground/5">
+                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-foreground/5">
                                                 <div
                                                     className="h-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-all duration-1000 ease-linear"
                                                     style={{ width: `${Math.min(100, Math.max(0, ((nowSec - program.startSec) / (program.endSec - program.startSec)) * 100))}%` }}
@@ -257,6 +270,14 @@ export function UpcomingProgramsTimeline({ epgData, currentChannelId, currentCha
             <style jsx>{`
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                @keyframes rpWave {
+                    0% { transform: scaleY(1); }
+                    100% { transform: scaleY(1.8); }
+                }
+                @keyframes rpPulseRing {
+                    0% { transform: scale(0.8); opacity: 0.5; }
+                    100% { transform: scale(2.4); opacity: 0; }
+                }
             `}</style>
         </div>
     );

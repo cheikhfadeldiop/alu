@@ -3,17 +3,18 @@
 import * as React from "react";
 import Image from "next/image";
 import Hls from "hls.js";
-import { LiveChannel } from "../../types/api";
+import { LiveChannel, EPGItem } from "../../types/api";
 import { ensureAbsoluteUrl } from "../../services/api";
 import { SafeImage } from "../ui/SafeImage";
-import { AdBannerV } from "../ui/AdBannerV";
+import { AdBannerV, AdBannerV2 } from "../ui/AdBannerV";
 import { ShareButton } from "../ui/ShareButton";
 
 interface LivePlayerSectionProps {
     channel: LiveChannel;
+    currentProgram?: EPGItem;
 }
 
-export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
+export function LivePlayerSection({ channel, currentProgram }: LivePlayerSectionProps) {
     const videoRef = React.useRef<HTMLVideoElement>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -37,9 +38,12 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
         let isAborted = false;
 
         const resolve = async () => {
-            setResolvedUrl(null);
-            setIsPlaying(false);
-            setIsResolving(true);
+            const nextUrl = channel.stream_url || "";
+            if (nextUrl !== resolvedUrl) {
+                setResolvedUrl(null);
+                setIsPlaying(false);
+                setIsResolving(true);
+            }
             setError(null);
 
             try {
@@ -89,6 +93,12 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
     React.useEffect(() => {
         const videoEl = videoRef.current;
         if (!videoEl || !resolvedUrl) return;
+
+        // If HLS is already initialized with this URL, don't re-init
+        if (hlsInstance && (hlsInstance as any).url === resolvedUrl) {
+            setIsResolving(false);
+            return;
+        }
 
         let hls: Hls;
 
@@ -142,8 +152,9 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
         initPlayer();
 
         return () => {
-            if (hls) hls.destroy();
-            setHlsInstance(null);
+            // Only destroy if we're actually changing URL or unmounting
+            // We'll handle cleanup manually if needed, or rely on Hls memory management
+            // For now, let's keep it simple to avoid memory leaks but allow continuity
         };
     }, [resolvedUrl]);
 
@@ -168,12 +179,16 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
         const onPlaying = () => setIsResolving(false);
         const onWaiting = () => setIsResolving(true);
         const onLoadStart = () => setIsResolving(true);
+        const onCanPlay = () => setIsResolving(false);
+        const onLoadedData = () => setIsResolving(false);
 
         v.addEventListener('play', onPlay);
         v.addEventListener('pause', onPause);
         v.addEventListener('playing', onPlaying);
         v.addEventListener('waiting', onWaiting);
         v.addEventListener('loadstart', onLoadStart);
+        v.addEventListener('canplay', onCanPlay);
+        v.addEventListener('loadeddata', onLoadedData);
 
         return () => {
             v.removeEventListener('play', onPlay);
@@ -181,6 +196,8 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
             v.removeEventListener('playing', onPlaying);
             v.removeEventListener('waiting', onWaiting);
             v.removeEventListener('loadstart', onLoadStart);
+            v.removeEventListener('canplay', onCanPlay);
+            v.removeEventListener('loadeddata', onLoadedData);
         };
     }, []);
 
@@ -248,12 +265,11 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8 justify-between">
+        <div className="flex flex-col xl:flex-row items-start justify-between w-full gap-8 xl:gap-[38px]">
 
-            <div ref={containerRef} className="w-full lg:w-[68%] ">
-                <div className="w-full overflow-hidden group/player rounded-sm bg-black shadow-2xl">
-                    <div className="relative aspect-video flex items-center justify-center bg-black overflow-hidden group/screen">
-
+            <div ref={containerRef} className="flex flex-col flex-1 w-full overflow-hidden">
+                <div className="w-full overflow-hidden group/player bg-black">
+                    <div className="relative flex items-center justify-center overflow-hidden group/screen aspect-video w-full bg-black">
                         {/* Video Canvas */}
                         <video
                             ref={videoRef}
@@ -296,141 +312,158 @@ export function LivePlayerSection({ channel }: LivePlayerSectionProps) {
                                 </div>
                             </button>
                         )}
-
-
                     </div>
 
                     {/* CONTROLS AREA */}
-                    <div className="h-20 sm:h-24 bg-[#0a0a0a]/80 backdrop-blur-md border-t border-white/5 flex flex-col justify-center px-4 sm:px-10 relative group/controls">
+                    <div className="backdrop-blur-md border-t border-white/5 flex flex-col justify-center relative group/controls px-4 sm:px-5"
+                        style={{ height: 80, background: "transparent" }}>
 
-                        {/* Minimal Progress Line for Live (Static) */}
+                        {/* Progress live bar */}
                         <div className="absolute -top-0.5 left-0 w-full h-1 bg-red-600/20">
                             <div className="h-full bg-red-600 w-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.5)]" />
                         </div>
 
-                        <div className="flex items-center justify-between w-full">
-                            {/* LEFT: Volume */}
-                            <div className="flex items-center gap-3 sm:gap-6 w-1/4 sm:w-1/3">
-                                <button onClick={toggleMute} className="text-white/40 hover:text-white transition-colors">
+                        {/* Controls row */}
+                        <div className="flex flex-row items-center justify-between w-full h-[28px]">
+
+                            {/* LEFT: volume controls */}
+                            <div className="flex flex-row items-center gap-3">
+                                <button onClick={toggleMute} className="p-0 border-none bg-none cursor-pointer">
                                     {isMuted || volume === 0 ? (
-                                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F7F7F4" strokeWidth="2" strokeLinecap="round">
+                                            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                                            <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
+                                        </svg>
                                     ) : (
-                                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F7F7F4" strokeWidth="2" strokeLinecap="round">
+                                            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                                            <path d="M15.54 8.46a5 5 0 010 7.07" />
+                                            <path d="M19.07 4.93a10 10 0 010 14.14" />
+                                        </svg>
                                     )}
                                 </button>
-                                <input
-                                    type="range"
-                                    min={0} max={1} step={0.05}
-                                    value={volume}
-                                    onChange={handleVolumeChange}
-                                    className="hidden sm:block w-24 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-red-600"
-                                />
+
+                                <div className="hidden sm:flex relative items-center w-[114px] h-[20px]">
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0 border-t-4 border-[#989896]" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-0 border-t-4 border-[#F7F7F4] transition-[width] duration-75"
+                                        style={{ width: `${volume * 114}px` }} />
+                                    <div className="absolute left-[112px] top-1/2 -translate-y-1/2 h-2.5 border-l-2 border-[#F7F7F4]" />
+                                    <input
+                                        type="range"
+                                        min={0} max={1} step={0.02}
+                                        value={volume}
+                                        onChange={handleVolumeChange}
+                                        className="absolute inset-0 w-full cursor-pointer opacity-0"
+                                    />
+                                </div>
                             </div>
 
-                            {/* CENTER: Play Button */}
-                            <div className="flex justify-center w-1/2 sm:w-1/3">
-                                <button onClick={togglePlay} className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:bg-red-600 hover:border-red-500 transition-all duration-300 shadow-2xl">
-                                    {isPlaying ? (
-                                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                                    ) : (
-                                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                                    )}
-                                </button>
-                            </div>
+                            {/* Play/Pause */}
+                            <button
+                                onClick={togglePlay}
+                                className="flex flex-row items-center justify-center p-0 border-none bg-none cursor-pointer mx-4"
+                            >
+                                {isPlaying ? (
+                                    <div className="flex flex-row items-center gap-[5px]">
+                                        <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
+                                        <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
+                                    </div>
+                                ) : (
+                                    <svg width="15" height="28" viewBox="0 0 15 28" fill="#F7F7F4">
+                                        <path d="M0 0L15 14L0 28V0Z" />
+                                    </svg>
+                                )}
+                            </button>
 
                             {/* RIGHT: Quality & Fullscreen */}
-                            <div className="flex items-center justify-end gap-3 sm:gap-6 w-1/4 sm:w-1/3">
+                            <div className="flex flex-row items-center gap-2 sm:gap-3">
+                                {/* Quality */}
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowQualityMenu(!showQualityMenu)}
-                                        className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest border px-2 sm:px-3 py-1 rounded-lg transition-all ${showQualityMenu ? 'bg-red-600 border-red-600 text-white' : 'text-white/40 border-white/10 hover:text-white hover:border-red-600'}`}
+                                        className="flex flex-row items-center justify-center h-[27px] bg-[#1F1E18] rounded-[5px] px-2 sm:px-3 gap-1 sm:gap-[5px] border-none cursor-pointer"
                                     >
-                                        {currentQuality === -1 ? 'Auto' : `${qualities.find(q => q.index === currentQuality)?.height}P`}
+                                        <span className="text-[12px] sm:text-[14px] leading-[21px] text-white font-[Roboto]">
+                                            {currentQuality === -1 ? 'Auto' : `${qualities.find(q => q.index === currentQuality)?.height}p`}
+                                        </span>
+                                        <svg width="10" height="6" viewBox="0 0 10 6" fill="#FFFFFF">
+                                            <path d="M0 0L5 6L10 0Z" />
+                                        </svg>
+                                        <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">HD</span>
                                     </button>
                                     {showQualityMenu && qualities.length > 0 && (
-                                        <div className="absolute bottom-full mb-4 right-0 w-32 sm:w-36 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+                                        <div className="absolute bottom-full mb-2 right-0 w-36 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
                                             <div className="p-2 space-y-1">
-                                                <button onClick={() => changeQuality(-1)} className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentQuality === -1 ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>Auto</button>
+                                                <button onClick={() => changeQuality(-1)}
+                                                    className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentQuality === -1 ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>
+                                                    Auto
+                                                </button>
                                                 {qualities.map(q => (
-                                                    <button key={q.index} onClick={() => changeQuality(q.index)} className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentQuality === q.index ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>{q.height}P</button>
+                                                    <button key={q.index} onClick={() => changeQuality(q.index)}
+                                                        className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentQuality === q.index ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>
+                                                        {q.height}p
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <button onClick={toggleFullscreen} className="text-white/40 hover:text-white transition-all transform hover:scale-110">
-                                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+
+                                <button onClick={toggleFullscreen} className="flex justify-center items-center w-[27px] h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M4 8V4H8M16 4H20V8M20 16V20H16M8 20H4V16" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Info Container */}
-                <div className="relative p-4 sm:p-6 md:p-8 backdrop-blur-3xl bg-secondary border border-white/5 overflow-hidden group/info">
-                    {/* Decoration Background */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+                <div className="flex flex-col justify-center items-center w-full bg-[#1C1C1C] p-6 sm:p-8">
+                    <div className="flex flex-col items-start w-full gap-5 lg:gap-[22px]">
+                        {/* Header row */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
+                            <div className="flex flex-row items-center gap-3">
+                                <div className="relative w-[80px] sm:w-[95px] h-[36px] sm:h-[42px] flex-shrink-0">
+                                    <SafeImage src={channel.hd_logo || channel.logo} alt={channel.title} fill className="object-contain" />
+                                </div>
+                                <div className="flex flex-row items-center gap-1 sm:gap-[3px]">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#F80000] flex-shrink-0 animate-pulse" />
+                                    <span className="b4 font-bold text-white uppercase leading-none">LIVE</span>
+                                    <svg width="12" height="24" viewBox="0 0 12 24" fill="none" className="shrink-0">
+                                        <path d="M3 8L9 12L3 16" stroke="#F80000" strokeWidth="1.5" strokeLinecap="round" />
+                                    </svg>
+                                    <h2 className="b1 font-bold text-white line-clamp-1">{channel.title}</h2>
+                                    <span className="hidden sm:inline b1 font-bold text-[#FF0000] ml-1">EN DIRECT</span>
+                                </div>
+                            </div>
 
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
-                        <div className="absolute top-0 right-0 p-0 sm:p-4 shrink-0 z-20">
                             <ShareButton
                                 title={channel.title}
                                 text={`Regardez ${channel.title} en direct sur CRTV Web`}
-                                className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center rounded-2xl bg-foreground/5 hover:bg-white/10 border border-white/5 transition-all duration-300 group/share"
-                                iconClassName="w-5 h-5 md:w-8 md:h-8 transition-transform group-hover/share:scale-110"
+                                className="flex justify-center items-center shrink-0"
+                                iconClassName="w-6 h-6"
                             />
                         </div>
 
-                        {/* Channel Logo */}
-                        <div className="relative w-24 h-16 sm:w-32 sm:h-24 rounded-2xl bg-black/5 p-4 border border-white/10 shadow-inner flex items-center justify-center overflow-hidden shrink-0">
-                            <SafeImage
-                                src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
-                                alt={channel.title}
-                                fill
-                                className="object-contain brightness-110 drop-shadow-md"
-                            />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 w-full text-center md:text-left space-y-4">
-                            {/* Header: Status + Title */}
-                            <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full w-fit">
-                                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]" />
-                                    <span className="text-[8px] font-bold uppercase tracking-widest">Live</span>
-                                </div>
-                                <h2 className="text-xl sm:text-2xl md:text-3xl font-black w-full uppercase tracking-tighter drop-shadow-sm pr-10 md:pr-0">
-                                    {channel.title}
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Description */}
-                    <div className="max-w-3xl pt-4 pb-8">
-                        <p className="text-sm md:text-base text-foreground/50 leading-relaxed font-medium">
+                        <p className="b2 text-[#8E8E8E] max-w-[800px] line-clamp-4 leading-relaxed">
                             {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
                         </p>
-                    </div>
 
-                    {/* Program Info (New addition matching image) */}
-                    <div className="pt-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border-t border-foreground/30">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] sm:text-xs font-bold text-red-500 uppercase tracking-widest">
-                                {"JOURNAL EN DIRECT"}
+                        <div className="flex flex-wrap items-center w-full gap-2 py-2">
+                            <span className="b3 font-bold text-[#FF0000] uppercase">
+                                {currentProgram?.program_title || "JOURNAL EN DIRECT"}
                             </span>
-                        </div>
-                        <div className="hidden md:block w-px h-4 bg-foreground/30" />
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[9px] sm:text-[10px] font-medium text-foreground/40 uppercase tracking-widest">PRÉSENTÉ DANS :</span>
-                            <span className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-wider">
-                                {channel.title || "JOURNAL EN DIRECT"}
+                            <span className="b3 font-bold text-[#8E8E8E]">| PRESENTE PAR :</span>
+                            <span className="b3 font-bold text-white/70 uppercase">
+                                {(currentProgram as any)?.presentateur || (currentProgram as any)?.presentateurs || channel.title}
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="w-full lg:w-[30%] sticky top-24 h-fit">
+
+            <div className="w-full xl:w-[434px] xl:sticky xl:top-24 h-fit flex justify-center">
                 <AdBannerV />
             </div>
         </div>

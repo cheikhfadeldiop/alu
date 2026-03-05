@@ -1,147 +1,383 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import * as React from "react";
-import { SectionTitle } from "../ui/SectionTitle";
-import { LiveChannel, EPGItem } from "../../types/api";
+import { Link } from "@/i18n/navigation";
+import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
 import { LiveCarousel } from "../shared/LiveCarousel";
 import { useTranslations } from "next-intl";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
 import { useLiveChannels, useEPGNow } from "@/hooks/useData";
+import { SectionTitle } from "../ui/SectionTitle";
+import { formatDate } from "@/utils/text";
 
 interface LiveChannelsGridProps {
     channels: LiveChannel[];
     epgItems: EPGItem[];
+    fullEpg?: FullEPGChannel[];
     title: string;
     title2: string;
     actionLabel: string;
 }
 
-export function LiveChannelsGrid({ channels: initialChannels, epgItems: initialEpg, title, title2, actionLabel }: LiveChannelsGridProps) {
+export function LiveChannelsGrid({
+    channels: initialChannels,
+    epgItems: initialEpg,
+    fullEpg = [],
+    title,
+    title2,
+    actionLabel,
+}: LiveChannelsGridProps) {
     const t = useTranslations("common");
+    const tf = useTranslations("footer.links");
+    const [activeTab, setActiveTab] = React.useState<"ALL" | "TV" | "RADIO">("ALL");
 
-    // Real-time status sync via Robust SWR Cache with fallback data for instant display
-    const { data: channelsRes } = useLiveChannels({ allitems: initialChannels } as any);
-    const { data: epgRes } = useEPGNow({ allitems: initialEpg } as any);
+    const filteredChannels = initialChannels.filter((channel) => {
+        if (activeTab === "ALL") return true;
+        return channel.type === activeTab;
+    });
 
-    const channels = channelsRes?.allitems || initialChannels;
-    const epgItems = epgRes?.allitems || initialEpg;
+    const epgItems = initialEpg;
 
-    if (!channels || channels.length === 0) return null;
+    if (!filteredChannels || filteredChannels.length === 0) return null;
 
     return (
-        <section className="">
-            <SectionTitle title={title} title2={title2} actionHref="/live" />
+        /**
+         * Layout : 2 colonnes côte-à-côte
+         *  ┌────────────┬──────────────────────────────────────────────┐
+         *  │ TITRE FIXE │  ◄ ─── CARTES EN SCROLL HORIZONTAL ─── ►    │
+         *  └────────────┴──────────────────────────────────────────────┘
+         */
+        <section className="flex flex-col lg:flex-row items-start lg:items-stretch gap-8 lg:gap-l">
 
-            <LiveCarousel>
-                {channels.map((channel, index) => {
-                    // Get current program for this channel from EPG
-                    const currentProgram = epgItems.find(
-                        (epg) => epg.channel_id === channel.id && epg.is_current
-                    );
+            {/* ── COL GAUCHE : titre fixe ── */}
+            <div
+                className="flex flex-col justify-between flex-shrink-0 w-full lg:w-[350px]"
+            >
+                <div className="flex flex-col gap-4">
+                    <SectionTitle title={title} title2={title2} actionHref="/live" />
 
-                    // Calculate progress percentage
-                    let progressPercentage = 0;
-                    if (currentProgram && currentProgram.start_time && currentProgram.end_time) {
-                        const now = new Date();
-                        const [startHour, startMinute] = currentProgram.start_time.split(":").map(Number);
-                        const [endHour, endMinute] = currentProgram.end_time.split(":").map(Number);
-                        const startDate = new Date(); startDate.setHours(startHour, startMinute, 0, 0);
-                        const endDate = new Date(); endDate.setHours(endHour, endMinute, 0, 0);
-                        if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
-                        const totalDuration = endDate.getTime() - startDate.getTime();
-                        const elapsed = now.getTime() - startDate.getTime();
-                        if (totalDuration > 0) {
-                            progressPercentage = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                    {/* ── TABS ── */}
+                    <div className="flex flex-row items-center gap-3 overflow-x-auto no-scrollbar pb-2">
+                        {(["ALL", "TV", "RADIO"] as const).map((tab) => {
+                            const isActive = activeTab === tab;
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`h-8 px-4 rounded-full transition-all duration-300 text-lg font-bold border whitespace-nowrap ${isActive
+                                        ? "border-accent text-accent bg-accent/5 shadow-sm"
+                                        : "border-transparent text-muted hover:text-foreground hover:bg-surface-2"
+                                        }`}
+                                >
+                                    {tab === "ALL" ? t("all") : tab === "TV" ? tf("tv") : tf("radio")}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── COL DROITE : carousel scrollable ── */}
+            <div className="w-full min-w-0">
+                <LiveCarousel>
+                    {filteredChannels.map((channel, index) => {
+                        // Calcul progression EPG
+                        const currentProgram = epgItems.find(
+                            (epg) => epg.channel_id === channel.id && epg.is_current
+                        );
+
+                        // Find detailed program from fullEpg if available
+                        const channelFullEpg = fullEpg.find(ch => ch.id === channel.id);
+                        let progDetails = null;
+
+                        if (channelFullEpg) {
+                            const now = new Date();
+                            const nowSec = now.getHours() * 3600 + now.getMinutes() * 60;
+                            const { matin = [], soir = [] } = channelFullEpg.subitems || {};
+                            const combined = [...matin, ...soir];
+
+                            progDetails = combined.find(prog => {
+                                const [sH, sM] = prog.startTime.split(':').map(Number);
+                                const [eH, eM] = prog.endTime.split(':').map(Number);
+                                const startSec = sH * 3600 + sM * 60;
+                                let endSec = eH * 3600 + eM * 60;
+                                if (endSec < startSec) endSec += 24 * 3600;
+                                return nowSec >= startSec && nowSec < endSec;
+                            });
                         }
-                    } else {
-                        const safeId = channel.id ? String(channel.id) : "unknown";
-                        const seed = safeId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                        progressPercentage = 15 + (seed % 75);
-                    }
 
-                    return (
-                        <Link
-                            key={index}
-                            href={`/live?channel=${channel.slug}`}
-                            className="group relative flex flex-col w-[220px] sm:w-[270px] h-[180px] sm:h-[220px] 
-                                overflow-hidden rounded-xl border border-white/5
-                                text-left transition-all duration-300 
-                                hover:scale-[1.02]"
-                        >
-                            <div className="relative h-[65%] w-full
-                            ">
-                                <SafeImage
-                                    src={channel.logo_url || channel.logo || SITE_CONFIG.theme.placeholders.video}
-                                    alt={channel.title}
-                                    fill
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                    className="object-cover opacity-60"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+                        let progressPercentage = 0;
+                        const channelLogo = channel.logo_url || channel.logo || (channel as any).hd_logo || (channel as any).sd_logo;
+                        const effectiveProgramTitle = progDetails?.title || currentProgram?.program_title || channel.title;
+                        const effectiveProgramLogo = progDetails?.logo || channelLogo;
+                        const startTime = progDetails?.startTime || currentProgram?.start_time;
+                        const endTime = progDetails?.endTime || currentProgram?.end_time;
 
-                                <div className="absolute top-3 right-3">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-sm text-black text-xs shadow-lg">
-                                        <span className="w-2 h-2 bg-[color:var(--accent)] rounded-full animate-pulse" />
-                                        {t("direct")}
-                                    </span>
-                                </div>
+                        if (startTime && endTime) {
+                            const now = new Date();
+                            const [startHour, startMinute] = startTime.split(":").map(Number);
+                            const [endHour, endMinute] = endTime.split(":").map(Number);
+                            const startDate = new Date();
+                            startDate.setHours(startHour, startMinute, 0, 0);
+                            const endDate = new Date();
+                            endDate.setHours(endHour, endMinute, 0, 0);
+                            if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
+                            const totalDuration = endDate.getTime() - startDate.getTime();
+                            const elapsed = now.getTime() - startDate.getTime();
+                            if (totalDuration > 0) {
+                                progressPercentage = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                            }
+                        } else {
+                            const safeId = channel.id ? String(channel.id) : "unknown";
+                            const seed = safeId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                            progressPercentage = 15 + (seed % 75);
+                        }
 
-                                <div className="absolute bottom-3 right-3">
-                                    <div className="w-20 h-12 p-1">
-                                        <SafeImage
-                                            src={channel.logo_url || channel.logo}
-                                            alt={channel.title}
-                                            fill
-                                            className="object-contain w-full h-full"
-                                        />
+                        const dateLabel =
+                            startTime ? `${startTime} - ${endTime || ''}` :
+                                formatDate(Date.now());
+                        const timeLabel =
+                            startTime && endTime ? `${startTime} - ${endTime}` :
+                                (startTime ?? new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+
+                        return (
+                            <Link
+                                key={index}
+                                href={channel.type === 'RADIO' ? `/radio?channel=${channel.slug}` : `/live?channel=${channel.slug}`}
+                                className="group flex flex-col flex-shrink-0 hover:opacity-90 transition-opacity"
+                                style={{ width: 260, height: 240, gap: 13, borderRadius: 10 }}
+                            >
+                                {/* ── THUMBNAIL 260 × 157 ── */}
+                                <div
+                                    className="relative flex-shrink-0 overflow-hidden"
+                                    style={{ width: 260, height: 157, borderRadius: 10 }}
+                                >
+                                    {/* Image de fond */}
+                                    <SafeImage
+                                        src={
+                                            effectiveProgramLogo ||
+                                            SITE_CONFIG.theme.placeholders.video
+                                        }
+                                        alt={effectiveProgramTitle}
+                                        fill
+                                        sizes="260px"
+                                        className="object-cover"
+                                    />
+
+                                    {/* Dégradé transparent → noir */}
+                                    <div
+                                        className="absolute inset-0"
+                                        style={{
+                                            background:
+                                                "linear-gradient(180deg, rgba(0,0,0,0) 22%, rgba(0,0,0,0.8) 92%)",
+                                            borderRadius: 10,
+                                        }}
+                                    />
+
+                                    {/* TOP : icône TV gauche · badge LIVE droite */}
+                                    <div
+                                        className="absolute flex flex-row items-center justify-between"
+                                        style={{ left: 8, right: 8, top: 9, height: 28 }}
+                                    >
+                                        {/* Icône TV */}
+
+
+                                        {/* Badge LIVE */}
+                                        <div
+                                            className="flex items-center justify-center"
+                                            style={{
+                                                width: 72,
+                                                height: 26,
+                                                background: "rgba(255,255,255,0.92)",
+                                                borderRadius: 50,
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <div className="flex flex-row items-center" style={{ gap: 4 }}>
+                                                <div
+                                                    className="relative"
+                                                    style={{ width: 14, height: 14, flexShrink: 0 }}
+                                                >
+                                                    <div
+                                                        className="absolute inset-0 rounded-full"
+                                                        style={{ background: "rgba(255,0,63,0.12)" }}
+                                                    />
+                                                    <div
+                                                        className="absolute rounded-full animate-pulse"
+                                                        style={{
+                                                            width: 7,
+                                                            height: 7,
+                                                            top: 3.5,
+                                                            left: 3.5,
+                                                            background: "#FF003F",
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span
+                                                    style={{
+                                                        fontFamily: "'Plus Jakarta Sans', Roboto, sans-serif",
+                                                        fontWeight: 500,
+                                                        fontSize: 12,
+                                                        lineHeight: "18px",
+                                                        color: "#3A3A3A",
+                                                    }}
+                                                >
+                                                    {t("direct")}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="absolute bottom-3 left-3">
-                                    <div className="w-8 h-8 relative drop-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity">
+                                    {/* Logo chaîne — bas droite */}
+                                    <div
+                                        className="absolute"
+                                        style={{ bottom: 8, right: 8, width: 44, height: 42 }}
+                                    >
                                         <SafeImage
-                                            src={SITE_CONFIG.theme.placeholders.video}
-                                            alt="Live TV"
+                                            src={channelLogo}
+                                            alt={channel.title}
                                             fill
                                             className="object-contain"
                                         />
                                     </div>
-                                </div>
-                            </div>
-                            <div className="h-[35%] w-full backdrop-blur-sm px-3 py-2 flex flex-col justify-between">
-                                <div className="flex items-center gap-2">
-                                    <h3 className="font-bold text-sm line-clamp-1 flex-shrink min-w-0">
-                                        {channel.title}
-                                    </h3>
-                                    <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden min-w-[40px]">
-                                        <div
-                                            className="h-full bg-[color:var(--accent)] rounded-full transition-all"
-                                            style={{ width: `${progressPercentage}%` }}
+                                    <div
+                                        className="absolute"
+                                        style={{ bottom: 8, left: 8, width: 28, height: 28 }}
+                                    >
+                                        <SafeImage
+                                            src={channel.type === 'RADIO' ? SITE_CONFIG.theme.placeholders.radio : SITE_CONFIG.theme.placeholders.video}
+                                            alt={channel.type}
+                                            fill
+                                            className="object-contain opacity-80"
                                         />
                                     </div>
                                 </div>
+                                {/* ── fin thumbnail ── */}
 
-                                <div className="flex items-center gap-2 text-[10px] dark:text-gray-400  ">
-                                    {/* Calendar Icon */}
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.start_time ?? new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', })}</span>
-                                    <span className="text-gray-400 dark:text-white/90  text-xs">-</span>
-                                    {/* Clock Icon */}
-                                    <svg className="w-5 h-5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span className="text-gray-500 text-sm">{currentProgram?.end_time || new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                {/* ── INFO SECTION ── */}
+                                <div
+                                    className="flex flex-col"
+                                    style={{ paddingLeft: 4, gap: 6, width: 260 }}
+                                >
+                                    {/* Ligne 1 : nom chaîne + barre de progression */}
+                                    <div
+                                        className="flex flex-row items-center"
+                                        style={{ gap: 8, width: 252, height: 24 }}
+                                    >
+                                        <h3
+                                            className="line-clamp-1 flex-shrink-0"
+                                            style={{
+                                                fontFamily: "var(--font-display)",
+                                                fontWeight: 600,
+                                                fontSize: 13,
+                                                lineHeight: "20px",
+                                                color: "var(--foreground)",
+                                                maxWidth: 145,
+                                            }}
+                                        >
+                                            {effectiveProgramTitle}
+                                        </h3>
+
+                                        {/* Barre de progression */}
+                                        <div className="relative flex-1" style={{ height: 5 }}>
+                                            <div
+                                                className="absolute inset-0 rounded-full"
+                                                style={{ background: "var(--token-colors-neutral-300)" }}
+                                            />
+                                            <div
+                                                className="absolute top-0 left-0 h-full rounded-full transition-all duration-300"
+                                                style={{
+                                                    width: `${progressPercentage}%`,
+                                                    background: "var(--accent)",
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Ligne 2 : date · tiret · heure */}
+                                    <div
+                                        className="flex flex-row items-center justify-between"
+                                        style={{ gap: 6, height: 18 }}
+                                    >
+                                        {/* 📅 Icône calendrier */}
+                                        <svg
+                                            width={14}
+                                            height={14}
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            style={{ flexShrink: 0 }}
+                                        >
+                                            <rect x={2} y={2.5} width={12} height={12} rx={1.5} stroke="#888" strokeWidth={1} />
+                                            <line x1={5} y1={1} x2={5} y2={4} stroke="#888" strokeWidth={1} />
+                                            <line x1={11} y1={1} x2={11} y2={4} stroke="#888" strokeWidth={1} />
+                                            <line x1={2} y1={6.5} x2={14} y2={6.5} stroke="#888" strokeWidth={1} />
+                                            <rect x={5} y={9} width={2} height={2} rx={0.5} fill="#888" />
+                                            <rect x={9} y={9} width={2} height={2} rx={0.5} fill="#888" />
+                                        </svg>
+
+                                        {/* Date */}
+                                        <span
+                                            style={{
+                                                fontFamily: "'Plus Jakarta Sans', Inter, sans-serif",
+                                                fontWeight: 400,
+                                                fontSize: 11,
+                                                lineHeight: "17px",
+                                                color: "#888",
+                                                whiteSpace: "nowrap",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                maxWidth: 120,
+                                            }}
+                                        >
+                                            {startTime && endTime ? `${startTime} - ${endTime}` : dateLabel}
+                                        </span>
+
+                                        {/* Tiret */}
+                                        <svg width={12} height={12} viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                                            <line x1={1} y1={6} x2={11} y2={6} stroke="#8E8E8E" strokeWidth={1.5} />
+                                        </svg>
+
+                                        {/* 🕐 Icône horloge */}
+                                        <svg
+                                            width={14}
+                                            height={14}
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            style={{ flexShrink: 0 }}
+                                        >
+                                            <circle cx={8} cy={8} r={7} stroke="#888" strokeWidth={1} />
+                                            <polyline
+                                                points="8,4 8,8 11,10"
+                                                stroke="#888"
+                                                strokeWidth={1}
+                                                strokeLinecap="round"
+                                            />
+                                        </svg>
+
+                                        {/* Heure */}
+                                        <span
+                                            style={{
+                                                fontFamily: "'Plus Jakarta Sans', Inter, sans-serif",
+                                                fontWeight: 400,
+                                                fontSize: 11,
+                                                lineHeight: "17px",
+                                                color: "#888",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {timeLabel}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
-                    );
-                })}
-            </LiveCarousel>
+                                {/* ── fin info section ── */}
+
+                            </Link>
+                        );
+                    })}
+                </LiveCarousel>
+            </div>
+
         </section>
     );
 }

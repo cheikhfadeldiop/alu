@@ -1,11 +1,10 @@
 import { WordPressCategoryColumn } from "./WordPressCategoryColumn";
+import { useTranslations } from "next-intl";
 
 interface RegionalCategoriesSectionProps {
     radioItems: any[];
     replayItems: any[];
 }
-
-import { useTranslations } from "next-intl";
 
 export function RegionalCategoriesSection({
     radioItems,
@@ -14,21 +13,32 @@ export function RegionalCategoriesSection({
     const t = useTranslations("pages.home");
 
     return (
-        <section className="py-2 md:py-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        // Section: flex row, gap-[50px], w-full
+        // (pattern Frame 427318772: flex row, items-start, gap-[50px])
+        <section
+            className="flex flex-col lg:flex-row items-start w-full gap-8 lg:gap-[50px]"
+        >
+            {/* Colonne Audio/Radio: flex col, gap-[20px], flex-1 */}
+            <div className="flex-1 min-w-0">
                 <WordPressCategoryColumn
                     title={t("journalsRadio")}
-                    title2=''
+                    title2=""
                     items={radioItems}
-                    categorySlug="radio"
-                    type="radio"
+                    categorySlug="audio"
+                    type="audio"
+                    figmaLayout
                 />
+            </div>
+
+            {/* Colonne TV: flex col, gap-[20px], flex-1 */}
+            <div className="flex-1 min-w-0">
                 <WordPressCategoryColumn
                     title={t("journalsTV")}
-                    title2=''
+                    title2=""
                     items={replayItems}
                     categorySlug="replays"
                     type="tv"
+                    figmaLayout
                 />
             </div>
         </section>

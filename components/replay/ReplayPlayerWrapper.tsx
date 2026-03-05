@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useParams } from "next/navigation";
-import { SliderVideoItem, findReplayBySlug } from "../../services/api";
+import { SliderVideoItem, findReplay } from "../../services/api";
 import { ReplayPlayer } from "./ReplayPlayer";
 import { useTranslations } from "next-intl";
 import { SITE_CONFIG } from "@/constants/site-config";
@@ -39,7 +39,7 @@ export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapper
                 }, 45000);
 
                 try {
-                    const found = await findReplayBySlug(slug);
+                    const found = await findReplay(slug);
                     if (found) {
                         clearTimeout(timer);
                         setVideo(found);

@@ -4,7 +4,7 @@ import * as React from "react";
 import { WordPressPost } from "../../types/api";
 import { SectionTitle } from "../ui/SectionTitle";
 import { useTranslations } from "next-intl";
-import { getWordPressLatestPosts, getWordPressPostById } from "../../services/api";
+import { getWordPressLatestPosts, getWordPressPost } from "../../services/api";
 import { AdBanner } from "../ui/AdBanner";
 import { Link } from "@/i18n/navigation";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
     const searchParams = useSearchParams();
     const router = useRouter();
     const idParam = searchParams.get("id");
+    const slugParam = searchParams.get("slug");
 
     const [posts, setPosts] = React.useState<WordPressPost[]>(initialPosts);
     const [page, setPage] = React.useState(1);
@@ -29,14 +30,16 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
     const [selectedArticle, setSelectedArticle] = React.useState<WordPressPost | null>(null);
     const [isArticleLoading, setIsArticleLoading] = React.useState(false);
 
-    // Initial load of article from ID
+    const articleIdentifier = slugParam || idParam;
+
+    // Initial load of article from identifier (ID or Slug)
     React.useEffect(() => {
-        const fetchArticle = async (id: string) => {
+        const fetchArticle = async (identifier: string) => {
             setIsArticleLoading(true);
             try {
-                const article = await getWordPressPostById(id);
+                // Use the new robust getWordPressPost function
+                const article = await getWordPressPost(identifier);
                 setSelectedArticle(article);
-                window.scrollTo({ top: 0, behavior: "smooth" });
             } catch (error) {
                 console.error("Failed to fetch corporate article:", error);
             } finally {
@@ -44,12 +47,12 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
             }
         };
 
-        if (idParam) {
-            fetchArticle(idParam);
+        if (articleIdentifier) {
+            fetchArticle(articleIdentifier);
         } else {
             setSelectedArticle(null);
         }
-    }, [idParam]);
+    }, [articleIdentifier]);
 
     const handleLoadMore = async () => {
         if (isLoading || !hasMore) return;
@@ -78,13 +81,11 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
         router.push("/corporate", { scroll: false });
     };
 
-    if (isArticleLoading && !selectedArticle) {
-        return <CorporatePageShimmer />;
-    }
+    const mainLoading = isArticleLoading && !selectedArticle;
 
     if (selectedArticle) {
         return (
-            <div className={`max-w-[1400px] mx-auto px-4 py-8 md:py-12 transition-opacity duration-300 ${isArticleLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`py-xxl md:py-4xl transition-opacity duration-300 ${isArticleLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                 <CorporateNewsDetail
                     article={selectedArticle}
                     relatedPosts={initialPosts}
@@ -95,65 +96,77 @@ export function CorporateNewsPageClient({ initialPosts }: CorporateNewsPageClien
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 space-y-8 md:space-y-12">
-            {/* Ad Banner - Top */}
+        <div className="py-xxl md:py-4xl space-y-xxl md:space-y-4xl">
+            {/* Ad Banner - Top (Always Visible) */}
             <div className="w-full">
                 <AdBanner />
             </div>
 
-            <div className=" space-y-8">
-                <SectionTitle
-                    title={tNav("corporate") || "Corporate news"}
-                    title2=""
-                    actionIcon={false}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {posts.map((post) => (
-                        <Link
-                            key={post.id}
-                            href={`/corporate?id=${post.id}`}
-                            className="group backdrop-blur-sm bg-background/30 border border-gray-100 dark:border-muted/30 rounded-2xl p-8 flex flex-col h-full hover:shadow-xl hover:border-[color:var(--accent)]/20 transition-all duration-300"
-                        >
-                            {/* Communiqué Label */}
-                            <div className="text-[color:var(--accent)] text-xs font-black uppercase tracking-widest mb-4">
-                                {t("pressRelease")}
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-lg font-bold leading-tight mb-4 group-hover:text-[color:var(--accent)] transition-colors line-clamp-3">
-                                {post.title.rendered}
-                            </h3>
-
-                            {/* Excerpt */}
-                            <div
-                                className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow"
-                                dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
-                            />
-
-                            {/* Link */}
-                            <div className="mt-auto flex items-center gap-2 text-sm font-bold text-foreground group-hover:gap-3 transition-all">
-                                <span>{t("readRelease")}</span>
-                                <span className="text-[color:var(--accent)]">→</span>
-                            </div>
-                        </Link>
-                    ))}
+            {mainLoading ? (
+                <CorporatePageShimmer />
+            ) : selectedArticle ? (
+                <div className={`transition-opacity duration-300 ${isArticleLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                    <CorporateNewsDetail
+                        article={selectedArticle}
+                        relatedPosts={posts}
+                        onBack={handleBack}
+                    />
                 </div>
+            ) : (
+                <div className="space-y-8">
+                    <SectionTitle
+                        title={tNav("corporate") || "Corporate news"}
+                        title2=""
+                        actionIcon={false}
+                    />
 
-                {hasMore && (
-                    <div className="flex justify-center pt-8">
-                        <button
-                            onClick={handleLoadMore}
-                            disabled={isLoading}
-                            className="group relative flex items-center justify-center px-10 py-3 rounded-full border border-foreground/30 hover:border-[color:var(--accent)] transition-all duration-300 disabled:opacity-50"
-                        >
-                            <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
-                                {isLoading ? t("loading") : "Charger +"}
-                            </span>
-                        </button>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-l lg:gap-2xl">
+                        {posts.map((post) => (
+                            <Link
+                                key={post.slug}
+                                href={`/corporate?slug=${post.slug}`}
+                                className="group backdrop-blur-sm bg-background/30 border border-muted/10  rounded-2xl p-l sm:p-xxl flex flex-col h-full hover:shadow-xl hover:border-[color:var(--accent)]/20 transition-all duration-300"
+                            >
+                                {/* Communiqué Label */}
+                                <div className="text-[color:var(--accent)] text-[9px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-4">
+                                    {t("pressRelease")}
+                                </div>
+
+                                {/* Title */}
+                                <h3 className="text-sm sm:text-lg font-bold leading-tight mb-2 sm:mb-4 group-hover:text-[color:var(--accent)] transition-colors line-clamp-3">
+                                    {post.title.rendered}
+                                </h3>
+
+                                {/* Excerpt */}
+                                <div
+                                    className="text-muted  text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 line-clamp-2 md:line-clamp-3 flex-grow"
+                                    dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
+                                />
+
+                                {/* Link */}
+                                <div className="mt-auto flex items-center gap-2 text-[10px] sm:text-sm font-bold text-foreground group-hover:gap-3 transition-all">
+                                    <span>{t("readRelease")}</span>
+                                    <span className="text-[color:var(--accent)]">→</span>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
-                )}
-            </div>
+
+                    {hasMore && (
+                        <div className="flex justify-center pt-xxl">
+                            <button
+                                onClick={handleLoadMore}
+                                disabled={isLoading}
+                                className="group relative flex items-center justify-center px-10 py-3 rounded-full border border-foreground/30 hover:border-[color:var(--accent)] transition-all duration-300 disabled:opacity-50"
+                            >
+                                <span className="text-sm font-bold uppercase tracking-[0.2em] group-hover:text-[color:var(--accent)] transition-colors">
+                                    {isLoading ? t("loading") : "Charger +"}
+                                </span>
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

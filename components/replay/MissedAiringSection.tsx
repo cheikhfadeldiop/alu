@@ -8,6 +8,7 @@ import { SectionTitle } from "../ui/SectionTitle";
 import { useReplayFetcher } from "../../hooks/useReplayFetcher";
 import { useTranslations } from "next-intl";
 import { SafeImage } from "../ui/SafeImage";
+import { getPostAuthor, formatDate } from "@/utils/text";
 
 interface MissedAiringSectionProps {
     initialVideos: SliderVideoItem[];
@@ -63,25 +64,32 @@ export function MissedAiringSection({ initialVideos, liveChannels = [] }: Missed
     if (blocks.length === 0) return null;
 
     return (
-        <section className=" w-full max-w-[1400px] mx-auto px-4 ">
-            <SectionTitle title={t("missed")} title2={t("onAir")} actionIcon={true} />
-            <div className="space-y-16">
+        <section className="w-full mx-auto px-4">
+            {/* SectionTitle untouched — as instructed */}
+            <SectionTitle title={t("missed") + "  " + t("onAir")} title2="" actionIcon={true} className="font-bold" />
+
+            <div className="space-y-16 pt-8">
                 {blocks.map((block, blockIdx) => (
-                    <div key={blockIdx} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {block.type === "A" ? (
-                            <>
-                                <div className="lg:col-span-2">{block.videos[0] && <BigCard video={block.videos[0]} />}</div>
-                                <div>{block.videos[1] && <SmallCard video={block.videos[1]} />}</div>
-                                <div>{block.videos[2] && <SmallCard video={block.videos[2]} />}</div>
-                            </>
-                        ) : (
-                            <>
-                                <div>{block.videos[1] && <SmallCard video={block.videos[1]} />}</div>
-                                <div>{block.videos[2] && <SmallCard video={block.videos[2]} />}</div>
-                                <div className="lg:col-span-2">{block.videos[0] && <BigCard video={block.videos[0]} />}</div>
-                            </>
-                        )}
-                        <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div key={blockIdx} className="space-y-8">
+                        {/* ── Row 1: BigCard + 2 SmallCards (Figma: 699px + 340px + 340px) ── */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] gap-5">
+                            {block.type === "A" ? (
+                                <>
+                                    {block.videos[0] && <BigCard video={block.videos[0]} />}
+                                    {block.videos[1] && <SmallCard video={block.videos[1]} />}
+                                    {block.videos[2] && <SmallCard video={block.videos[2]} />}
+                                </>
+                            ) : (
+                                <>
+                                    {block.videos[1] && <SmallCard video={block.videos[1]} />}
+                                    {block.videos[2] && <SmallCard video={block.videos[2]} />}
+                                    {block.videos[0] && <BigCard video={block.videos[0]} />}
+                                </>
+                            )}
+                        </div>
+
+                        {/* ── Row 2: 4 SmallCards (Figma: 4 × 340px) ── */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                             {block.videos.slice(3, 7).map((video, idx) => (
                                 <SmallCard key={idx} video={video} />
                             ))}
@@ -91,9 +99,15 @@ export function MissedAiringSection({ initialVideos, liveChannels = [] }: Missed
             </div>
 
             {(replays.length > shownCount || hasMore) && (
-                <div className="flex justify-center pt-10">
-                    <button onClick={onTriggerLoadMore} disabled={loading} className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50">
-                        <span className="text-sm font-bold uppercase tracking-[0.2em] ">{loading ? t("loading") : t("loadMore")}</span>
+                <div className="flex justify-center pt-16">
+                    <button
+                        onClick={onTriggerLoadMore}
+                        disabled={loading}
+                        className="group relative flex items-center gap-1 px-10 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-red-600 transition-all duration-300 bg-background/30 backdrop-blur-md shadow-sm hover:shadow-md disabled:opacity-50"
+                    >
+                        <span className="text-sm font-bold uppercase tracking-[0.2em]">
+                            {loading ? t("loading") : t("loadMore")}
+                        </span>
                     </button>
                 </div>
             )}
@@ -101,54 +115,203 @@ export function MissedAiringSection({ initialVideos, liveChannels = [] }: Missed
     );
 }
 
+/* ══════════════════════════════════════════════════
+   BigCard — Figma: 699×393, gradient bottom, play-circle-02 + title + meta
+══════════════════════════════════════════════════ */
 function BigCard({ video }: { video: SliderVideoItem }) {
-    const channelLogo = video.channel_logo;
     return (
-        <Link href={`/replay/${video.slug}`} className="group relative block aspect-video overflow-hidden rounded-sm hover:scale-105 transition-transform hover:z-10 ">
-            <SafeImage src={video.logo_url || video.logo} alt={video.title} fill className="object-cover transition-transform duration-700 " sizes="(max-width: 1024px) 100vw, 50vw" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
-            <div className="absolute bottom-6 left-6 z-20">
-                <Image src="/assets/placeholders/play_overlay.png" alt="Play" width={40} height={40} />
-            </div>
-            {channelLogo && (
-                <div className="absolute bottom-6 right-6 z-20 w-14 h-12 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
-                    <SafeImage src={channelLogo} alt="Channel" fill className="object-contain" />
-                </div>
-            )}
-            <div className="absolute inset-x-0 bottom-0 p-6 pl-20 space-y-1 z-10">
-                <h3 className="text-lg md:text-xl font-bold text-white line-clamp-2 leading-tight ">{video.title}</h3>
-                <div className="flex items-center gap-4 text-xs text-white/60 font-medium">
-                    <span className="flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{video.time || "2min 27s"}</span>
-                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-white/40" />{video.date}</span>
+        <Link
+            href={`/replay/${video.slug || (video as any).id}`}
+            className="group relative block overflow-hidden rounded-sm hover:scale-[1.02] transition-transform duration-300 hover:z-10"
+            style={{ aspectRatio: "699/393" }}
+        >
+            {/* Thumbnail */}
+            <SafeImage
+                src={video.logo_url || video.logo}
+                alt={video.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 50vw"
+            />
+
+            {/* Figma gradient: transparent → black/90 */}
+            <div
+                className="absolute inset-0"
+                style={{
+                    background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.9) 100%)",
+                }}
+            />
+
+            {/* Bottom content block (Figma: padding 20px, gap 10px) */}
+            <div className="absolute inset-0 flex flex-col justify-end p-5">
+                {/* play-circle-02 + text row */}
+                <div className="flex items-start gap-3">
+                    {/* play-circle-02 icon (Figma: 56×56, circle border + play triangle) */}
+                    <div className="shrink-0" style={{ width: 48, height: 48 }}>
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="20" stroke="#D2D2D2" strokeWidth="1.5" />
+                            <path
+                                d="M20 17.5L32 24L20 30.5V17.5Z"
+                                fill="#D2D2D2"
+                            />
+                        </svg>
+                    </div>
+
+                    {/* Title + meta */}
+                    <div className="flex flex-col gap-2 min-w-0">
+                        {/* Title (Figma: Inter 500 18px, color #D2D2D2) */}
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter">
+                            {getPostAuthor(video)}
+                        </span>
+                        <h3
+                            className="line-clamp-2 leading-snug"
+                            style={{
+                                fontFamily: "Inter, sans-serif",
+                                fontWeight: 500,
+                                fontSize: 18,
+                                color: "#D2D2D2",
+                            }}
+                        >
+                            {video.title}
+                        </h3>
+
+                        {/* Meta row (Figma: duration icon + duration text + dot + date) */}
+                        <MetaRow
+                            time={video.time}
+                            date={video.date}
+                            color="rgba(210, 210, 210, 1)"
+                            dotColor="#D2D2D2"
+                        />
+                    </div>
                 </div>
             </div>
         </Link>
     );
 }
 
+/* ══════════════════════════════════════════════════
+   SmallCard — Figma: 340×325 (190px image + 126px text block)
+══════════════════════════════════════════════════ */
 function SmallCard({ video }: { video: SliderVideoItem }) {
-    const channelLogo = video.channel_logo;
     return (
-        <Link href={`/replay/${video.slug}`} className="group block space-y-4 hover:scale-105 transition-transform hover:z-10 ">
-            <div className="relative aspect-video overflow-hidden rounded-sm bg-white/5">
-                <SafeImage src={video.logo_url || video.logo} alt={video.title} fill className="object-cover transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
-                <div className="absolute bottom-3 left-3">
-                    <Image src="/assets/placeholders/play_overlay.png" alt="Play" width={32} height={32} />
+        <Link
+            href={`/replay/${video.slug || (video as any).id}`}
+            className="group block hover:scale-[1.02] transition-transform duration-300 hover:z-10"
+            style={{ display: "flex", flexDirection: "column", gap: 10 }}
+        >
+            {/* Image block — Figma: 338×190, gradient, play-circle-02 bottom-left */}
+            <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: "338/190" }}>
+                <SafeImage
+                    src={video.logo_url || video.logo}
+                    alt={video.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                />
+
+                {/* Figma gradient: transparent 50% → black/90 */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: "linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%)",
+                    }}
+                />
+
+                {/* play-circle-02 bottom-left (Figma: ~48×48, left:10 top:127–133) */}
+                <div className="absolute bottom-2 left-2.5">
+                    <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                        <circle cx="24" cy="24" r="20" stroke="#BBBBBB" strokeWidth="1.5" />
+                        <path d="M20 17.5L32 24L20 30.5V17.5Z" fill="#BBBBBB" />
+                    </svg>
                 </div>
-                {channelLogo && (
-                    <div className="absolute bottom-2 right-2 z-20 w-12 h-10 rounded-sm bg-background/30 backdrop-blur-md p-0.5 shadow-md">
-                        <SafeImage src={channelLogo} alt="Channel" fill className="object-contain" />
-                    </div>
-                )}
             </div>
-            <div className="space-y-2 justify-between">
-                <h4 className="font-bold text-sm line-clamp-2 leading-snug">{video.title}</h4>
-                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight">
-                    <span className="flex items-center gap-1 text-foreground/40"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{video.time || "2min 27s"}</span>
-                    <span className="w-2 h-2 rounded-full bg-gray-300"></span>
-                    <span className="flex items-center gap-1 text-foreground/40"><span className="w-1 h-1 rounded-full bg-white/20" />{video.date}</span>
-                </div>
+
+            {/* Text block (Figma: 320×126, gap 10) */}
+            <div
+                className="flex flex-col justify-center"
+                style={{ gap: 10, paddingLeft: 0 }}
+            >
+                <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter">
+                    {getPostAuthor(video)}
+                </span>
+                {/* Title (Figma: Inter 500 18px, #D2D2D2, 3-line clamp at ~79px) */}
+                <h4
+                    className="line-clamp-3 leading-snug"
+                    style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 500,
+                        fontSize: 15,
+                        //color: "#c54d4dff",
+                    }}
+                >
+                    {video.title}
+                </h4>
+
+                {/* Meta row (Figma: duration + dot + date, color #777) */}
+                <MetaRow
+                    time={video.time}
+                    date={video.date}
+                    color="#777777"
+                    dotColor="#777777ff"
+                />
             </div>
         </Link>
+    );
+}
+
+/* ══════════════════════════════════════════════════
+   MetaRow — clock icon + duration + dot + date
+   (Figma: carbon:time 16×16 + Inter 400 12px)
+══════════════════════════════════════════════════ */
+function MetaRow({
+    time,
+    date,
+    color,
+    dotColor,
+}: {
+    time?: string;
+    date?: string;
+    color: string;
+    dotColor: string;
+}) {
+    return (
+        <div className="flex items-center  w-full" style={{ gap: 19 }}>
+            {/* Duration container (Figma: padding 10px 10px 10px 0, gap 10, border-radius 50px) */}
+            <div className="flex items-center" style={{ gap: 10, paddingRight: 10 }}>
+                {/* carbon:time icon */}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" stroke={color} strokeWidth="1.2" />
+                    <path d="M8 4.5V8L10.5 9.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+                {/* Duration text */}
+                <span
+                    style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 400,
+                        fontSize: 12,
+                        color,
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {time || "2min 27s"}
+                </span>
+            </div>
+            {/*cercle grey*/}
+            <div className="w-2 h-2 rounded-full bg-muted/30"></div>
+            
+
+            {/* Date */}
+            <span
+                style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 400,
+                    fontSize: 12,
+                    color,
+                    whiteSpace: "nowrap",
+                }}
+            >
+                {formatDate(date)}
+            </span>
+        </div>
     );
 }

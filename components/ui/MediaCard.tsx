@@ -15,6 +15,8 @@ export type MediaCardProps = {
   aspect?: "16/9" | "4/3" | "1/1" | "469/246";
   channelLogo?: string;
   target?: boolean;
+  author?: string;
+  className?: string;
   onClick?: (e: React.MouseEvent) => void;
 };
 
@@ -35,7 +37,7 @@ function aspectClass(aspect: MediaCardProps["aspect"]) {
 function PlayOverlay() {
   return (
     <div
-      className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transition-transform group-hover:scale-110"
+      className="absolute left-1/2 top-1/2 flex h-10 w-10 sm:h-14 sm:w-14 -translate-x-1/2 -translate-y-1/2 transition-transform group-hover:scale-110"
       aria-hidden
     >
       <SafeImage
@@ -43,7 +45,7 @@ function PlayOverlay() {
         alt="Play"
         width={40}
         height={40}
-        className="h-12 w-12"
+        className="h-8 w-8 sm:h-12 sm:w-12"
       />
     </div>
   );
@@ -60,11 +62,13 @@ export function MediaCard({
   aspect = "16/9",
   channelLogo,
   target = true,
+  author,
   onClick,
+  className,
 }: MediaCardProps) {
   const content = (
     <div className="group block overflow-hidden bg-background/30 backdrop-blur-xl hover:scale-105 transition-transform hover:z-10 cursor-pointer">
-      <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ")}>
+      <div className={["relative w-full overflow-hidden", aspectClass(aspect)].join(" ") + " " + className}>
         <SafeImage
           src={imageSrc}
           alt={title}
@@ -107,15 +111,21 @@ export function MediaCard({
         )}
       </div>
 
-      <div className="space-y-1 p-4 justify-between">
-        <div className="line-clamp-2 text-sm font-semibold leading-6 text-foreground ">
+      <div className="space-y-1 p-2.5 sm:p-4 justify-between">
+        <div className="line-clamp-2 text-[11px] sm:text-sm font-semibold sm:leading-6 text-foreground ">
           {title}
         </div>
         {meta ? (
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-[color:var(--muted)]">{meta}</div>
-            <span className="w-1 h-1 bg-[color:var(--secondary)] rounded-full"></span>
-            <span className="text-xs text-[color:var(--muted)]">la rédaction</span>
+          <div className="flex items-center justify-between w-full">
+            <div className="text-[11px] sm:text-xs text-muted">{meta}</div>
+            {author && (
+              <div className="flex items-center gap-1.5 sm:gap-2 hidden sm:flex">
+                <span className="w-1 h-1 bg-success rounded-full"></span>
+                <span className="text-[10px] sm:text-xs text-muted">
+                  {author}
+                </span>
+              </div>
+            )}
           </div>
         ) : null}
       </div>

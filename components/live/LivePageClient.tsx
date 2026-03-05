@@ -5,18 +5,19 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { LiveSelectionCarousel } from "./LiveSelectionCarousel";
 import { LivePlayerSection } from "./LivePlayerSection";
-import { EPGScheduleView } from "./EPGScheduleView";
 import { UpcomingProgramsTimeline } from "../radio/UpcomingProgramsTimeline";
-import { LiveChannel, EPGItem, FullEPGChannel } from "../../types/api";
-import { AdBanner } from "../ui/AdBanner";
+import { RadioPlayerSection } from "../radio/RadioPlayerSection";
+import { RadioAudiosSection } from "../radio/RadioAudiosSection";
+import { LiveChannel, EPGItem, FullEPGChannel, AODItem } from "../../types/api";
 
 interface LivePageClientProps {
     initialChannels: LiveChannel[];
     epgData: EPGItem[];
     fullEpg: FullEPGChannel[];
+    aodItems: AODItem[];
 }
 
-export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageClientProps) {
+export function LivePageClient({ initialChannels, epgData, fullEpg, aodItems }: LivePageClientProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -25,22 +26,22 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
     // Default to first TV channel or channel from URL parameter
     const getDefaultChannel = () => {
         if (channelParam) {
-            const paramChannel = initialChannels.find(c => c.id === channelParam);
-            if (paramChannel && paramChannel.type === 'TV') return paramChannel;
+            const paramChannel = initialChannels.find(c => c.slug === channelParam || c.id === channelParam);
+            if (paramChannel) return paramChannel;
         }
         return initialChannels.find(c => c.type === 'TV') || initialChannels[0];
     };
 
     const [selectedChannel, setSelectedChannel] = useState<LiveChannel>(getDefaultChannel());
-    const [selectedCarouselId, setSelectedCarouselId] = useState<string>(getDefaultChannel()?.id || '');
+    const [selectedCarouselId, setSelectedCarouselId] = useState<string>(getDefaultChannel()?.slug || getDefaultChannel()?.id || '');
 
     // Update selected channel when URL parameter changes
     useEffect(() => {
         if (channelParam) {
-            const paramChannel = initialChannels.find(c => c.id === channelParam);
-            if (paramChannel && paramChannel.type === 'TV') {
+            const paramChannel = initialChannels.find(c => c.slug === channelParam || c.id === channelParam);
+            if (paramChannel) {
                 setSelectedChannel(paramChannel);
-                setSelectedCarouselId(paramChannel.id);
+                setSelectedCarouselId(paramChannel.slug || paramChannel.id);
             }
         }
     }, [channelParam, initialChannels]);
@@ -58,16 +59,9 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
 
     // Handle channel selection
     const handleChannelSelect = (channel: LiveChannel) => {
-        setSelectedCarouselId(channel.id);
-
-        // If it's a radio, navigate to radio page with this radio
-        if (channel.type === 'RADIO') {
-            router.push(`/radio?channel=${channel.id}`);
-        } else {
-            // If it's a TV channel, update the player and URL
-            setSelectedChannel(channel);
-            router.replace(`${pathname}?channel=${channel.id}`, { scroll: false });
-        }
+        setSelectedCarouselId(channel.slug || channel.id);
+        setSelectedChannel(channel);
+        router.replace(`${pathname}?channel=${channel.slug || channel.id}`, { scroll: false });
     };
 
     if (!selectedChannel) {
@@ -80,28 +74,37 @@ export function LivePageClient({ initialChannels, epgData, fullEpg }: LivePageCl
             <LiveSelectionCarousel
                 channels={initialChannels}
                 epgItems={currentPrograms}
+                fullEpg={fullEpg}
                 onSelectChannel={handleChannelSelect}
                 selectedChannelId={selectedCarouselId}
             />
 
-            {/* 2. Player Section - Only for TV */}
-            {selectedChannel.type === 'TV' && (
-                <LivePlayerSection channel={selectedChannel} />
+            {/* 2. Player Section */}
+            {selectedChannel.type === 'TV' ? (
+                <LivePlayerSection
+                    channel={selectedChannel}
+                    currentProgram={currentPrograms.find(p => p.channel_id === selectedChannel.id)}
+                />
+            ) : (
+                <RadioPlayerSection
+                    channel={selectedChannel}
+                    currentProgram={currentPrograms.find(p => p.channel_id === selectedChannel.id)}
+                />
             )}
 
-            {/* 3. Info & EPG Schedule - Only for TV
-
-            <AdBanner />
-             */}
-
-
-            {/* 4. Upcoming Programs Timeline */}
-            {fullEpg.length > 0 && (
-                <UpcomingProgramsTimeline
-                    epgData={fullEpg}
-                    currentChannelId={selectedChannel.id}
-                    currentChannelLogo={selectedChannel.logo_url || selectedChannel.logo}
-                />
+            {/* 3. Info & Grid Section */}
+            {selectedChannel.type === 'TV' ? (
+                <>
+                    {fullEpg.length > 0 && (
+                        <UpcomingProgramsTimeline
+                            epgData={fullEpg}
+                            currentChannelId={selectedChannel.id}
+                            currentChannelLogo={selectedChannel.logo_url || selectedChannel.logo}
+                        />
+                    )}
+                </>
+            ) : (
+                <RadioAudiosSection items={aodItems} />
             )}
         </div>
     );

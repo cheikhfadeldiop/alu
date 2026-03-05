@@ -7,6 +7,7 @@ import { WordPressPost } from "../../types/api";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { SafeImage } from "../ui/SafeImage";
 import { useWordPressNews } from "@/hooks/useData";
+import { getPostAuthor, formatDate, parseToDate, decodeHtmlEntities } from "@/utils/text";
 
 interface WordPressNewsSectionProps {
     alauneItems: WordPressPost[];
@@ -32,7 +33,10 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
         initialTrending
     );
 
-    const currentItems = activeTab === "alaune" ? alauneItems : trendingItems;
+    const sortedAlaune = [...alauneItems].sort((a, b) => (parseToDate(b.date)?.getTime() || 0) - (parseToDate(a.date)?.getTime() || 0));
+    const sortedTrending = [...trendingItems].sort((a, b) => (parseToDate(b.date)?.getTime() || 0) - (parseToDate(a.date)?.getTime() || 0));
+
+    const currentItems = activeTab === "alaune" ? sortedAlaune : sortedTrending;
     const featuredItem = currentItems[0];
     const listItems = currentItems.slice(1);
 
@@ -50,8 +54,8 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                 <div className="w-full lg:col-span-2">
                     {featuredItem && (
                         <Link
-                            href={`/news?id=${featuredItem.id}`}
-                            className="group relative block w-full h-[240px] sm:h-[400px] lg:h-[520px] rounded-lg overflow-hidden
+                            href={`/news?slug=${featuredItem.slug || featuredItem.id}`}
+                            className="group relative block w-full h-[200px] sm:h-[400px] lg:h-[520px] rounded-lg overflow-hidden
                             hover:scale-[1.02] transition-all"
                         >
                             <div className="absolute inset-0">
@@ -66,18 +70,14 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                             <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
                                 <h2 className="text-lg sm:text-xl font-bold leading-tight mb-2 sm:mb-3 ">
-                                    {featuredItem.title.rendered}
+                                    {decodeHtmlEntities(featuredItem.title.rendered)}
                                 </h2>
                                 <div className="flex items-center gap-3 text-xs sm:text-sm text-white/90">
                                     <span>
-                                        {new Date(featuredItem.date).toLocaleDateString("fr-FR", {
-                                            day: "numeric",
-                                            month: "long",
-                                            year: "numeric"
-                                        })}
+                                        {formatDate(featuredItem.date)}
                                     </span>
                                     <span className="w-1 h-1 rounded-full bg-[color:var(--success)]"></span>
-                                    <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                                    <span>{getPostAuthor(featuredItem)}</span>
                                 </div>
                             </div>
                         </Link>
@@ -106,51 +106,44 @@ export function WordPressNewsSection({ alauneItems: initialAlaune, trendingItems
                         </button>
                     </div>
 
-                    <div className="h-[300px] sm:h-[400px] lg:h-[440px]  overflow-y-auto pr-2 space-y-2 px-2
-                    scrollbar-thin 
+                    <div className="h-[400px] sm:h-[400px] lg:h-[440px] overflow-y-auto pr-2 px-2 scrollbar-thin 
                         [&::-webkit-scrollbar]:w-1 
                         [&::-webkit-scrollbar-track]:bg-transparent 
                         [&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)] 
                         [&::-webkit-scrollbar-thumb]:rounded-full 
                         hover:[&::-webkit-scrollbar-thumb]:bg-[color:var(--accent)]
-                        
                     ">
-                        {listItems.map((item) => (
-                            <Link
-                                key={item.id}
-                                href={`/news?id=${item.id}`}
-                                className="group flex gap-4 items-start hover:bg-muted/10  p-3  transition-colors
-                                border-b dark:border-muted/30
-                                hover:scale-[1.01] transition-all
-                                "
-                            >
-                                <div className="relative w-24 h-20 flex-shrink-0 rounded overflow-hidden">
-                                    <SafeImage
-                                        src={getImageUrl(item)}
-                                        alt={item.title.rendered}
-                                        fill
-                                        sizes="96px"
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-0 space-x-2">
-                                    <h3 className="text-sm font-semibold leading-snug line-clamp-3  mb-2">
-                                        {item.title.rendered}
-                                    </h3>
-                                    <div className="flex items-center gap-5 text-xs text-gray-500 dark:text-gray-400">
-                                        <span>
-                                            {new Date(item.date).toLocaleDateString("fr-FR", {
-                                                day: "numeric",
-                                                month: "long",
-                                                year: "numeric"
-                                            })}
-                                        </span>
-                                        <span className="w-1 h-1 rounded-full bg-[color:var(--success)]"></span>
-                                        <span>{SITE_CONFIG.strings.editorialTeam}</span>
+                        <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-0 lg:space-y-2">
+                            {listItems.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    href={`/news?slug=${item.slug || item.id}`}
+                                    className="group flex flex-col lg:flex-row gap-2 lg:gap-4 items-start hover:bg-muted/10 p-2 sm:p-3 transition-colors border-b dark:border-muted/30 hover:scale-[1.01] transition-all"
+                                >
+                                    <div className="relative w-full lg:w-24 aspect-video lg:h-20 flex-shrink-0 rounded overflow-hidden">
+                                        <SafeImage
+                                            src={getImageUrl(item)}
+                                            alt={item.title.rendered}
+                                            fill
+                                            sizes="(max-width: 1024px) 150px, 96px"
+                                            className="object-cover"
+                                        />
                                     </div>
-                                </div>
-                            </Link>
-                        ))}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-[11px] lg:text-sm font-semibold leading-snug line-clamp-3 mb-1 lg:mb-2 text-foreground">
+                                            {decodeHtmlEntities(item.title.rendered)}
+                                        </h3>
+                                        <div className="flex items-center gap-1.5 lg:gap-5 text-[9px] lg:text-xs text-gray-500 dark:text-gray-400">
+                                            <span>
+                                                {formatDate(item.date)}
+                                            </span>
+                                            <span className="w-1 h-1 rounded-full bg-[color:var(--success)] hidden lg:block"></span>
+                                            <span className="hidden lg:block">{getPostAuthor(item)}</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
