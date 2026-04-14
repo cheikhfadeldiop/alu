@@ -1,5 +1,5 @@
 import { WordPressPost } from "../../types/api";
-import { AdBannerV } from "../ui/AdBannerV";
+import { AdBanner } from "../ui/AdBanner";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Link } from "@/i18n/navigation";
 import { SITE_CONFIG } from "@/constants/site-config";
@@ -93,9 +93,11 @@ export function CategoryWithAdSection({ title, title2, posts, categorySlug }: Ca
     );
 
     return (
-        <section className="flex flex-col xl:flex-row items-start w-full gap-8 xl:gap-[45px]">
+        <section className="flex flex-col items-start w-full gap-8 lg:gap-10">
+            <AdBanner className="w-full pb-2 md:pb-4" />
+
             {/* ── COL GAUCHE ── */}
-            <div className="flex flex-col flex-1 w-full gap-10 lg:gap-[40px]">
+            <div className="flex flex-col w-full gap-10 lg:gap-[40px]">
                 {/* Title Container */}
                 <SectionTitle
                     title={title}
@@ -106,7 +108,7 @@ export function CategoryWithAdSection({ title, title2, posts, categorySlug }: Ca
                 />
 
                 {/* Main Content Layout */}
-                <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-[55px]">
+                <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-8 xl:gap-10">
                     {/* ── SUB-COL GAUCHE ── */}
                     <div className="flex flex-col items-center w-full lg:flex-1 gap-[30px] min-w-0">
                         {/* Article Container featured */}
@@ -144,7 +146,7 @@ export function CategoryWithAdSection({ title, title2, posts, categorySlug }: Ca
                     </div>
 
                     {/* ── SUB-COL DROITE ── */}
-                    <div className="flex flex-col items-center w-full lg:flex-1 gap-[20px] min-w-0">
+                    <div className="flex flex-col items-center w-full lg:w-[34%] xl:w-[31%] gap-[20px] min-w-0">
                         {col2List.map((item, idx) => (
                             <div key={item.id + '-' + idx} className="flex flex-col items-center w-full gap-[20px]">
                                 <ArticleRow item={item} />
@@ -155,11 +157,6 @@ export function CategoryWithAdSection({ title, title2, posts, categorySlug }: Ca
                         ))}
                     </div>
                 </div>
-            </div>
-
-            {/* ── COL DROITE PUB ── */}
-            <div className="w-full xl:w-[434px] xl:sticky xl:top-24 flex justify-center">
-                <AdBannerV />
             </div>
         </section>
     );

@@ -11,3 +11,15 @@ export function AdBanner({ className }: { className?: string }) {
     </section>
   );
 }
+
+export function AdBannerH({ className }: { className?: string }) {
+  return (
+    <section className={"overflow-hidden rounded-sm " + (className ?? "")}>
+      <div className="relative aspect-[1280/247] w-full ">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <SafeImage src="/assets/banner/banH.png" alt="Pub" width={1460} height={370} />
+        </div>
+      </div>
+    </section>
+  );
+}

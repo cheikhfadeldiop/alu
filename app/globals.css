@@ -2,8 +2,16 @@
 
 :root {
   /* Core colors (light) */
-  --background: #ffffff;
-  --surface: #f6f7f9;
+  --primary: #8E55AD;
+  --primary-light: #A172BC;
+  --primary-dark: #541612;
+  --primary-text: #23142A;
+  --primary-text-light: #D2D2D2;
+  --primary-text-dark: #606060;
+  --primary-border: #E0DBE8;
+  --primary-background: #FDF9FF;
+  --background: #FCF9FF;
+  --surface: #ffffff;
   --surface-2: #f0f2f5;
   --foreground: #0b0d12;
   --muted: #5b616b;
@@ -22,6 +30,42 @@
 
   /* Status */
   --success: #22c55e;
+
+  /* Figma home tokens (light) */
+  
+  --fig-bg: #fcf9ff;
+  --fig-surface: #ffffff;
+  --fig-text-primary: #211529;
+  --fig-text-secondary: #606060;
+  --fig-border: #e0dbe8;
+  --fig-border-soft: #ece5f2;
+  --fig-tag-religion: #57fb60;
+  --fig-tag-sport: #da8af6;
+  --fig-tag-news: #f6e08a;
+  --fig-tag-video: #8ab6f6;
+
+  /* News page validated sizing tokens */
+  --news-container: 1280px;
+  --news-topbar-h: 93px;
+  --news-gap-topbar-header: 3px;
+  --news-feature-main-w: 566px;
+  --news-feature-side-w: 694px;
+  --news-feature-main-h: 462px;
+  --news-feature-side-h: 292px;
+  --news-feature-row2-h: 230px;
+  --news-more-left-w: 789px;
+  --news-more-right-w: 465px;
+  --news-more-col-h: 757px;
+  --news-more-hero-h: 340px;
+  --news-more-hero-img-h: 235px;
+  --news-more-item-h: 120px;
+  --news-more-item-thumb-w: 103px;
+  --news-more-item-thumb-h: 107px;
+  --news-similar-card-w: 356px;
+  --news-similar-card-h: 317px;
+  --news-similar-img-h: 200px;
+  --news-announce-card-w: 366px;
+  --news-announce-card-h: 218px;
 }
 
 @theme inline {
@@ -46,6 +90,14 @@
 /* Dark theme values (controlled by next-themes) */
 html[data-theme="dark"],
 html.dark {
+  --primary: #8E55AD;
+  --primary-light: #A172BC;
+  --primary-dark: #541612;
+  --primary-text: #23142A;
+  --primary-text-light: #D2D2D2;
+  --primary-text-dark: #606060;
+  --primary-border: #E0DBE8;
+  --primary-background: #FDF9FF;
   --background: #07080a;
   --surface: #101216;
   --surface-2: #0c0e12;
@@ -57,6 +109,18 @@ html.dark {
 
   --pattern-opacity: 0.06;
   --pattern-invert: 1;
+
+  /* Figma home tokens (dark) */
+  --fig-bg: #15121a;
+  --fig-surface: #221c2b;
+  --fig-text-primary: #f3edf9;
+  --fig-text-secondary: #b8accc;
+  --fig-border: #413650;
+  --fig-border-soft: #352c43;
+  --fig-tag-religion: #6ef278;
+  --fig-tag-sport: #d7a2ef;
+  --fig-tag-news: #e4d07d;
+  --fig-tag-video: #7cb0f2;
 }
 
 html[data-theme="light"],
@@ -146,4 +210,82 @@ input[type=range]::-webkit-slider-thumb {
   height: 24px;
   -webkit-appearance: none;
   @apply bg-red-600 rounded-full shadow-lg;
+}
+
+@layer utilities {
+  .fig-h9 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+  }
+
+  .fig-h10 {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 30px;
+  }
+
+  .fig-11 {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 26px;
+  }
+
+  .fig-b3 {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+  }
+
+  .fig-b4 {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 15px;
+  }
+
+  /* News page reusable rules (validated with user) */
+  .news-page-wrap {
+    width: 100%;
+    max-width: var(--news-container);
+    margin-inline: auto;
+  }
+
+  .news-topbar-bleed {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    margin-top: var(--news-gap-topbar-header);
+    background: #fff;
+  }
+
+  .news-topbar-inner {
+    height: var(--news-topbar-h);
+    max-width: var(--news-container);
+    margin-inline: auto;
+  }
+
+  .news-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .news-section-line {
+    height: 0;
+    border-top: 0.5px solid #9a74b7;
+  }
+
+  .news-hscroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .news-hscroll > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
 }

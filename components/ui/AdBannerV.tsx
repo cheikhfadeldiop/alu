@@ -34,3 +34,27 @@ export function AdBannerV2({ className }: { className?: string }) {
     </section>
   );
 }
+
+export function AdBanV({ className }: { className?: string }) {
+  return (
+    <section className={"overflow-hidden rounded-sm " + (className ?? "")}>
+      <div className="relative aspect-[578/1137]  w-full ">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <SafeImage src="/assets/banV.png" alt="Pub" width={578} height={1137} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function AdBanV2({ className }: { className?: string }) {
+  return (
+    <section className={"overflow-hidden rounded-sm " + (className ?? "")}>
+      <div className="relative aspect-[465/824]  w-full ">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <SafeImage src="/assets/banner/banV2.png" alt="Pub" width={578} height={1137} />
+        </div>
+      </div>
+    </section>
+  );
+}

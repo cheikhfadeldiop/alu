@@ -14,7 +14,7 @@ const SITE_DEFAULTS = {
         name: "CRTV",
         officialName: "Cameroon Radio Television",
         tagline: "L'organisme public camerounais de radio-télévision",
-        description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
+        description: "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
         siteUrl: 'https://crtv.cm',
         api: {
             baseUrl: 'https://tveapi.acan.group/myapiv2',
