@@ -32,6 +32,7 @@ async function LivePageContent() {
       initialChannels={allChannels}
       epgData={epgNowItems}
       fullEpg={fullEpg}
+      aodItems={[]}
     />
   );
 }
@@ -72,7 +73,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 export default async function LivePage() {
 
   return (
-    <div className="crtv-page-enter space-y-8 md:space-y-12 max-w-[1400px] mx-auto px-4 py-8">
+    <div className="crtv-page-enter space-y-8 md:space-y-12 max-w-[1400px] mx-auto px-4 py-8 bg-[#171717] text-[#E8E8E8] rounded-[20px]">
 
       <Suspense fallback={<LivePageShimmer />}>
         <LivePageContent />

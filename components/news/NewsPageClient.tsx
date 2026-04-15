@@ -145,7 +145,7 @@ export function NewsPageClient() {
     }, [pool]);
 
     return (
-        <div className="w-full bg-[var(--fig-bg)]">
+        <div className="w-full ">
             <div className="mx-auto w-full max-w-[1280px] px-4 pb-8 pt-[16px] xl:px-0">
 
             {(isLoading || !featured) ? (

@@ -6,7 +6,6 @@ import Hls from "hls.js";
 import { LiveChannel, EPGItem } from "../../types/api";
 import { ensureAbsoluteUrl } from "../../services/api";
 import { SafeImage } from "../ui/SafeImage";
-import { AdBannerV, AdBannerV2 } from "../ui/AdBannerV";
 import { ShareButton } from "../ui/ShareButton";
 
 interface LivePlayerSectionProps {
@@ -75,7 +74,11 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                     return;
                 }
 
-                throw new Error("Impossible de charger le flux en direct.");
+                if (!isAborted) {
+                    setError("Impossible de charger le flux en direct.");
+                    setIsResolving(false);
+                }
+                return;
             } catch (err: any) {
                 console.error("Live Resolution Error:", err);
                 if (!isAborted) {
@@ -265,11 +268,11 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
     };
 
     return (
-        <div className="flex flex-col xl:flex-row items-start justify-between w-full gap-8 xl:gap-[38px]">
+        <div className="mx-auto grid w-full max-w-[1280px] gap-0 xl:grid-cols-[730px_550px]">
 
-            <div ref={containerRef} className="flex flex-col flex-1 w-full overflow-hidden">
-                <div className="w-full overflow-hidden group/player bg-black">
-                    <div className="relative flex items-center justify-center overflow-hidden group/screen aspect-video w-full bg-black">
+            <div ref={containerRef} className="w-full overflow-hidden">
+                <div className="w-full overflow-hidden group/player  h-[488px]">
+                    <div className="relative h-[410px] w-full overflow-hidden bg-black">
                         {/* Video Canvas */}
                         <video
                             ref={videoRef}
@@ -315,8 +318,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                     </div>
 
                     {/* CONTROLS AREA */}
-                    <div className="backdrop-blur-md border-t border-white/5 flex flex-col justify-center relative group/controls px-4 sm:px-5"
-                        style={{ height: 80, background: "transparent" }}>
+                    <div className="relative flex h-[78px] flex-col justify-center border-t border-white/5 bg-[#333333]/10 px-5">
 
                         {/* Progress live bar */}
                         <div className="absolute -top-0.5 left-0 w-full h-1 bg-red-600/20">
@@ -324,7 +326,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                         </div>
 
                         {/* Controls row */}
-                        <div className="flex flex-row items-center justify-between w-full h-[28px]">
+                        <div className="flex h-[28px] w-full flex-row items-center justify-between">
 
                             {/* LEFT: volume controls */}
                             <div className="flex flex-row items-center gap-3">
@@ -419,53 +421,82 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                     </div>
                 </div>
 
-                <div className="flex flex-col justify-center items-center w-full bg-[#1C1C1C] p-6 sm:p-8">
-                    <div className="flex flex-col items-start w-full gap-5 lg:gap-[22px]">
-                        {/* Header row */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
-                            <div className="flex flex-row items-center gap-3">
-                                <div className="relative w-[80px] sm:w-[95px] h-[36px] sm:h-[42px] flex-shrink-0">
-                                    <SafeImage src={channel.hd_logo || channel.logo} alt={channel.title} fill className="object-contain" />
-                                </div>
-                                <div className="flex flex-row items-center gap-1 sm:gap-[3px]">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#F80000] flex-shrink-0 animate-pulse" />
-                                    <span className="b4 font-bold text-white uppercase leading-none">LIVE</span>
-                                    <svg width="12" height="24" viewBox="0 0 12 24" fill="none" className="shrink-0">
-                                        <path d="M3 8L9 12L3 16" stroke="#F80000" strokeWidth="1.5" strokeLinecap="round" />
-                                    </svg>
-                                    <h2 className="b1 font-bold text-white line-clamp-1">{channel.title}</h2>
-                                    <span className="hidden sm:inline b1 font-bold text-[#FF0000] ml-1">EN DIRECT</span>
-                                </div>
-                            </div>
-
-                            <ShareButton
-                                title={channel.title}
-                                text={`Regardez ${channel.title} en direct sur CRTV Web`}
-                                className="flex justify-center items-center shrink-0"
-                                iconClassName="w-6 h-6"
-                            />
-                        </div>
-
-                        <p className="b2 text-[#8E8E8E] max-w-[800px] line-clamp-4 leading-relaxed">
-                            {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
-                        </p>
-
-                        <div className="flex flex-wrap items-center w-full gap-2 py-2">
-                            <span className="b3 font-bold text-[#FF0000] uppercase">
-                                {currentProgram?.program_title || "JOURNAL EN DIRECT"}
-                            </span>
-                            <span className="b3 font-bold text-[#8E8E8E]">| PRESENTE PAR :</span>
-                            <span className="b3 font-bold text-white/70 uppercase">
-                                {(currentProgram as any)?.presentateur || (currentProgram as any)?.presentateurs || channel.title}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
 
-            <div className="w-full xl:w-[434px] xl:sticky xl:top-24 h-fit flex justify-center">
-                <AdBannerV />
-            </div>
+         
+            <div className="flex h-[488px] w-full flex-col justify-between bg-[#1C1C1C] p-6 sm:p-8">
+  
+  {/* TOP */}
+  <div className="flex flex-col gap-6">
+    
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+      
+      <div className="flex items-center gap-3">
+        
+        <div className="relative w-[95px] h-[42px] shrink-0">
+          <SafeImage
+            src={channel.hd_logo || channel.logo}
+            alt={channel.title}
+            fill
+            className="object-contain"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#F80000] animate-pulse" />
+
+          <span className="b4 font-bold text-white uppercase">
+            LIVE
+          </span>
+
+          <svg width="12" height="24" viewBox="0 0 12 24">
+            <path d="M3 8L9 12L3 16" stroke="#F80000" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+
+          <h2 className="b1 font-bold text-white line-clamp-1">
+            {channel.title}
+          </h2>
+
+          <span className="hidden sm:inline b1 font-bold text-[#FF0000] ml-1">
+            EN DIRECT
+          </span>
+        </div>
+      </div>
+
+      <ShareButton
+        title={channel.title}
+        text={`Regardez ${channel.title} en direct sur CRTV Web`}
+        className="shrink-0"
+        iconClassName="w-6 h-6"
+      />
+    </div>
+
+    {/* Description */}
+    <p className="b2 text-[#8E8E8E] max-w-[514px] leading-relaxed">
+      {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture."}
+    </p>
+  </div>
+
+  {/* BOTTOM */}
+  <div className="flex flex-wrap items-center gap-2">
+    <span className="b3 font-bold text-[#FF0000] uppercase">
+      {currentProgram?.program_title || "JOURNAL EN DIRECT"}
+    </span>
+
+    <span className="b3 font-bold text-[#8E8E8E]">
+      | PRESENTE PAR :
+    </span>
+
+    <span className="b3 font-bold text-white/70 uppercase">
+      {(currentProgram as any)?.presentateur ||
+        (currentProgram as any)?.presentateurs ||
+        channel.title}
+    </span>
+  </div>
+
+</div>
         </div>
 
     );

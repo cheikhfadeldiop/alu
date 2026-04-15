@@ -40,7 +40,7 @@ export function NewsTopBar({ tabs, activeTab, onTabClick, className = "" }: News
   };
 
   return (
-    <section className={`relative left-1/2 right-1/2 w-screen -translate-x-1/2 bg-white ${className}`}>
+    <section className={`relative left-1/2  right-1/2 w-screen -translate-x-1/2 bg-[var(--fig-surface)]/95 ${className}`}>
       <div className="mx-auto flex h-[120px] w-full max-w-[1280px] items-center px-4 xl:px-0">
         <div className="w-full pb-[10px]">
           <div ref={navRef} className="no-scrollbar flex items-center gap-[85px] overflow-x-auto whitespace-nowrap">
@@ -58,10 +58,10 @@ export function NewsTopBar({ tabs, activeTab, onTabClick, className = "" }: News
             ))}
           </div>
           <div className="mt-[6px] flex justify-end gap-[5px]">
-            <button type="button" aria-label="Scroll left" onClick={() => scrollTabs("left")} className="h-[14px] w-[14px] text-[#141B34]">
+            <button type="button" aria-label="Scroll left" onClick={() => scrollTabs("left")} className="h-[14px] w-[14px] ">
               ‹
             </button>
-            <button type="button" aria-label="Scroll right" onClick={() => scrollTabs("right")} className="h-[14px] w-[14px] text-[#141B34]">
+            <button type="button" aria-label="Scroll right" onClick={() => scrollTabs("right")} className="h-[14px] w-[14px] ">
               ›
             </button>
           </div>

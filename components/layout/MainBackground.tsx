@@ -7,9 +7,20 @@ import { PageContainer } from "./PageContainer";
 
 export function MainBackground({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isMediaDarkRoute =
+    pathname.includes("/live") ||
+    pathname.includes("/replay") ||
+    pathname.includes("/radio") ||
+    pathname.includes("/playback");
 
   return (
-    <div className="relative w-full max-w-[1728px] mx-auto flex-1 bg-background overflow-x-hidden">
+    <div
+      className={`relative mx-auto flex-1 overflow-x-hidden ${
+        isMediaDarkRoute
+          ? "min-h-screen w-full max-w-none bg-[#171717] text-[#E8E8E8]"
+          : "w-full max-w-[1728px] bg-background"
+      }`}
+    >
       {/* Decorative pattern (rolled stripe) — in layout background only */}
       <div
         aria-hidden="true"
@@ -24,7 +35,7 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
         }}
       />
 
-      <main className="relative z-10  pb-3xl ">
+      <main className={`relative z-10 pb-3xl ${isMediaDarkRoute ? "bg-[#171717]" : ""}`}>
         <PageContainer>{children}</PageContainer>
       </main>
     </div>

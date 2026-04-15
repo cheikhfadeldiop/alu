@@ -306,11 +306,10 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
     const youtubeId = resolvedUrl ? getYoutubeId(resolvedUrl) : null;
 
     return (
-        <div ref={containerRef} className="rounded-sm w-full overflow-hidden group/player mb-12 space-y-4">
-            <div className="flex flex-col h-auto">
-                {/* Video Area - Full Width */}
-                <div className="w-full flex flex-col relative overflow-hidden group/screen rounded-sm bg-black shadow-2xl">
-                    <div className="relative aspect-video overflow-hidden flex items-center justify-center bg-black">
+        <div ref={containerRef} className="mx-auto grid w-full max-w-[1280px] gap-0 overflow-hidden group/player mb-12 xl:grid-cols-[730px_550px]">
+            <div className="w-full">
+                <div className="w-full flex flex-col relative overflow-hidden group/screen ">
+                    <div className="relative h-[410px] overflow-hidden flex items-center justify-center bg-black">
                         {youtubeId ? (
                             <iframe src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`} className="w-full h-full border-0" allowFullScreen />
                         ) : (
@@ -356,8 +355,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                     </div>
 
                     {!youtubeId && (
-                        <div className="backdrop-blur-md border-t bg-black border-white/5 flex flex-col justify-center relative group/controls bg-[#1A1A1A]/95 px-6"
-                            style={{ height: 80 }}>
+                        <div className="border-t border-white/5 flex flex-col justify-center relative group/controls bg-[#333333]/10 px-5 h-[78px]">
 
                             {/* Progress bar */}
                             <div className="absolute -top-1 left-0 w-full h-1.5 bg-accent/20 cursor-pointer group/progress">
@@ -374,13 +372,9 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                 />
                             </div>
 
-                            <div className="flex flex-row items-center justify-between w-full ">
-
-                                <div className="flex flex-row items-center gap-6">
-
-
-                                    {/* Mute and Volume Track combined */}
-                                    <div className="flex items-center gap-3">
+                            <div className="flex h-[28px] w-full flex-row items-center justify-between">
+                                {/* LEFT: volume controls */}
+                                <div className="flex flex-row items-center gap-3">
                                         <button onClick={toggleMute} className="text-white hover:text-accent transition-colors">
                                             {isMuted || volume === 0 ? (
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F7F7F4" strokeWidth="2" strokeLinecap="round">
@@ -397,77 +391,57 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         </button>
 
 
-                                        {/* Track volume interactif */}
-                                        <div className="relative flex items-center flex-shrink-0" style={{ width: 80, height: 20 }}>
-                                            <div className="absolute" style={{
-                                                left: 0, top: "50%", transform: "translateY(-50%)",
-                                                width: 80, height: 0, borderTop: "3px solid #989896"
-                                            }} />
-                                            <div className="absolute" style={{
-                                                left: 0, top: "50%", transform: "translateY(-50%)",
-                                                width: `${volume * 80}px`, height: 0,
-                                                borderTop: "3px solid #F7F7F4", transition: "width 0.05s ease"
-                                            }} />
+                                        <div className="hidden sm:flex relative items-center w-[114px] h-[20px]">
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0 border-t-4 border-[#989896]" />
+                                            <div
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 h-0 border-t-4 border-[#F7F7F4] transition-[width] duration-75"
+                                                style={{ width: `${volume * 114}px` }}
+                                            />
+                                            <div className="absolute left-[112px] top-1/2 -translate-y-1/2 h-2.5 border-l-2 border-[#F7F7F4]" />
                                             <input
                                                 type="range"
                                                 min={0} max={1} step={0.02}
                                                 value={volume}
                                                 onChange={handleVolumeChange}
-                                                className="absolute w-full h-full cursor-pointer opacity-0 z-10"
+                                                className="absolute inset-0 w-full cursor-pointer opacity-0"
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Timecode */}
-                                    <span className="b5 font-bold text-white/60 tracking-wider">
-                                        {formatTime(currentTime)}
-                                        <span className="mx-2 text-white/20">/</span>
-                                        {formatTime(duration)}
-                                    </span>
-                                </div>
+                                {/* Play/Pause */}
                                 <button
                                     onClick={togglePlay}
-                                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                                    className="flex flex-row items-center justify-center p-0 border-none bg-none cursor-pointer mx-4"
                                 >
                                     {isPlaying ? (
-                                        <div className="flex flex-row items-center" style={{ gap: 5 }}>
-                                            <div style={{ width: 0, height: 20, borderLeft: "4px solid #F7F7F4" }} />
-                                            <div style={{ width: 0, height: 20, borderLeft: "4px solid #F7F7F4" }} />
+                                        <div className="flex flex-row items-center gap-[5px]">
+                                            <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
+                                            <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
                                         </div>
                                     ) : (
-                                        <svg width="14" height="20" viewBox="0 0 14 20" fill="#F7F7F4">
-                                            <path d="M0 0L14 10L0 20V0Z" />
+                                        <svg width="15" height="28" viewBox="0 0 15 28" fill="#F7F7F4">
+                                            <path d="M0 0L15 14L0 28V0Z" />
                                         </svg>
                                     )}
                                 </button>
 
                                 {/* RIGHT: Quality + CC + Fullscreen */}
-                                <div className="flex flex-row items-center" style={{ gap: 10 }}>
+                                <div className="flex flex-row items-center gap-2 sm:gap-3">
 
                                     {/* Quality */}
                                     <div className="relative">
                                         <button
                                             onClick={() => setShowQualityMenu(!showQualityMenu)}
-                                            className="flex justify-center items-center"
-                                            style={{
-                                                width: 88, height: 27, borderRadius: 5,
-                                                padding: "0 10px", border: "none", cursor: "pointer"
-                                            }}
+                                            className="flex flex-row items-center justify-center h-[27px] bg-[#1F1E18] rounded-[5px] px-2 sm:px-3 gap-1 sm:gap-[5px] border-none cursor-pointer"
                                         >
-                                            <div className="flex flex-row items-center" style={{ gap: 5 }}>
-                                                <span style={{
-                                                    fontFamily: "Roboto", fontWeight: 400, fontSize: 14,
-                                                    lineHeight: "21px", color: "#FFFFFF"
-                                                }}>
+                                            <div className="flex flex-row items-center gap-1 sm:gap-[5px]">
+                                                <span className="text-[12px] sm:text-[14px] leading-[21px] text-white font-[Roboto]">
                                                     {currentQuality === -1 ? 'Auto' : `${qualities.find(q => q.index === currentQuality)?.height}p`}
                                                 </span>
-                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" className={`transition-transform ${showQualityMenu ? 'rotate-180' : ''}`}>
+                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="#FFFFFF" className={`transition-transform ${showQualityMenu ? 'rotate-180' : ''}`}>
                                                     <path d="M0 0L5 6L10 0Z" />
                                                 </svg>
-                                                <span style={{
-                                                    fontFamily: "Roboto", fontWeight: 400, fontSize: 14,
-                                                    lineHeight: "21px", color: "#FFFFFF"
-                                                }}>HD</span>
+                                                <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">HD</span>
                                             </div>
                                         </button>
                                         {showQualityMenu && qualities.length > 0 && (
@@ -490,11 +464,10 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
 
                                     {/* CC — ouvre showTrackMenu si tracks disponibles */}
                                     <div className="relative">
-                                        <button className="flex justify-center items-center"
-                                            style={{
-                                                width: 27, height: 27, background: "#1F1E18", borderRadius: 5,
-                                                border: "none", cursor: "pointer"
-                                            }}>
+                                        <button
+                                            onClick={() => setShowTrackMenu(!showTrackMenu)}
+                                            className="flex justify-center items-center w-[27px] h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer"
+                                        >
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                 <rect x="3" y="4" width="18" height="16" rx="2" fill="#FFFFFF" />
                                                 <text x="5" y="16" fontSize="8" fontWeight="bold" fill="#1F1E18">CC</text>
@@ -519,12 +492,8 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                     </div>
 
                                     {/* Fullscreen */}
-                                    <button onClick={toggleFullscreen} className="flex justify-center items-center"
-                                        style={{
-                                            width: 27, height: 27, background: "#1F1E18", borderRadius: 5,
-                                            border: "none", cursor: "pointer"
-                                        }}>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <button onClick={toggleFullscreen} className="flex justify-center items-center w-[27px] h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                             <path d="M4 8V4H8M16 4H20V8M20 16V20H16M8 20H4V16"
                                                 stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
                                         </svg>
@@ -534,100 +503,52 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                         </div>
                     )}
                 </div>
+            </div>
 
-                {/* Info Container */}
-                <div className="flex flex-col justify-center items-center"
-                    style={{ width: "100%", background: "#1C1C1C", padding: "10px 10px 10px 0" }}>
-                    {/* Inner: flex col, items-start, gap-[22px], w-[896px] */}
-                    <div className="flex flex-col items-start" style={{ width: "100%", gap: 22 }}>
-
-                        {/* Header row: flex row, justify-between, h-[53px] */}
-                        <div className="flex flex-row justify-between items-center w-full" style={{ height: 53 }}>
-
-                            {/* LEFT: logo + status + title — flex row, items-center, gap-[13px] */}
-                            <div className="flex flex-row items-center" style={{ gap: 13 }}>
-                                {/* Logo: 95×42px */}
-                                <div className="relative flex-shrink-0" style={{ width: 95, height: 42 }}>
-                                    <SafeImage
-                                        src={video.channel_logo || video.logo || "/assets/placeholders/radio_icon_sur_card.png"}
-                                        alt={video.title} fill className="object-contain" />
+            {/* Info Container */}
+            <div className="h-[488px] w-full bg-[#333333]/10 px-[20px] py-[40px]">
+                    <div className="flex h-full flex-col justify-between">
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-[13px]">
+                                    <div className="relative h-[42px] w-[95px]">
+                                        <SafeImage
+                                            src={video.channel_logo || video.logo || "/assets/placeholders/radio_icon_sur_card.png"}
+                                            alt={video.title}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-[3px]">
+                                        <svg width="12" height="24" viewBox="0 0 12 24" fill="none">
+                                            <path d="M3 8L9 12L3 16" stroke="#E3211F" strokeWidth="1.5" strokeLinecap="round" />
+                                        </svg>
+                                        <span className="text-[16px] font-bold text-[#BBBBBB] line-clamp-1">
+                                            {video.title}
+                                        </span>
+                                    </div>
                                 </div>
-                                {/* Status + title: flex row, items-center, gap-[3px] */}
-                                <div className="flex flex-row items-center" style={{ gap: 3 }}>
-                                    {/* Dot: 6×6px #F80000 */}
-                                    <div className="rounded-full flex-shrink-0"
-                                        style={{ width: 6, height: 6, background: "#F80000" }} />
-                                    {/* "LIVE": Inter/700 13px blanc */}
-                                    <span style={{
-                                         fontWeight: 700, fontSize: 13,
-                                        lineHeight: "50px", color: "#db0e0eff",
-                                        display: "flex", alignItems: "center", textAlign: "center"
-                                    }}>
-                                        Replay
-                                    </span>
-                                    {/* Arrow: 12×24px #F80000 */}
-                                    <svg width="12" height="24" viewBox="0 0 12 24" fill="none">
-                                        <path d="M3 8L9 12L3 16" stroke="#F80000" strokeWidth="1.5" strokeLinecap="round" />
-                                    </svg>
-                                    {/* Channel title: DM Sans/700 16px blanc, w-137px */}
-                                    <span style={{
-                                        fontWeight: 700, fontSize: 16,
-                                        lineHeight: "18px", color: "#FFFFFF",
-                                        height: 26, display: "flex", alignItems: "center", paddingRight: 2
-                                    }}>
-                                        {video.title}
-                                    </span>
-
-                                </div>
-                            </div>
-
-                            {/* RIGHT: Share button — 45×45px, bg #FFFFFF, border-radius 5px, shadow */}
-                            <div className="flex-shrink-0 ">
                                 <ShareButton
                                     title={video.title}
-                                    text={`Regardez ${video.title} en direct sur CRTV Web`}
-                                    className="flex justify-center items-center"
+                                    text={`Regardez ${video.title} en replay sur CRTV Web`}
+                                    className="shrink-0"
                                     iconClassName="w-6 h-6"
                                 />
                             </div>
+                            <p className="text-[14px] leading-[21px] text-[#A4A4A4]">
+                                {video.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
+                            </p>
                         </div>
-
-                        {/* Description: Nunito/400 16px #8E8E8E, w-629px, h-76px */}
-                        <p style={{
-                            fontWeight: 400, fontSize: 16, paddingLeft: 20,
-                            lineHeight: "22px", color: "#8E8E8E", width: 629, height: 76,
-                            overflow: "hidden"
-                        }}>
-                            {video.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
-                        </p>
-
-                        {/* Programme subtitle: DM Sans/700 15px #FF0000, w-896px, h-40px */}
-                        <div className="flex items-center w-full" style={{ height: 40, paddingLeft: 20, }}>
-                            <span style={{
-                                 fontWeight: 700, fontSize: 15,
-                                lineHeight: "18px", color: "#FF0000"
-                            }}>
-                                {"REPLAY"}
-                            </span>
-                            {/*divider vertical puis presenter par puis le nom de l'emission*/}
-                            <span style={{
-                              fontWeight: 700, fontSize: 15,
-                                lineHeight: "18px", color: "#7a7a7aff", padding: 5
-                            }}>
-                                | DE L'EMISSION :
-                            </span>
-                            <span style={{
-                               fontWeight: 700, fontSize: 15,
-                                lineHeight: "18px", color: "#b4b4b4ff", padding: 5
-                            }}>
-                                {" " + video.title}
-                            </span>
+                        <div className="flex row item-center ">
+                        <div className="text-[15px] font-bold leading-[18px] text-[#F90000]">
+                            REPLAY  I  DE L'EMISSION: 
+                        </div>
+                        <div className="text-[15px] font-bold leading-[18px] text-[#BBBBBB] line-clamp-1 px-2">
+                        {video.title}
+                        </div>
                         </div>
                     </div>
-                </div>
             </div>
-
-
         </div>
 
     );

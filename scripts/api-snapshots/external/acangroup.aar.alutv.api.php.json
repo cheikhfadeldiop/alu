@@ -1,0 +1,24 @@
+{
+    "allitems": [
+        {
+            "title": "ALU TV",
+            "des": "Alu TV from ABUJA",
+            "type": "tv",
+            "logo": "https:\/\/acangroup.org\/aar\/logo\/assamadiyyahtv.png",
+            "stream_url": "https:\/\/live1.acangroup.org:1929\/acanabr\/alutv\/playlist.m3u8?wmsAuthSign=c2VydmVyX3RpbWU9NC8xNS8yMDI2IDEyOjIzOjU2IFBNJmhhc2hfdmFsdWU9ZEx6RlZvZlpuQm9ibXk0a0FnRHphdz09JnZhbGlkbWludXRlcz0zMA==",
+            "hls_url": "https:\/\/live1.acangroup.org:1929\/acanabr\/alutv\/playlist.m3u8?wmsAuthSign=c2VydmVyX3RpbWU9NC8xNS8yMDI2IDEyOjIzOjU2IFBNJmhhc2hfdmFsdWU9ZEx6RlZvZlpuQm9ibXk0a0FnRHphdz09JnZhbGlkbWludXRlcz0zMA==",
+            "api_key": "AIzaSyCZ2BQ4z0Mf41tnxonZzgYj5neV13Ya4Fo",
+            "yt_channel_id": "UCAUyALRtbHt_0Uu7xMAp1gg"
+        },
+        {
+            "title": "Alu Radio",
+            "des": "Alu Radio",
+            "type": "radio",
+            "logo": "https:\/\/acangroup.org\/aar\/logo\/assamadiyyahtv.png",
+            "stream_url": "https:\/\/10gb1.acangroup.org:8000\/aluya",
+            "hls_url": "https:\/\/10gb1.acangroup.org:8000\/aluya",
+            "api_key": "AIzaSyCZ2BQ4z0Mf41tnxonZzgYj5neV13Ya4Fo",
+            "yt_channel_id": "UCAUyALRtbHt_0Uu7xMAp1gg"
+        }
+    ]
+}

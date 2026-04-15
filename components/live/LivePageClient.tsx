@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useRouter, usePathname } from "@/i18n/navigation";
+import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { LiveSelectionCarousel } from "./LiveSelectionCarousel";
-import { LivePlayerSection } from "./LivePlayerSection";
-import { UpcomingProgramsTimeline } from "../radio/UpcomingProgramsTimeline";
-import { RadioPlayerSection } from "../radio/RadioPlayerSection";
-import { RadioAudiosSection } from "../radio/RadioAudiosSection";
 import { LiveChannel, EPGItem, FullEPGChannel, AODItem } from "../../types/api";
+import { SafeImage } from "../ui/SafeImage";
+import { AdBannerH, AdBannerHD } from "../ui/AdBanner";
+import { LivePlayerSection } from "./LivePlayerSection";
 
 interface LivePageClientProps {
     initialChannels: LiveChannel[];
@@ -17,95 +14,127 @@ interface LivePageClientProps {
     aodItems: AODItem[];
 }
 
-export function LivePageClient({ initialChannels, epgData, fullEpg, aodItems }: LivePageClientProps) {
-    const router = useRouter();
-    const pathname = usePathname();
+export function LivePageClient({ initialChannels, epgData, fullEpg, aodItems: _aodItems }: LivePageClientProps) {
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
 
-    // Default to first TV channel or channel from URL parameter
-    const getDefaultChannel = () => {
+    const selectedChannel = useMemo(() => {
         if (channelParam) {
             const paramChannel = initialChannels.find(c => c.slug === channelParam || c.id === channelParam);
             if (paramChannel) return paramChannel;
         }
         return initialChannels.find(c => c.type === 'TV') || initialChannels[0];
-    };
-
-    const [selectedChannel, setSelectedChannel] = useState<LiveChannel>(getDefaultChannel());
-    const [selectedCarouselId, setSelectedCarouselId] = useState<string>(getDefaultChannel()?.slug || getDefaultChannel()?.id || '');
-
-    // Update selected channel when URL parameter changes
-    useEffect(() => {
-        if (channelParam) {
-            const paramChannel = initialChannels.find(c => c.slug === channelParam || c.id === channelParam);
-            if (paramChannel) {
-                setSelectedChannel(paramChannel);
-                setSelectedCarouselId(paramChannel.slug || paramChannel.id);
-            }
-        }
     }, [channelParam, initialChannels]);
 
-    // Filter EPG for the selected channel (Daily schedule)
-    const activeChannelEPG = useMemo(() => {
-        if (!selectedChannel) return [];
-        return epgData.filter(item => item.channel_id === selectedChannel.id);
+    const currentProgram = useMemo(() => {
+        if (!selectedChannel) return undefined;
+        return epgData.find((item) => item.channel_id === selectedChannel.id && item.is_current) || epgData[0];
     }, [epgData, selectedChannel]);
 
-    // Current EPG items for all channels (for carousel info)
-    const currentPrograms = useMemo(() => {
-        return epgData.filter(item => item.is_current);
-    }, [epgData]);
+    const latestVideos = useMemo(() => {
+        const pool = initialChannels.filter((ch) => ch.type === "TV");
+        if (!pool.length) return [];
+        return Array.from({ length: 12 }, (_, i) => pool[i % pool.length]);
+    }, [initialChannels]);
 
-    // Handle channel selection
-    const handleChannelSelect = (channel: LiveChannel) => {
-        setSelectedCarouselId(channel.slug || channel.id);
-        setSelectedChannel(channel);
-        router.replace(`${pathname}?channel=${channel.slug || channel.id}`, { scroll: false });
-    };
+    const programs = useMemo(() => {
+        const flattened = fullEpg.flatMap((channel) => {
+            const matin = channel.subitems?.matin || [];
+            const soir = channel.subitems?.soir || [];
+            return [...matin, ...soir].map((p) => ({
+                title: p.title || "CANDELIGHT INITIATIVE",
+                logo: p.logo || channel.logo,
+                days: "Monday - Thursday",
+                time: p.startTime || "09:00 PM",
+            }));
+        });
+        if (!flattened.length) {
+            return Array.from({ length: 4 }, () => ({
+                title: "CANDELIGHT INITIATIVE",
+                logo: selectedChannel?.logo_url || selectedChannel?.logo || "",
+                days: "Monday - Thursday",
+                time: "09:00 PM",
+            }));
+        }
+        return flattened.slice(0, 4);
+    }, [fullEpg, selectedChannel]);
 
     if (!selectedChannel) {
         return <div className="text-center text-white py-20">Aucune chaîne disponible</div>;
     }
 
     return (
-        <div className="space-y-8 md:space-y-12">
-            {/* 1. Carousel with Tabs */}
-            <LiveSelectionCarousel
-                channels={initialChannels}
-                epgItems={currentPrograms}
-                fullEpg={fullEpg}
-                onSelectChannel={handleChannelSelect}
-                selectedChannelId={selectedCarouselId}
-            />
+        <div className="space-y-[45px] text-white">
+            <LivePlayerSection channel={selectedChannel} currentProgram={currentProgram} />
 
-            {/* 2. Player Section */}
-            {selectedChannel.type === 'TV' ? (
-                <LivePlayerSection
-                    channel={selectedChannel}
-                    currentProgram={currentPrograms.find(p => p.channel_id === selectedChannel.id)}
-                />
-            ) : (
-                <RadioPlayerSection
-                    channel={selectedChannel}
-                    currentProgram={currentPrograms.find(p => p.channel_id === selectedChannel.id)}
-                />
-            )}
+            <section className="mx-auto w-full max-w-[1280px] space-y-[50px]">
+                <div className="news-section-header">
+                    <h2 className="fig-h9 uppercase text-white">Latest videos</h2>
+                    <div className="news-section-line" />
+                </div>
+                <div className="grid gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+                    {latestVideos.map((video, index) => (
+                        <article key={`${video.id}-${index}`} className="space-y-2">
+                            <div className="h-[172px] overflow-hidden rounded-[10px]">
+                                <SafeImage
+                                    src={video.logo_url || video.logo || "/assets/placeholders/live_tv_frame.png"}
+                                    alt={video.title}
+                                    width={306}
+                                    height={172}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                            <h3 className="line-clamp-2 text-[16px] leading-[24px] text-white">
+                                Sabon Shugaban Karamar Hukumar Kebbe Alh. Musa Garba Kuci Ya Lashe
+                            </h3>
+                            <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+                                <span>15 juin 2024</span>
+                                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+                                <span>15:47</span>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+                <div className="flex justify-center">
+                    <button type="button" className="h-[40px] rounded-[60px] border border-[#777777] px-5 text-[14px] font-semibold uppercase text-white">
+                        Load more
+                    </button>
+                </div>
+            </section>
 
-            {/* 3. Info & Grid Section */}
-            {selectedChannel.type === 'TV' ? (
-                <>
-                    {fullEpg.length > 0 && (
-                        <UpcomingProgramsTimeline
-                            epgData={fullEpg}
-                            currentChannelId={selectedChannel.id}
-                            currentChannelLogo={selectedChannel.logo_url || selectedChannel.logo}
-                        />
-                    )}
-                </>
-            ) : (
-                <RadioAudiosSection items={aodItems} />
-            )}
+            <div className="mx-auto w-full max-w-[1280px]">
+                <AdBannerHD className="mx-auto max-w-[1280px] py-16" />
+            </div>
+
+            <section className="mx-auto w-full max-w-[1280px] space-y-[42px]">
+                <div className="news-section-header">
+                    <h2 className="fig-h9 uppercase text-white">Programs TV</h2>
+                    <div className="news-section-line" />
+                </div>
+                <div className="grid gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+                    {programs.map((program, idx) => (
+                        <article key={`${program.title}-${idx}`} className="space-y-4">
+                            <div className="h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
+                                <SafeImage
+                                    src={program.logo || "/assets/placeholders/live_tv_frame.png"}
+                                    alt={program.title}
+                                    width={343}
+                                    height={440}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                            <h3 className="fig-h9 uppercase text-white">{program.title}</h3>
+                            <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+                                <span>Monday</span>
+                                <span>-</span>
+                                <span>Thursday</span>
+                                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+                                <span>{program.time}</span>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

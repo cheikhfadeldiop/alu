@@ -98,8 +98,8 @@ html.dark {
   --primary-text-dark: #606060;
   --primary-border: #E0DBE8;
   --primary-background: #FDF9FF;
-  --background: #07080a;
-  --surface: #101216;
+  --background: #171717;
+  --surface: #10121600;
   --surface-2: #0c0e12;
   --foreground: #f2f4f8;
   --muted: #a1a7b2;
@@ -111,8 +111,8 @@ html.dark {
   --pattern-invert: 1;
 
   /* Figma home tokens (dark) */
-  --fig-bg: #15121a;
-  --fig-surface: #221c2b;
+  --fig-bg: #15121a00;
+  --fig-surface: #3333331e;
   --fig-text-primary: #f3edf9;
   --fig-text-secondary: #b8accc;
   --fig-border: #413650;
@@ -136,7 +136,7 @@ html.dark {
 /* Fallback if next-themes hasn't mounted yet */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --background: #07080a;
+    --background: #171717;
     --surface: #101216;
     --surface-2: #0c0e12;
     --foreground: #f2f4f8;

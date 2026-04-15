@@ -1,0 +1,21 @@
+﻿{
+    "createdAt":  "2026-04-15T12:23:53.2520756+00:00",
+    "appId":  "lacrtv",
+    "wpCategoryId":  9,
+    "endpoints":  [
+                      "https://tveapi.acan.group/myapiv2/listLiveTV/lacrtv/json",
+                      "https://tveapi.acan.group/myapiv2/listLiveRadios/lacrtv/json",
+                      "https://tveapi.acan.group/myapiv2/guidetvnow/lacrtv/json",
+                      "https://tveapi.acan.group/myapiv2/guidetvall/lacrtv/today/json",
+                      "https://tveapi.acan.group/myapiv2/listChannelsbygroup/lacrtv/json",
+                      "https://tveapi.acan.group/myapiv2/alaunesliders/lacrtv/json",
+                      "https://actu.crtv.cm/wp-json/wp/v2/posts?_embed=wp:featuredmedia,wp:term\u0026per_page=20\u0026page=1",
+                      "https://actu.crtv.cm/wp-json/wp/v2/posts?_embed=wp:featuredmedia,wp:term\u0026per_page=20\u0026page=1\u0026categories=9",
+                      "https://acangroup.org/aar/alutv/api.php",
+                      "https://tveapi.acan.group/myapiv2/relatedItems/lacrtv/32926/json",
+                      "https://tveapi.acan.group/myapiv2/relatedItems/lacrtv/32906/json",
+                      "https://tveapi.acan.group/myapiv2/relatedItems/lacrtv/32901/json",
+                      "https://tveapi.acan.group/myapiv2/relatedItems/lacrtv/32860/json",
+                      "https://tveapi.acan.group/myapiv2/relatedItems/lacrtv/32854/json"
+                  ]
+}

@@ -52,7 +52,7 @@ export function Header() {
   const pathname = usePathname();
   const locale = useLocale();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [langOpen, setLangOpen] = React.useState(false);
   const [showHeader, setShowHeader] = React.useState(true);
@@ -103,10 +103,19 @@ export function Header() {
   ] as const;
 
   const currentLocale = localeOptions.find((o) => o.value === locale) ?? localeOptions[0];
+  const isDarkMediaRoute =
+    pathname.includes("/live") ||
+    pathname.includes("/replay") ||
+    pathname.includes("/radio") ||
+    pathname.includes("/playback");
+  const isDarkTheme = mounted && resolvedTheme === "dark";
+  const useDarkHeader = isDarkMediaRoute || isDarkTheme;
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full  bg-[var(--fig-surface)]/95 backdrop-blur transition-transform duration-300 ${
+      className={`sticky top-0 z-50 w-full backdrop-blur transition-transform duration-300 ${
+        useDarkHeader ? "bg-[#3333331e]" : "bg-[var(--fig-surface)]"
+      } ${
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -123,7 +132,7 @@ export function Header() {
             />
           </Link>
 
-          <nav className="mx-auto hidden h-[50px] w-full max-w-[640px] items-center justify-center rounded-[60px] bg-[#f7f3fa]/50 px-[10px] md:flex">
+          <nav className={`mx-auto hidden h-[50px] w-full max-w-[640px] items-center justify-center rounded-[60px] px-[10px] md:flex ${useDarkHeader ? "bg-[#2A2A2A]" : "bg-[#f7f3fa]/50"}`}>
             <div className="flex items-center gap-[8px]">
               {navItems.map((item) => {
                 const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -132,9 +141,13 @@ export function Header() {
                     key={item.key}
                     href={item.href}
                     className={`flex h-[30px] items-center justify-center rounded-[30px] px-4 text-[14px] ${
-                      active
-                        ? "border text-[#5f3974] [border-color:var(--fig-border)]"
-                        : "text-[#5f3974]"
+                      useDarkHeader
+                        ? active
+                          ? "border border-[#8E8E8E] text-[#8E8E8E]"
+                          : "text-[#8E8E8E]"
+                        : active
+                          ? "border text-[#5f3974] [border-color:var(--fig-border)]"
+                          : "text-[#5f3974]"
                     }`}
                   >
                     {item.key === "home" ? <HomeIcon /> : item.label}
@@ -149,7 +162,9 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setLangOpen((prev) => !prev)}
-                className="flex h-[34px] items-center gap-2 rounded-full border px-2 pr-3 text-[13px] text-[#333] [border-color:var(--fig-border)]"
+                className={`flex h-[34px] items-center gap-2 rounded-full border px-2 pr-3 text-[13px] ${
+                  useDarkHeader ? "border-[#4a4a4a] text-white bg-[#2A2A2A]" : "text-[#333] [border-color:var(--fig-border)]"
+                }`}
               >
                 <img src={currentLocale.flag} alt={currentLocale.label} className="h-4 w-6 rounded-[2px] object-cover" />
                 <span>{currentLocale.value.toUpperCase()}</span>
@@ -157,7 +172,11 @@ export function Header() {
               </button>
 
               {langOpen && (
-                <div className="absolute right-0 mt-2 w-[150px] rounded-xl border bg-[var(--fig-surface)] p-1 shadow-lg [border-color:var(--fig-border)]">
+                <div className={`absolute right-0 mt-2 w-[150px] rounded-xl border p-1 shadow-lg ${
+                  useDarkHeader
+                    ? "border-[#4a4a4a] bg-[#1f1f1f]"
+                    : "bg-[var(--fig-surface)] [border-color:var(--fig-border)]"
+                }`}>
                   {localeOptions.map((option) => (
                     <button
                       key={option.value}
@@ -166,7 +185,11 @@ export function Header() {
                         setLangOpen(false);
                         router.replace(pathname, { locale: option.value });
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] text-[var(--fig-text-primary)] hover:bg-[#f4eef9]"
+                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] ${
+                        useDarkHeader
+                          ? "text-[#E8E8E8] hover:bg-[#2A2A2A]"
+                          : "text-[var(--fig-text-primary)] hover:bg-[#f4eef9]"
+                      }`}
                     >
                       <img src={option.flag} alt={option.label} className="h-4 w-6 rounded-[2px] object-cover" />
                       <span>{option.label}</span>
@@ -176,7 +199,7 @@ export function Header() {
               )}
             </div>
 
-            <div className="flex h-[50px] items-center gap-[5px] rounded-[60px] border px-[9px] [border-color:var(--fig-border)]">
+            <div className={`flex h-[50px] items-center gap-[5px] rounded-[60px] border px-[9px] ${useDarkHeader ? "border-[#4a4a4a]" : "[border-color:var(--fig-border)]"}`}>
               {(["light", "system", "dark"] as const).map((mode) => {
                 const active = mounted && (theme ?? "system") === mode;
                 return (
@@ -185,7 +208,7 @@ export function Header() {
                     type="button"
                     onClick={() => setTheme(mode)}
                     className={`flex h-[33px] w-[33px] items-center justify-center rounded-full ${
-                      active ? "bg-[#4a4a4a] text-white" : "text-[#5f3974]"
+                      active ? "bg-[#4a4a4a] text-white" : useDarkHeader ? "text-[#E8E8E8]" : "text-[#5f3974]"
                     }`}
                     aria-label={mode}
                   >

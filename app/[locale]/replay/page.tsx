@@ -1,60 +1,79 @@
-import {
-  getLiveChannels,
-  getEPGNow,
-  getLatestAggregateReplays,
-  getVODShows,
-  getReplaysByShowAggregated
-} from "../../../services/api";
-import { LiveDirectSection } from "../../../components/replay/LiveDirectSection";
-import { DernieresEditionsCarousel } from "../../../components/replay/DernieresEditionsCarousel";
-import { MissedAiringSection } from "../../../components/replay/MissedAiringSection";
-import { EmissionsSlider } from "../../../components/replay/EmissionsSlider";
-import { AdBanner } from "@/components/ui/AdBanner";
-import { Suspense } from "react";
-import { PromoAntenneWrapper } from "@/components/home/HomeWrappers";
+import { getVODShows } from "../../../services/api";
+import { AdBannerH, AdBannerHD } from "@/components/ui/AdBanner";
+import { SafeImage } from "@/components/ui/SafeImage";
+import { Link } from "@/i18n/navigation";
 
-export default async function ReplayPage() {
-  // Fetch all data for the replay main page
-  const [liveChannelsData, epgData, replays, showsData] = await Promise.all([
-    getLiveChannels().catch(() => ({ allitems: [] })),
-    getEPGNow().catch(() => ({ allitems: [] })),
-    getLatestAggregateReplays().catch(() => []),
-    getVODShows().catch(() => ({ allitems: [] })),
-  ]);
+type ReplayPageProps = {
+  searchParams?: Promise<{ rows?: string }>;
+};
 
-  const liveChannels = liveChannelsData.allitems || [];
-  const epgItems = epgData.allitems || [];
+export default async function ReplayPage({ searchParams }: ReplayPageProps) {
+  const params = (await searchParams) ?? {};
+  const rows = Math.max(3, Number(params.rows ?? "3"));
+  const showsData = await getVODShows().catch(() => ({ allitems: [] }));
+
   const shows = showsData.allitems || [];
+  const showFallback = {
+    id: "fallback-show",
+    slug: "candelight-initiative",
+    title: "CANDELIGHT INITIATIVE",
+    logo: "/assets/placeholders/live_tv_frame.png",
+    logo_url: "/assets/placeholders/live_tv_frame.png",
+  };
+  const showsPool = shows?.length ? shows : [showFallback];
+  const cards = Array.from({ length: rows * 4 }, (_, i) => showsPool[i % showsPool.length]);
 
   return (
-    <div className="py-8 space-y-8 md:space-y-12">
-      {/* 1. Live Direct Section */}
-      <div className="max-w-[1400px] mx-auto px-4">
-        <LiveDirectSection
-          channels={liveChannels}
-          epgItems={epgItems}
-        />
+    <div className="mx-auto py-8 text-white space-y-8 max-w-[1220px] md:space-y-12">
+      <div className="mx-auto w-full ">
+        <AdBannerHD />
       </div>
-      <AdBanner />
 
-      {/* 2. Replay Carousel */}
-      <DernieresEditionsCarousel videos={replays} liveChannels={liveChannels} />
+      <section className="mx-auto w-full  space-y-[42px]">
+        <div className="news-section-header">
+          <h2 className="fig-h9 uppercase text-white">Programs TV</h2>
+          <div className="news-section-line" />
+        </div>
 
-      {/* 3. Missed Airing Section */}
-      <MissedAiringSection initialVideos={replays} liveChannels={liveChannels} />
+        <div className="grid gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+          {cards.map((program, idx) => (
+            <Link key={`${program.slug || program.id}-${idx}`} href={`/replay/${program.slug || program.id}`} className="space-y-4 pb-5 ">
+              <div className="h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
+                <SafeImage
+                  src={program.logo_url || program.logo || "/assets/placeholders/live_tv_frame.png"}
+                  alt={program.title || "Program"}
+                  width={343}
+                  height={440}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <h3 className="fig-h9 line-clamp-1 uppercase text-white">
+                {program.title || "CANDELIGHT INITIATIVE"}
+              </h3>
+              <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+                <span>Monday</span>
+                <span className="h-[2px] w-[8px] bg-[#606060]" />
+                <span>Thursday</span>
+                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+                <span>09:00 PM</span>
+              </div>
+            </Link>
+          ))}
+        </div>
 
-      <AdBanner />
+        <div className="flex justify-center">
+          <Link
+            href={`/replay?rows=${rows + 3}`}
+            className="h-[40px] rounded-[60px] border border-[#777777] px-5 text-[14px] font-semibold uppercase text-white inline-flex items-center"
+          >
+            Load more
+          </Link>
+        </div>
+      </section>
 
-      {/* 4. Nos Émissions Section */}
-      <EmissionsSlider shows={shows} />
-
-      {/* 5. Promo Antenne */}
-      <Suspense fallback={<div className="h-40 bg-muted/5 animate-pulse rounded-lg" />}>
-        <PromoAntenneWrapper
-          titre="CAPSULES VIDEOS CRTVWeb"
-          showMetadata={true}
-        />
-      </Suspense>
+      <div className="mx-auto w-full max-w-[1264px]">
+        <AdBannerHD />
+      </div>
     </div>
   );
 }

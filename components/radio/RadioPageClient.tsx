@@ -1,75 +1,24 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useRouter, usePathname } from "@/i18n/navigation";
-import { useSearchParams } from "next/navigation";
-import { LiveSelectionCarousel } from "../live/LiveSelectionCarousel";
+import { useMemo } from "react";
 import { RadioPlayerSection } from "./RadioPlayerSection";
-import { UpcomingProgramsTimeline } from "./UpcomingProgramsTimeline";
-import { LiveChannel, EPGItem, FullEPGChannel, AODItem, FullEPGProgram } from "../../types/api";
-import { RadioAudiosSection } from "./RadioAudiosSection";
-import { PromoAntenne } from "../home/PromoAntenne";
-import { AdBanner } from "../ui/AdBanner";
+import { LiveChannel, EPGItem } from "../../types/api";
 import { useTranslations } from "next-intl";
+import { AdBannerHD } from "../ui/AdBanner";
 
 interface RadioPageClientProps {
     initialRadios: LiveChannel[];
-    allChannels: LiveChannel[]; // Both radios and TV channels
     epgData: EPGItem[];
-    fullEpgData: FullEPGChannel[];
-    audiosData?: AODItem[];
-    promoPrograms?: FullEPGProgram[];
 }
 
-export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgData, audiosData = [], promoPrograms = [] }: RadioPageClientProps) {
+export function RadioPageClient({ initialRadios, epgData }: RadioPageClientProps) {
     const t = useTranslations("pages.radio");
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-    const channelParam = searchParams.get('channel');
-
-    // Default to first radio or radio from URL parameter
-    const getDefaultRadio = () => {
-        if (channelParam) {
-            const paramRadio = initialRadios.find(r => r.slug === channelParam || r.id === channelParam);
-            if (paramRadio) return paramRadio;
-        }
-        return initialRadios[0];
-    };
-
-    const [selectedRadio, setSelectedRadio] = useState<LiveChannel>(getDefaultRadio());
-    const [selectedCarouselId, setSelectedCarouselId] = useState<string>((getDefaultRadio()?.slug || getDefaultRadio()?.id) || '');
+    const selectedRadio = initialRadios[0];
 
     // Current EPG items for all channels (for carousel info)
     const currentPrograms = useMemo(() => {
         return epgData.filter(item => item.is_current);
     }, [epgData]);
-
-    // Update selected radio when URL parameter changes
-    useEffect(() => {
-        if (channelParam) {
-            const paramRadio = initialRadios.find(r => r.slug === channelParam || r.id === channelParam);
-            if (paramRadio) {
-                setSelectedRadio(paramRadio);
-                setSelectedCarouselId(paramRadio.slug || paramRadio.id);
-            }
-        }
-    }, [channelParam, initialRadios]);
-
-    // Handle channel/radio selection
-    const handleItemSelect = (item: LiveChannel) => {
-        const itemKey = item.slug || item.id;
-        setSelectedCarouselId(itemKey);
-
-        // If it's a TV channel, navigate to live page with this channel
-        if (item.type === 'TV') {
-            router.push(`/live?channel=${itemKey}`);
-        } else {
-            // Radio: Update state and URL
-            setSelectedRadio(item);
-            router.replace(`${pathname}?channel=${itemKey}`, { scroll: false });
-        }
-    };
 
     // Current program for the selected radio
     const currentRadioProgram = useMemo(() => {
@@ -83,39 +32,14 @@ export function RadioPageClient({ initialRadios, allChannels, epgData, fullEpgDa
 
     return (
         <div className="space-y-8 md:space-y-12">
-            {/* 1. Carousel with Tabs - Shows both radios and TV channels */}
-            <LiveSelectionCarousel
-                channels={allChannels}
-                epgItems={currentPrograms}
-                onSelectChannel={handleItemSelect}
-                selectedChannelId={selectedCarouselId}
-            />
+            <section className="relative mx-auto h-[247px] w-full max-w-[1227px] overflow-hidden ">
+            <AdBannerHD/>
 
-            {/* 2. Radio Player Section - Only plays radios */}
+            </section>
             <RadioPlayerSection
                 channel={selectedRadio}
                 currentProgram={currentRadioProgram}
-                onNextChannel={() => {
-                    const currentIndex = initialRadios.findIndex(r => (r.slug || r.id) === (selectedRadio.slug || selectedRadio.id));
-                    const nextIndex = (currentIndex + 1) % initialRadios.length;
-                    handleItemSelect(initialRadios[nextIndex]);
-                }}
-                onPrevChannel={() => {
-                    const currentIndex = initialRadios.findIndex(r => (r.slug || r.id) === (selectedRadio.slug || selectedRadio.id));
-                    const prevIndex = (currentIndex - 1 + initialRadios.length) % initialRadios.length;
-                    handleItemSelect(initialRadios[prevIndex]);
-                }}
             />
-
-            <AdBanner />
-
-            <div className="space-y-10 md:space-y-16">
-                {/* 3. Audios Section */}
-                <RadioAudiosSection items={audiosData} promoPrograms={promoPrograms} />
-
-                {/* 4. Promo Section matches Home design */}
-            </div>
-
         </div>
     );
 }
