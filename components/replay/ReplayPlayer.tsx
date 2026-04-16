@@ -53,7 +53,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
 
             const timeoutId = setTimeout(() => {
                 if (!resolvedUrl && !isAborted) {
-                    setError("Le chargement du flux a expiré (45s).");
+                    setError(t("streamUnavailable"));
                     setIsResolving(false);
                 }
             }, 45000);
@@ -99,7 +99,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                         clearTimeout(timeoutId);
                         return;
                     }
-                    throw new Error("Impossible de charger les métadonnées de la vidéo.");
+                    throw new Error(t("streamUnavailable"));
                 }
 
                 if (data.allitems && Array.isArray(data.allitems) && data.allitems.length > 0) {
@@ -138,7 +138,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                         clearTimeout(timeoutId);
                         return;
                     }
-                    throw new Error("Aucun flux exploitable trouvé.");
+                    throw new Error(t("streamUnavailable"));
                 }
 
                 if (!isAborted) {
@@ -148,7 +148,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
             } catch (err: any) {
                 console.error("Resolution Error:", err);
                 if (!isAborted) {
-                    setError(err.message || "Erreur de chargement.");
+                    setError(err.message || t("streamUnavailable"));
                     setIsResolving(false);
                 }
             }
@@ -180,7 +180,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
                             case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break;
-                            default: hls.destroy(); setError("Erreur fatale du flux."); break;
+                            default: hls.destroy(); setError(t("streamUnavailable")); break;
                         }
                     }
                 });
@@ -189,7 +189,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                 videoEl.src = resolvedUrl;
                 videoEl.play().catch(() => setIsResolving(false));
             } else {
-                setError("Navigateur non supporté.");
+                setError(t("streamUnavailable"));
                 setIsResolving(false);
             }
         };
@@ -291,7 +291,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
     const changeQuality = (index: number) => { if (hlsInstance) { hlsInstance.currentLevel = index; setCurrentQuality(index); setShowQualityMenu(false); } };
     const changeTrack = (index: number) => { if (hlsInstance) { hlsInstance.subtitleTrack = index; setCurrentTrack(index); setShowTrackMenu(false); } };
     const formatTime = (time: number) => {
-        if (isNaN(time)) return "00:00";
+        if (isNaN(time)) return t("timeZero");
         const h = Math.floor(time / 3600);
         const m = Math.floor((time % 3600) / 60);
         const s = Math.floor(time % 60);
@@ -306,7 +306,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
     const youtubeId = resolvedUrl ? getYoutubeId(resolvedUrl) : null;
 
     return (
-        <div ref={containerRef} className="mx-auto grid w-full max-w-[1280px] gap-0 overflow-hidden group/player mb-12 xl:grid-cols-[730px_550px]">
+        <div ref={containerRef} className="mx-auto bg-[#333333]/10 grid w-full max-w-[1280px] gap-0 overflow-hidden group/player mb-12 xl:grid-cols-[730px_550px]">
             <div className="w-full">
                 <div className="w-full flex flex-col relative overflow-hidden group/screen ">
                     <div className="relative h-[410px] overflow-hidden flex items-center justify-center bg-black">
@@ -436,12 +436,12 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         >
                                             <div className="flex flex-row items-center gap-1 sm:gap-[5px]">
                                                 <span className="text-[12px] sm:text-[14px] leading-[21px] text-white font-[Roboto]">
-                                                    {currentQuality === -1 ? 'Auto' : `${qualities.find(q => q.index === currentQuality)?.height}p`}
+                                                    {currentQuality === -1 ? t("auto") : `${qualities.find(q => q.index === currentQuality)?.height}p`}
                                                 </span>
                                                 <svg width="10" height="6" viewBox="0 0 10 6" fill="#FFFFFF" className={`transition-transform ${showQualityMenu ? 'rotate-180' : ''}`}>
                                                     <path d="M0 0L5 6L10 0Z" />
                                                 </svg>
-                                                <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">HD</span>
+                                                <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">{t("hd")}</span>
                                             </div>
                                         </button>
                                         {showQualityMenu && qualities.length > 0 && (
@@ -449,7 +449,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                                 <div className="p-1">
                                                     <button onClick={() => changeQuality(-1)}
                                                         className={`w-full px-4 py-2 text-[10px] font-bold uppercase text-left rounded-md transition-colors ${currentQuality === -1 ? 'bg-accent text-white' : 'text-white/60 hover:bg-white/5'}`}>
-                                                        Auto
+                                                        {t("auto")}
                                                     </button>
                                                     {qualities.map(q => (
                                                         <button key={q.index} onClick={() => changeQuality(q.index)}
@@ -470,7 +470,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         >
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                 <rect x="3" y="4" width="18" height="16" rx="2" fill="#FFFFFF" />
-                                                <text x="5" y="16" fontSize="8" fontWeight="bold" fill="#1F1E18">CC</text>
+                                                <text x="5" y="16" fontSize="8" fontWeight="bold" fill="#1F1E18">{t("cc")}</text>
                                             </svg>
                                         </button>
                                         {showTrackMenu && tracks.length > 0 && (
@@ -478,7 +478,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                                 <div className="p-2 space-y-1">
                                                     <button onClick={() => changeTrack(-1)}
                                                         className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentTrack === -1 ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>
-                                                        Off
+                                                        {t("ccOff")}
                                                     </button>
                                                     {tracks.map(tr => (
                                                         <button key={tr.index} onClick={() => changeTrack(tr.index)}
@@ -506,7 +506,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
             </div>
 
             {/* Info Container */}
-            <div className="h-[488px] w-full bg-[#333333]/10 px-[20px] py-[40px]">
+            <div className="h-[488px] w-full px-[20px] py-[40px]">
                     <div className="flex h-full flex-col justify-between">
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
@@ -530,23 +530,16 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                 </div>
                                 <ShareButton
                                     title={video.title}
-                                    text={`Regardez ${video.title} en replay sur ${SITE_CONFIG.name} Web`}
+                                    text={t("shareReplayText", { videoTitle: video.title, siteName: SITE_CONFIG.name })}
                                     className="shrink-0"
                                     iconClassName="w-6 h-6"
                                 />
                             </div>
                             <p className="text-[14px] leading-[21px] text-[#A4A4A4]">
-                                {video.desc || "Votre Chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés."}
+                                {video.desc || t("channelDescriptionFallback")}
                             </p>
                         </div>
-                        <div className="flex row item-center ">
-                        <div className="text-[15px] font-bold leading-[18px] text-[#F90000]">
-                            REPLAY  I  DE L'EMISSION: 
-                        </div>
-                        <div className="text-[15px] font-bold leading-[18px] text-[#BBBBBB] line-clamp-1 px-2">
-                        {video.title}
-                        </div>
-                        </div>
+                        
                     </div>
             </div>
         </div>

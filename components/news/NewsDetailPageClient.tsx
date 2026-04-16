@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useWordPressNews, useWordPressPost } from "@/hooks/useData";
@@ -11,6 +11,7 @@ import { NewsHeroShimmer } from "@/components/ui/shimmer/NewsShimmers";
 import { useRouter } from "@/i18n/navigation";
 import { SafeImage } from "../ui/SafeImage";
 import { useWordPressCategories } from "@/hooks/useData";
+import { useTranslations } from "next-intl";
 const TWO_YEARS_MS = 1000 * 60 * 60 * 24 * 365 * 2;
 
 function normalizeImageUrl(url?: string) {
@@ -24,7 +25,8 @@ function getPostImage(post: any) {
 }
 
 function isRecentPost(post: any) {
-  if (!post?.date) return false;
+  // If WP doesn't provide `date`, don't exclude the post (prevents “empty sidebar” glitches).
+  if (!post?.date) return true;
   const t = new Date(post.date).getTime();
   if (!Number.isFinite(t)) return false;
   return Date.now() - t <= TWO_YEARS_MS;
@@ -65,9 +67,17 @@ function MetaRow({ date }: { date?: string }) {
 export function NewsDetailPageClient({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("pages.news");
   const [activeSlug, setActiveSlug] = useState(slug);
   useEffect(() => setActiveSlug(slug), [slug]);
-  const { data: post, isLoading: postLoading } = useWordPressPost(activeSlug);
+
+  const { data: post, isLoading: postLoading, error: postError } = useWordPressPost(activeSlug);
+  const lastPostRef = useRef<any>(null);
+  useEffect(() => {
+    if (post) lastPostRef.current = post;
+  }, [post]);
+
+  const postForView = post ?? lastPostRef.current;
   const { data: wpCategories = [] } = useWordPressCategories();
   const validCategories = useMemo(
     () =>
@@ -85,38 +95,41 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
   const allCategoryIds = validCategories.length
     ? validCategories.map((c: any) => Number(c.id)).join(",")
     : String(activeCategoryId);
-  const postCategoryId = post?.categories?.[0] || SITE_CONFIG.categories.news.alaune;
-  const { data: categoryArticles = [], isLoading: categoryLoading } = useWordPressNews(postCategoryId, 40);
-  const { data: latestArticles = [], isLoading: latestLoading } = useWordPressNews(allCategoryIds, 80);
+  // Sidebar must remain stable for a given category, independent of the current post.
+  const { data: categoryArticles = [] } = useWordPressNews(activeCategoryId, 40);
+  const { data: latestArticles = [] } = useWordPressNews(allCategoryIds, 80);
 
   const categoryRecent = useMemo(() => categoryArticles.filter((item) => isRecentPost(item)), [categoryArticles]);
   const latestRecent = useMemo(() => latestArticles.filter((item) => isRecentPost(item)), [latestArticles]);
 
   const sameCategoryPool = useMemo(() => {
-    if (!post) return [];
+    if (!postForView) return [];
     const merged = [...categoryRecent, ...latestRecent];
     const dedup = new Map<number, any>();
     for (const item of merged) {
-      if (item?.id && item.id !== post.id && !dedup.has(item.id)) dedup.set(item.id, item);
+      if (item?.id && item.id !== postForView.id && !dedup.has(item.id)) dedup.set(item.id, item);
     }
     return Array.from(dedup.values()).sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime());
-  }, [post, categoryRecent, latestRecent]);
+  }, [postForView, categoryRecent, latestRecent]);
 
   const sideItems = useMemo(() => {
-    if (!post) return [];
+    if (!postForView) return [];
     const others = sameCategoryPool.slice(0, 4);
-    return [post, ...others];
-  }, [sameCategoryPool, post]);
+    return [postForView, ...others];
+  }, [sameCategoryPool, postForView]);
   const similarItems = useMemo(() => {
+    if (!postForView) return [];
     const dedup = new Map<number, any>();
     for (const item of latestRecent) {
-      if (item?.id && item.id !== post?.id && !dedup.has(item.id)) dedup.set(item.id, item);
+      if (item?.id && item.id !== postForView.id && !dedup.has(item.id)) dedup.set(item.id, item);
     }
     const sorted = Array.from(dedup.values()).sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime());
     return sorted.slice(0, 4);
-  }, [latestRecent, post?.id]);
+  }, [latestRecent, postForView]);
 
-  if (postLoading || categoryLoading || latestLoading || !post) {
+  // Initial load (or fetch failure with no cached data): show full shimmer.
+  // For slug changes, SWR keeps previous data so `post` should remain available most of the time.
+  if (!postForView) {
     return (
       <div className="mx-auto w-full max-w-[1280px] px-4 py-8 xl:px-0">
         <NewsHeroShimmer />
@@ -124,12 +137,16 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
     );
   }
 
-  const articleText = stripHtml(post.content?.rendered || post.excerpt?.rendered);
+  const articleText = stripHtml(postForView.content?.rendered || postForView.excerpt?.rendered);
   const openDetail = (item: any) => {
     if (!item) return;
     const target = String(item.slug || item.id);
     setActiveSlug(target);
-    router.replace(`/news/${target}?cat=${activeCategoryId}`);
+
+    // Keep the current route shell without triggering a full navigation (prevents right sidebar flicker).
+    if (typeof window !== "undefined") {
+      window.history.replaceState({}, "", `/news/${target}?cat=${activeCategoryId}`);
+    }
   };
   const handleBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -149,7 +166,7 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
             className="inline-flex items-center gap-2 text-[13px] text-[var(--fig-text-secondary)] hover:text-[var(--fig-text-primary)]"
           >
             <span>←</span>
-            <span>Retour</span>
+            <span>{t("back")}</span>
           </button>
         </div>
 
@@ -157,8 +174,8 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
         <div>
           <div className="h-[445px] overflow-hidden rounded-[10px]">
             <SafeImage
-              src={getPostImage(post)}
-              alt={decodeHtmlEntities(post.title?.rendered || "News")}
+              src={getPostImage(postForView)}
+              alt={decodeHtmlEntities(postForView.title?.rendered || "News")}
               className="h-full w-full object-cover"
               width={781}
               height={445}
@@ -166,9 +183,9 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
           </div>
 
           <h1 className="mt-[39px] text-[28px] font-bold leading-[42px] text-[var(--fig-text-primary)]">
-            {decodeHtmlEntities(post.title?.rendered || "")}
+            {decodeHtmlEntities(postForView.title?.rendered || "")}
           </h1>
-          <MetaRow date={post.date} />
+          <MetaRow date={postForView.date} />
 
           <div className="mt-[34px] space-y-6">
             {articleText
@@ -185,7 +202,7 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
 
         <aside>
           <div className="news-section-header">
-            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Latest in same category</h2>
+            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">{t("latestInSameCategory")}</h2>
             <div className="news-section-line" />
           </div>
           <div className="mt-3 space-y-[10px]">
@@ -219,46 +236,64 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
       </section>
 
       <section className="mt-[93px] flex flex-col gap-[41px]">
-        <div className="news-section-header">
-          <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Similar content</h2>
-          <div className="news-section-line" />
-        </div>
-        <div className="news-hscroll no-scrollbar pb-2">
-          {similarItems.map((item, idx) => (
-            <article key={`${item?.id || "similar"}-${idx}`} className="w-[356px]">
-              <Link
-                href={item ? `/news/${item.slug || item.id}` : "#"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  openDetail(item);
-                }}
-                className="block rounded-[10px] hover-lift-primary"
-              >
-                <div className="h-[200px] overflow-hidden rounded-[10px]">
-                  <SafeImage
-                    src={getPostImage(item)}
-                    alt={getTitle(item?.title?.rendered, idx)}
-                    className="h-full w-full object-cover"
-                    width={356}
-                    height={200}
-                  />
+  
+  {/* Header */}
+  <div className="news-section-header">
+    <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">{t("similarContent")}</h2>
+    <div className="news-section-line" />
+  </div>
+
+  {/* Scroll */}
+  <div className="overflow-x-auto no-scrollbar pb-2 pl-5 pt-5 pr-5">
+    <div className="flex gap-[20px]">
+
+      {similarItems.map((item, idx) => (
+        <article
+          key={`${item?.id || "similar"}-${idx}`}
+          className="w-[356px] shrink-0"
+        >
+          <Link
+            href={item ? `/news/${item.slug || item.id}` : "#"}
+            onClick={(e) => {
+              e.preventDefault();
+              openDetail(item);
+            }}
+            className="block rounded-[10px] hover-lift-primary"
+          >
+            <div className="flex flex-col h-[300px] overflow-hidden rounded-[10px]">
+
+              {/* Image */}
+              <SafeImage
+                src={getPostImage(item)}
+                alt={getTitle(item?.title?.rendered, idx)}
+                className="h-[200px] w-full object-cover rounded-[10px]"
+                width={356}
+                height={200}
+              />
+
+              {/* Content */}
+              <div className="h-[100px] px-[10px] pt-[10px] pb-2 flex flex-col justify-between">
+                
+                <h3 className="fig-h10 line-clamp-2 text-[var(--fig-text-primary)]">
+                  {getTitle(item?.title?.rendered, idx)}
+                </h3>
+
+                <div className="flex items-center justify-between">
+                  <MetaRow date={item?.date} />
+                  <span className="inline-flex h-[15px] items-center rounded-full border px-2 text-[8px] leading-[12px] text-[var(--fig-text-secondary)] [border-color:var(--fig-tag-religion)]">
+                    {safeCategoryLabel(item)}
+                  </span>
                 </div>
-                <div className="mt-[25px] w-[345px]">
-                  <h3 className="fig-h10 line-clamp-2 text-[var(--fig-text-primary)]">
-                    {getTitle(item?.title?.rendered, idx)}
-                  </h3>
-                  <div className="mt-[15px] flex items-center justify-between">
-                    <MetaRow date={item?.date} />
-                    <span className="inline-flex h-[15px] items-center rounded-full border px-2 text-[8px] leading-[12px] text-[var(--fig-text-secondary)] [border-color:var(--fig-tag-religion)]">
-                      {safeCategoryLabel(item)}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
+
+              </div>
+            </div>
+          </Link>
+        </article>
+      ))}
+
+    </div>
+  </div>
+</section>
       </div>
     </div>
   );

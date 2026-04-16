@@ -75,13 +75,7 @@ export default function ContactPage() {
                   <p className="text-[18px] font-medium leading-[27px] text-[var(--fig-text-primary)]">{SITE_CONFIG.contact.phones}</p>
                 </div>
 
-                <div className="flex flex-col gap-[4px]">
-                  <div className="flex items-center gap-[9px]">
-                    <IconFax className="h-6 w-6 text-[#118A39]" />
-                    <span className="text-[16px] font-normal uppercase leading-[24px] text-[var(--fig-text-secondary)]">{t("fax")}</span>
-                  </div>
-                  <p className="text-[18px] font-medium leading-[27px] text-[var(--fig-text-primary)]">{SITE_CONFIG.contact.fax}</p>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -117,9 +111,9 @@ export default function ContactPage() {
                   <span className="text-[14px] font-normal leading-[21px] text-[var(--fig-text-primary)]">{t("subject")}</span>
                   <select className="h-[38px] rounded-[5px] border border-[var(--fig-border)] bg-[var(--surface)] px-[14px] text-[10px] leading-[15px] text-[var(--fig-text-secondary)] outline-none" defaultValue="">
                     <option value="" disabled>{t("placeholders.subject")}</option>
-                    <option>Partenariat</option>
-                    <option>Support</option>
-                    <option>Autre</option>
+                    <option>{t("options.partnership")}</option>
+                    <option>{t("options.support")}</option>
+                    <option>{t("options.other")}</option>
                   </select>
                 </label>
 

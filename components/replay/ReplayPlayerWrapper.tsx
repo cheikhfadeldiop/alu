@@ -14,7 +14,7 @@ interface ReplayPlayerWrapperProps {
 export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapperProps) {
     const t = useTranslations("common");
     const params = useParams();
-    const slug = params?.slug as string;
+    const identifier = (params?.videoSlug || params?.slug) as string | undefined;
     const sectionRef = React.useRef<HTMLDivElement>(null);
     const [video, setVideo] = React.useState<SliderVideoItem | undefined>(initialVideo);
     const [isSearching, setIsSearching] = React.useState(!initialVideo);
@@ -29,7 +29,7 @@ export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapper
 
     // Deep search if video is missing (deep-links or refresh on paginated items)
     React.useEffect(() => {
-        if (!video && slug) {
+        if (!video && identifier) {
             const deepSearch = async () => {
                 setIsSearching(true);
 
@@ -39,7 +39,7 @@ export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapper
                 }, 45000);
 
                 try {
-                    const found = await findReplay(slug);
+                    const found = await findReplay(identifier);
                     if (found) {
                         clearTimeout(timer);
                         setVideo(found);
@@ -52,7 +52,7 @@ export function ReplayPlayerWrapper({ video: initialVideo }: ReplayPlayerWrapper
             };
             deepSearch();
         }
-    }, [video, slug]);
+    }, [video, identifier]);
 
     // Scroll into view only when initialVideo or slug changes if needed, 
     // but the user wants to avoid jumping, so we remove the auto-scroll.

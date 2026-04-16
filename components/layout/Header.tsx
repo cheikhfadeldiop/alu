@@ -42,7 +42,7 @@ function IconMonitor(props: React.SVGProps<SVGSVGElement>) {
 function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 9l6 6 6-6"  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -98,8 +98,8 @@ export function Header() {
   ];
 
   const localeOptions = [
-    { value: "fr", label: "Français", flag: "https://flagcdn.com/w40/fr.png" },
-    { value: "en", label: "English", flag: "https://flagcdn.com/w40/gb.png" },
+    { value: "fr", label: t("header.languages.fr"), flag: "https://flagcdn.com/w40/fr.png" },
+    { value: "en", label: t("header.languages.en"), flag: "https://flagcdn.com/w40/gb.png" },
   ] as const;
 
   const currentLocale = localeOptions.find((o) => o.value === locale) ?? localeOptions[0];
@@ -157,47 +157,68 @@ export function Header() {
             </div>
           </nav>
 
-          <div className="ml-auto flex items-center gap-3">
-            <div ref={langRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setLangOpen((prev) => !prev)}
-                className={`flex h-[34px] items-center gap-2 rounded-full border px-2 pr-3 text-[13px] ${
-                  useDarkHeader ? "border-[#4a4a4a] text-white bg-[#2A2A2A]" : "text-[#333] [border-color:var(--fig-border)]"
-                }`}
-              >
-                <img src={currentLocale.flag} alt={currentLocale.label} className="h-4 w-6 rounded-[2px] object-cover" />
-                <span>{currentLocale.value.toUpperCase()}</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
+          <div className="ml-auto flex items-center gap-10">
+          <div ref={langRef} className="relative">
+  
+  <button
+    type="button"
+    onClick={() => setLangOpen((prev) => !prev)}
+    className="flex items-center gap-[9px]"
+  >
+    {/* Flag */}
+    <img
+      src={currentLocale.flag}
+      alt={currentLocale.label}
+      className="w-[28px] h-[18px] object-cover"
+    />
 
-              {langOpen && (
-                <div className={`absolute right-0 mt-2 w-[150px] rounded-xl border p-1 shadow-lg ${
-                  useDarkHeader
-                    ? "border-[#4a4a4a] bg-[#1f1f1f]"
-                    : "bg-[var(--fig-surface)] [border-color:var(--fig-border)]"
-                }`}>
-                  {localeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => {
-                        setLangOpen(false);
-                        router.replace(pathname, { locale: option.value });
-                      }}
-                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] ${
-                        useDarkHeader
-                          ? "text-[#E8E8E8] hover:bg-[#2A2A2A]"
-                          : "text-[var(--fig-text-primary)] hover:bg-[#f4eef9]"
-                      }`}
-                    >
-                      <img src={option.flag} alt={option.label} className="h-4 w-6 rounded-[2px] object-cover" />
-                      <span>{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+    {/* Text + arrow */}
+    <div className="flex items-center gap-[5px]">
+      
+      <span
+        className={`text-[18px] leading-[27px] font-medium ${
+          useDarkHeader ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"
+        }`}
+      >
+        {currentLocale.value.toUpperCase()}
+      </span>
+
+      <ChevronDown
+  className={`w-[17px] h-[13px] transition-transform duration-200 ${
+    langOpen ? "rotate-180" : "rotate-0"
+  } ${useDarkHeader ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}
+/>
+    </div>
+  </button>
+
+  {/* Dropdown */}
+  {langOpen && (
+    <div className="absolute right-0 mt-2 w-[150px] rounded-xl border p-1 shadow-lg bg-[var(--fig-surface)] [border-color:var(--fig-border)]">
+      
+      {localeOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => {
+            setLangOpen(false);
+            router.replace(pathname, { locale: option.value });
+          }}
+          className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] ${
+            useDarkHeader ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"
+          } hover-lift-primary`}
+        >
+          <img
+            src={option.flag}
+            alt={option.label}
+            className="h-4 w-6 object-cover"
+          />
+          <span>{option.label}</span>
+        </button>
+      ))}
+
+    </div>
+  )}
+</div>
 
             <div className={`flex h-[50px] items-center gap-[5px] rounded-[60px] border px-[9px] ${useDarkHeader ? "border-[#4a4a4a]" : "[border-color:var(--fig-border)]"}`}>
               {(["light", "system", "dark"] as const).map((mode) => {

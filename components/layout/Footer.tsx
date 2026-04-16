@@ -3,19 +3,27 @@
 import { SafeImage } from "../ui/SafeImage";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { usePathname } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
   const pathname = usePathname();
+  const t = useTranslations("footer");
   const isDarkMediaRoute =
     pathname.includes("/live") ||
     pathname.includes("/replay") ||
     pathname.includes("/radio");
 
   return (
-    <footer className={`w-full px-4 pb-[50px] ${isDarkMediaRoute ? "mt-0 bg-[#171717]" : "mt-[50px]"}`}>
-      <div className={`mx-auto max-w-[1812px] rounded-[55px] px-6 py-[43px] md:px-[120px] ${
-        isDarkMediaRoute ? "bg-[#1F1F1F]" : "bg-[var(--fig-surface)]"
-      }`}>
+    <footer
+      className={`relative z-20 w-full px-4 pb-[50px] ${
+        isDarkMediaRoute ? "mt-0 bg-[#171717]" : "mt-[50px]"
+      }`}
+    >
+        <div
+          className={`mx-auto max-w-[1812px] rounded-[55px] px-6 py-[43px] md:px-[120px] ${
+            isDarkMediaRoute ? "bg-[#1F1F1F]" : "bg-[var(--fig-surface)]"
+          }`}
+        >
         <div className="mx-auto max-w-[1284px] ">
         <div className="grid items-start gap-10 md:grid-cols-[364px_1fr_281px] justify-between">
               <div className="space-y-[14px]">
@@ -26,7 +34,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className={`fig-h10 ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>Contact</h3>
+              <h3 className={`fig-h10 ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>{t("links.contact")}</h3>
               <div className={`mt-[22px] space-y-5 text-[16px] leading-[24px] ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>
                 <p>{SITE_CONFIG.contact.address}</p>
                 <p>{SITE_CONFIG.contact.phones}</p>
@@ -35,7 +43,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className={`fig-h10 ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>Download the app</h3>
+              <h3 className={`fig-h10 ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>{t("downloadApp")}</h3>
               <div className="mt-[30px] flex gap-[7px]">
                 <a href={SITE_CONFIG.apps.appleStore} target="_blank" rel="noopener noreferrer" className="block w-[137px]">
                   <SafeImage src="/assets/backgrounds/apple.png" alt="App Store" width={137} height={40} className="w-full object-contain" />
@@ -54,7 +62,7 @@ export function Footer() {
                   href={SITE_CONFIG.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Facebook"
+                  aria-label={t("social.facebook")}
                   className="inline-flex h-[16px] w-6 items-center justify-center transition-opacity hover:opacity-80"
                 >
                   <svg viewBox="0 0 24 25" className="h-[15px] w-6 fill-current" aria-hidden="true">
@@ -65,7 +73,7 @@ export function Footer() {
                   href={SITE_CONFIG.social.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Twitter"
+                  aria-label={t("social.twitter")}
                   className="inline-flex h-[16px] w-6 items-center justify-center transition-opacity hover:opacity-80"
                 >
                   <svg viewBox="0 0 24 25" className="h-[15px] w-6 fill-current" aria-hidden="true">
@@ -76,7 +84,7 @@ export function Footer() {
                   href={SITE_CONFIG.social.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="LinkedIn"
+                  aria-label={t("social.linkedin")}
                   className="inline-flex h-[16px] w-6 items-center justify-center transition-opacity hover:opacity-80"
                 >
                   <svg viewBox="0 0 24 25" className="h-[15px] w-6 fill-current" aria-hidden="true">
@@ -87,7 +95,7 @@ export function Footer() {
                   href={SITE_CONFIG.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Instagram"
+                  aria-label={t("social.instagram")}
                   className="inline-flex h-[17px]  w-6 items-center justify-center transition-opacity hover:opacity-80"
                 >
                   <svg
@@ -100,7 +108,7 @@ export function Footer() {
                 </a>
               </div>
               <p className={`text-[14px] ${isDarkMediaRoute ? "text-[#E8E8E8]" : "text-[var(--fig-text-primary)]"}`}>
-                ©2026 All Rights Reserved@aCANGroup
+                {t("copyright")}
               </p>
             </div>
           </div>

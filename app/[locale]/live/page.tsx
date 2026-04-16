@@ -4,7 +4,7 @@ import { LivePageClient } from "@/components/live/LivePageClient";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
   getAluLiveChannels,
-  getYouTubeLatestVideos
+  getYouTubeLatestVideosPage
 } from "@/services/api";
 import { LivePageShimmer } from "@/components/ui/shimmer/LiveShimmers";
 import { Metadata } from "next";
@@ -14,12 +14,16 @@ import { getSiteAbsoluteUrl, ensureAbsoluteUrl } from "@/services/api";
 async function LivePageContent() {
   const allChannelsRes = await getAluLiveChannels().catch(() => ({ allitems: [] }));
   const allChannels = allChannelsRes.allitems || [];
-  const channelVideos = await getYouTubeLatestVideos(48).catch(() => []);
+  const { items: channelVideos, nextPageToken } = await getYouTubeLatestVideosPage({ maxResults: 24, ttlKey: "realtime" }).catch(() => ({
+    items: [],
+    nextPageToken: null,
+  }));
 
   return (
     <LivePageClient
       initialChannels={allChannels}
       initialChannelVideos={channelVideos}
+      initialNextPageToken={nextPageToken}
       epgData={[]}
       fullEpg={[]}
       aodItems={[]}

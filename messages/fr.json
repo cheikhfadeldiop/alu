@@ -2,7 +2,7 @@
   "nav": {
     "home": "Accueil",
     "news": "Info",
-    "replay": "Vidéos",
+    "replay": "Replay TV",
     "radio": "Radio",
     "audio": "Audio",
     "live": "Live",
@@ -16,7 +16,11 @@
       "system": "Système",
       "light": "Clair",
       "dark": "Sombre"
-    }
+      },
+      "languages": {
+        "fr": "Français",
+        "en": "Anglais"
+      }
   },
   "footer": {
     "about": "Nous connaître",
@@ -25,6 +29,13 @@
     "other": "Autres",
     "description": "La Cameroon Radio Television est l'Office national de radio diffusion Télévision du Cameroun.",
     "short_description": "Telechargez nos applications depuis ",
+    "downloadApp": "Télécharger l’application",
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram"
+    },
     "links": {
       "about": "À propos",
       "crtvCameroon": "CRTV Cameroun",
@@ -75,6 +86,7 @@
     "inProgress": "En cours",
     "loading": "Chargement...",
     "loadMore": "Charger +",
+    "auto": "Auto",
     "controls": "CONTRÔLES",
     "previewUnavailable": "Aperçu non disponible",
     "streamUnavailable": "Flux indisponible",
@@ -94,7 +106,18 @@
     "retrySearch": "Réessayer la recherche",
     "scheduleUnavailable": "Programme non disponible pour le moment.",
     "tvSchedule": "Programme TV",
-    "noDescription": "Aucune description"
+    "noDescription": "Aucune description",
+    "hd": "HD",
+    "cc": "CC",
+    "ccOff": "Désactivé",
+    "timeZero": "00:00",
+    "program": "Programme",
+    "unknownTime": "--:--",
+    "presentedBy": "PRÉSENTÉ PAR :",
+    "channelDescriptionFallback": "Votre chaîne, au cœur de l'actualité et de la culture. Restez à l'écoute pour nos programmes variés.",
+    "shareLiveText": "Regardez {channel} en direct sur {siteName} Web",
+    "shareReplayText": "Regardez {videoTitle} en replay sur {siteName} Web",
+    "replayOfShowLabel": "REPLAY I DE L'EMISSION:"
   },
   "pages": {
     "home": {
@@ -164,6 +187,7 @@
         "longLoad": "Cela peut prendre jusqu'à 45 secondes...",
         "offlineTitle": "Radio Hors Ligne",
         "offlineMessage": "La radio est actuellement indisponible. Le flux pourrait être temporairement hors ligne.",
+        "replayOfflineMessage": "Le fichier audio ne peut pas être lu pour le moment.",
         "offline": "Hors ligne",
         "connecting": "Connexion...",
         "ready": "Prêt"
@@ -173,6 +197,8 @@
         "presentedBy": "PRÉSENTÉ PAR :",
         "live": "En direct"
       },
+      "shareLiveText": "Écoutez {channelTitle} en direct sur {siteName} Web",
+      "shareReplayText": "Écoutez cet audio : {channelTitle} sur {siteName} Web",
       "fallback": {
         "desc": "Votre radio nationale, au cœur de l'actualité et de la culture camerounaise. Restez à l'écoute pour nos programmes variés.",
         "program": "JOURNAL EN DIRECT",
@@ -203,7 +229,18 @@
       "moreOf": "plus d'",
       "newsTitle": "ACTUALITÉS",
       "loadingNews": "Chargement de l'actualité...",
-      "noArticles": "Aucun article trouvé dans cette catégorie pour le moment. Nous revenons bientôt avec plus d'actu !"
+      "noArticles": "Aucun article trouvé dans cette catégorie pour le moment. Nous revenons bientôt avec plus d'actu !",
+      "noRecentArticles": "Aucune actualité récente pour cette catégorie.",
+      "moreStories": "Plus d’histoires",
+      "mostPopular": "Les plus populaires",
+      "communicationAnnouncement": "Communication et annonce",
+      "back": "Retour",
+      "latestInSameCategory": "Le meilleur de la même catégorie",
+      "similarContent": "Contenu similaire",
+      "noArticlesAvailableTitle": "Aucun article disponible",
+      "noArticlesAvailableDesc": "Il n&apos;y a pas encore de contenu publié dans cette catégorie. Revenez plus tard ou explorez une autre rubrique.",
+      "selectAnotherCategoryHint": "Sélectionnez une autre catégorie ci-dessus",
+      "noSubcategory": "Aucune sous-catégorie"
     },
     "contact": {
       "title": "Contact",
@@ -225,6 +262,11 @@
         "phone": "Votre numéro de téléphone",
         "subject": "Sujet",
         "message": "Quel est votre message ?"
+      },
+      "options": {
+        "partnership": "Partenariat",
+        "support": "Support",
+        "other": "Autre"
       }
     },
     "info": {

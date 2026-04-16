@@ -30,7 +30,7 @@ export function ReplaySection({ videos }: ReplaySectionProps) {
                 {displayVideos.map((video, index) => (
                     <MediaCard
                         key={`${video.slug}-${index}`}
-                        href={video.video_url || `/replay/${video.slug}`}
+                        href={`/replay/${video.slug || video.id}`}
                         target={false}
                         title={video.title}
                         imageSrc={video.logo_url}

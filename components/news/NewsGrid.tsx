@@ -22,11 +22,14 @@ export function NewsGrid({
     loadingMore,
     hasMore,
     onLoadMore,
-    title = "plus ",
-    title2 = "ACTUELLES",
+    title,
+    title2,
     onItemClick,
 }: NewsGridProps) {
     const t = useTranslations("common");
+    const newsT = useTranslations("pages.news");
+    const resolvedTitle = title ?? `${newsT("moreOf")} `;
+    const resolvedTitle2 = title2 ?? newsT("newsTitle");
 
     const getImageUrl = (post: WordPressPost) =>
         post.acan_image_url ||
@@ -38,11 +41,11 @@ export function NewsGrid({
             <section className="flex flex-col items-center w-full py-6 sm:py-10">
                 <div className="w-full max-w-[1400px] mx-auto">
                     {/* HEADER */}
-                    {(title || title2) && (
+                    {(resolvedTitle || resolvedTitle2) && (
                         <div className="flex flex-row items-center justify-between w-full mb-6 sm:mb-10">
                             <SectionTitle
-                                title={title}
-                                title2={title2}
+                                title={resolvedTitle}
+                                title2={resolvedTitle2}
                                 className="font-bold"
                             />
                         </div>
@@ -74,10 +77,10 @@ export function NewsGrid({
                         {/* Text */}
                         <div className="flex flex-col items-center gap-2 text-center max-w-sm">
                             <h3 className="text-lg sm:text-xl font-bold uppercase text-foreground tracking-wide">
-                                Aucun article disponible
+                                {newsT("noArticlesAvailableTitle")}
                             </h3>
                             <p className="text-sm sm:text-base text-muted leading-relaxed">
-                                Il n&apos;y a pas encore de contenu publié dans cette catégorie. Revenez plus tard ou explorez une autre rubrique.
+                                {newsT("noArticlesAvailableDesc")}
                             </p>
                         </div>
 
@@ -89,7 +92,7 @@ export function NewsGrid({
                             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M19 12H5M12 19l-7-7 7-7" />
                             </svg>
-                            Sélectionnez une autre catégorie ci-dessus
+                            {newsT("selectAnotherCategoryHint")}
                         </p>
                     </div>
                 </div>
@@ -159,8 +162,8 @@ export function NewsGrid({
                 {/* HEADER */}
                 <div className="flex flex-row items-center justify-between w-full mb-4 sm:mb-6 md:mb-[30px]">
                     <SectionTitle
-                        title={title}
-                        title2={title2}
+                        title={resolvedTitle}
+                        title2={resolvedTitle2}
                         actionHref="/news"
                         actionIcon
                         className="font-bold"

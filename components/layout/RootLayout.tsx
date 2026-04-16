@@ -6,7 +6,7 @@ import { Footer } from "./Footer";
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex bg-[#171717] min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Header />
       <MainBackground>{children}</MainBackground>
       <Footer />

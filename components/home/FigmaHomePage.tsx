@@ -1,4 +1,4 @@
-import { AdBannerH } from "../ui/AdBanner";
+import { AdBannerH, AdBannerH2 } from "../ui/AdBanner";
 import { AdBanV } from "../ui/AdBannerV";
 import { SafeImage } from "../ui/SafeImage";
 import type { WordPressPost, SliderVideoItem } from "@/types/api";
@@ -130,6 +130,8 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
   const logoPlaceholder = SITE_CONFIG.theme.placeholders.logo;
   const shortsPool = shorts && shorts.length
     ? shorts
+    : normalizedVideos.length
+      ? normalizedVideos
     : [
       { id: "short-fb-1", slug: "short-fb-1", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
       { id: "short-fb-2", slug: "short-fb-2", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
@@ -180,7 +182,7 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
     <div className="flex items-center gap-2 text-sm text-gray-300 justify-between">
       <div>
       <span>{heroCenter?.date ? formatDate(heroCenter.date) : nowLabel}</span>
-      <Dot />
+      <Dot/>
       <span>{formatDisplayTime(heroCenter?.date)}</span>
       </div>
       <div>
@@ -199,10 +201,10 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
             <Link
               key={stableItemKey(post || {}, `side-${i}`)}
               href={wpHref(post)}
-              className="block rounded-[10px] hover-lift-primary"
+              className="block rounded-[5px] mb-2 hover-lift-primary"
             >
-            <article className=" h-[122px] flex pb-3 justify-between  ">
-              <div className="flex flex-col bg-surface p-2  px-2 rounded-md justify-between">
+            <article className=" h-[115px] flex  justify-between  ">
+              <div className="flex flex-col bg-surface pb-3 w-full p-2  px-2 rounded-md justify-between">
               <h4 className="text-[16px] font-medium leading-[24px]">
                 {wpTitle(post, "Actualité")}
               </h4>
@@ -289,31 +291,54 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
         </div>
       </section>
 
-      <section >
-        <SectionTitle>{labels.latestNews}</SectionTitle>
-        <div className="grid gap-[15px] sm:grid-cols-2 lg:grid-cols-4 pt-6 pb-10 ">
-          {safePosts.slice(0, 4).map((post, i) => (
-            <Link
-              key={stableItemKey(post || {}, `latest-${i}`)}
-              href={wpHref(post)}
-              className="block rounded-[10px] hover-lift-primary"
-            >
-              <article>
-                <SafeImage alt={wpTitle(post, "Article")} className="h-[179px] w-full rounded-[10px] object-cover" src={wpImage(post)} width={300} height={179} />
-                <h4 className="mt-2 fig-h11 font-medium leading-[18px]">
-                  {wpTitle(post, "Actualité")}
-                </h4>
-                <div className="mt-1 flex items-center justify-between">
-                  <CardMeta date={post?.date} small />
-                  <CategoryTag label={getPostAuthor(post) || "News"} color="var(--fig-tag-news)" />
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <section>
+  <SectionTitle>{labels.latestNews}</SectionTitle>
 
-      <AdBannerH className="mx-auto max-w-[1280px] pb-6" />
+  <div className="pt-6 pl-2 pb-10 overflow-x-auto no-scrollbar">
+    <div className="flex gap-[20px]">
+      
+      {safePosts.slice(0, 4).map((post, i) => (
+        <Link
+          key={stableItemKey(post || {}, `latest-${i}`)}
+          href={wpHref(post)}
+          className="block w-[356px] shrink-0 rounded-[10px] hover-lift-primary"
+        >
+          <article className="rounded-[10px] h-[290px] flex flex-col overflow-hidden">
+            
+            {/* Image */}
+            <SafeImage
+              alt={wpTitle(post, "Article")}
+              className="h-[200px] w-full object-cover rounded-[10px]"
+              src={wpImage(post)}
+              width={356}
+              height={200}
+            />
+
+            {/* Content */}
+            <div className="px-[10px]  pt-[1px] pb-2 h-[100px] flex flex-col justify-between">
+              
+              <h4 className="fig-h11 font-medium leading-[20px] line-clamp-2">
+                {wpTitle(post, "Actualité")}
+              </h4>
+
+              <div className="flex items-center justify-between">
+                <CardMeta date={post?.date} small />
+                <CategoryTag
+                  label={getPostAuthor(post) || "News"}
+                  color="var(--fig-tag-news)"
+                />
+              </div>
+
+            </div>
+
+          </article>
+        </Link>
+      ))}
+
+    </div>
+  </div>
+</section>
+      <AdBannerH2 className="mx-auto max-w-[1280px] pb-6" />
 
       <section>
       <SectionTitle>{labels.videos}</SectionTitle>

@@ -9,13 +9,29 @@ import { AdBannerH, AdBannerHD } from "../ui/AdBanner";
 import { LivePlayerSection } from "./LivePlayerSection";
 import { formatDate, parseToDate } from "@/utils/text";
 import { SITE_CONFIG } from "@/constants/site-config";
+import { useTranslations } from "next-intl";
 
 interface LivePageClientProps {
     initialChannels: LiveChannel[];
     initialChannelVideos: SliderVideoItem[];
+    initialNextPageToken?: string | null;
     epgData: EPGItem[];
     fullEpg: FullEPGChannel[];
     aodItems: AODItem[];
+}
+
+const LIVE_GRID_ROW_SIZE = 4;
+const LIVE_FETCH_BATCH_SIZE = 8;
+const INITIAL_VISIBLE_LATEST_COUNT = LIVE_GRID_ROW_SIZE * 3; // 3 lignes
+
+function uniqVideos(items: SliderVideoItem[]) {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+        const key = String(item.slug || item.id || "");
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 function displayTime(date?: string, fallbackTime?: string) {
@@ -25,11 +41,17 @@ function displayTime(date?: string, fallbackTime?: string) {
     return parsed.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function LivePageClient({ initialChannels, initialChannelVideos, epgData, fullEpg, aodItems: _aodItems }: LivePageClientProps) {
+export function LivePageClient({ initialChannels, initialChannelVideos, initialNextPageToken, epgData, fullEpg, aodItems: _aodItems }: LivePageClientProps) {
+    const t = useTranslations("common");
     const searchParams = useSearchParams();
     const channelParam = searchParams.get('channel');
-    const [visibleLatestCount, setVisibleLatestCount] = useState(8);
+    const initialLoadedLatestVideos = useMemo(() => uniqVideos(initialChannelVideos), [initialChannelVideos]);
+    const [loadedLatestVideos, setLoadedLatestVideos] = useState(() => initialLoadedLatestVideos);
+    const [visibleLatestCount, setVisibleLatestCount] = useState(() =>
+        Math.min(INITIAL_VISIBLE_LATEST_COUNT, initialLoadedLatestVideos.length)
+    );
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [nextPageToken, setNextPageToken] = useState<string | null>(initialNextPageToken || null);
 
     const selectedChannel = useMemo(() => {
         if (channelParam) {
@@ -44,10 +66,10 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
         return epgData.find((item) => item.channel_id === selectedChannel.id && item.is_current) || epgData[0];
     }, [epgData, selectedChannel]);
 
-    const latestVideos = useMemo(() => initialChannelVideos, [initialChannelVideos]);
+    const latestVideos = useMemo(() => loadedLatestVideos, [loadedLatestVideos]);
     const visibleLatestVideos = useMemo(() => latestVideos.slice(0, visibleLatestCount), [latestVideos, visibleLatestCount]);
-    const hasMoreLatestVideos = visibleLatestCount < latestVideos.length;
-    const programs = useMemo(() => initialChannelVideos.slice(0, 4), [initialChannelVideos]);
+    const hasMoreLatestVideos = visibleLatestCount < latestVideos.length || Boolean(nextPageToken);
+    const programs = useMemo(() => latestVideos.slice(0, 4), [latestVideos]);
 
     const getVideoTitle = (video: SliderVideoItem) => {
         const raw = (video.title || "").trim();
@@ -56,17 +78,40 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
         return descBased || "";
     };
 
-    const handleLoadMoreLatestVideos = () => {
+    const handleLoadMoreLatestVideos = async () => {
         if (!hasMoreLatestVideos || isLoadingMore) return;
+        // On ne met le loading/skeleton que si on fait un vrai fetch (pagination).
+        if (!nextPageToken) {
+            setVisibleLatestCount((prev) => Math.min(prev + LIVE_GRID_ROW_SIZE * 2, latestVideos.length));
+            return;
+        }
+
         setIsLoadingMore(true);
-        setTimeout(() => {
-            setVisibleLatestCount((prev) => Math.min(prev + 4, latestVideos.length));
+        try {
+            // Si on a une prochaine page, on la fetch toujours (append/déduplique).
+            if (nextPageToken) {
+                const response = await fetch(
+                    `/api/youtube/latest-videos?maxResults=${LIVE_FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(nextPageToken)}`
+                );
+                if (!response.ok) {
+                    throw new Error("Failed to fetch more videos");
+                }
+
+                const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
+                const nextItems = uniqVideos([...(latestVideos || []), ...((data.items || []) as SliderVideoItem[])]);
+
+                setLoadedLatestVideos(nextItems);
+                setNextPageToken(data.nextPageToken || null);
+                setVisibleLatestCount((prev) => Math.min(prev + LIVE_GRID_ROW_SIZE * 2, nextItems.length));
+                return;
+            }
+        } finally {
             setIsLoadingMore(false);
-        }, 600);
+        }
     };
 
     if (!selectedChannel) {
-        return <div className="text-center text-white py-20">Aucune chaîne disponible</div>;
+        return <div className="text-center text-white py-20">{t("scheduleUnavailable")}</div>;
     }
 
     return (
@@ -75,7 +120,7 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
 
             <section className="mx-auto w-full max-w-[1280px] space-y-[50px]">
                 <div className="news-section-header">
-                    <h2 className="fig-h9 uppercase text-white">Latest videos</h2>
+                    <h2 className="fig-h9 uppercase text-white">{t("latestVideos")}</h2>
                     <div className="news-section-line" />
                 </div>
                 <div className="grid gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
@@ -90,6 +135,7 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
                                     className="h-full w-full object-cover"
                                 />
                             </div>
+                            <div className="px-2">
                             <h3 className="line-clamp-3 text-[16px] leading-[24px] text-white">
                                 {getVideoTitle(video)}
                             </h3>
@@ -98,11 +144,12 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
                                 <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
                                 <span>{displayTime(video.date, video.time)}</span>
                             </div>
+                            </div>
                         </Link>
                     ))}
                     {isLoadingMore && (
                         <>
-                            {[0, 1].map((idx) => (
+                            {Array.from({ length: 2 }, (_, idx) => (
                                 <article key={`latest-shimmer-${idx}`} className="space-y-2 animate-pulse">
                                     <div className="h-[172px] overflow-hidden rounded-[10px] bg-[#2a2a2a]" />
                                     <div className="h-5 w-4/5 rounded bg-[#2a2a2a]" />
@@ -120,7 +167,7 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
                             disabled={isLoadingMore}
                             className="h-[40px] rounded-[60px] border border-[#777777] px-5 text-[14px] font-semibold uppercase text-white disabled:opacity-60"
                         >
-                            {isLoadingMore ? "Loading..." : "Load more"}
+                            {isLoadingMore ? t("loading") : t("loadMore")}
                         </button>
                     </div>
                 )}
@@ -132,7 +179,7 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
 
             <section className="mx-auto w-full max-w-[1280px] space-y-[42px]">
                 <div className="news-section-header">
-                    <h2 className="fig-h9 uppercase text-white">Programs TV</h2>
+                    <h2 className="fig-h9 uppercase text-white">{t("tvSchedule")}</h2>
                     <div className="news-section-line" />
                 </div>
                 <div className="grid gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
@@ -147,11 +194,13 @@ export function LivePageClient({ initialChannels, initialChannelVideos, epgData,
                                     className="h-full w-full object-cover"
                                 />
                             </div>
+                            <div className="px-2">
                             <h3 className="fig-h9 uppercase text-white line-clamp-2">{getVideoTitle(program)}</h3>
                             <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
                                 <span>{program.date ? formatDate(program.date) : formatDate(new Date())}</span>
                                 <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
                                 <span>{displayTime(program.date, program.time)}</span>
+                            </div>
                             </div>
                         </Link>
                     ))}

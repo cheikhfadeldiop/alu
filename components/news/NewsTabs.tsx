@@ -4,6 +4,7 @@ import { decodeHtmlEntities } from "../../utils/text";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { TabsShimmer } from "../ui/shimmer/CommonShimmers";
 import { useWordPressCategories } from "@/hooks/useData";
+import { useTranslations } from "next-intl";
 
 interface NewsTabsProps {
     onFilterChange: (categoryIds: string, categoryName: string) => void;
@@ -19,6 +20,7 @@ interface VirtualParent {
 }
 
 export function NewsTabs({ onFilterChange }: NewsTabsProps) {
+    const t = useTranslations("pages.news");
     const [activeGroupId, setActiveGroupId] = useState<string>(VIRTUAL_PARENTS[0].id);
     const [activeSubId, setActiveSubId] = useState<number | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -216,7 +218,7 @@ export function NewsTabs({ onFilterChange }: NewsTabsProps) {
                             fontSize: 12,
                             color: "#606060",
                         }}>
-                            Aucune sous-catégorie
+                            {t("noSubcategory")}
                         </span>
                     )}
 

@@ -14,7 +14,7 @@ interface RadioPlayerSectionProps {
     isReplay?: boolean;
 }
 
-export function RadioPlayerSection({ channel, currentProgram: _currentProgram, isReplay = false }: RadioPlayerSectionProps) {
+export function RadioPlayerSection({ channel, currentProgram, isReplay = false }: RadioPlayerSectionProps) {
     const t = useTranslations("pages.radioPlayer");
 
     // ... existing hooks and standard variables ...
@@ -247,7 +247,9 @@ export function RadioPlayerSection({ channel, currentProgram: _currentProgram, i
     };
 
 
-    const shareText = isReplay ? `Écoutez cet audio : ${channel.title} sur ${SITE_CONFIG.name} Web` : `Écoutez ${channel.title} en direct sur ${SITE_CONFIG.name} Web`;
+    const shareText = isReplay
+        ? t("shareReplayText", { channelTitle: channel.title, siteName: SITE_CONFIG.name })
+        : t("shareLiveText", { channelTitle: channel.title, siteName: SITE_CONFIG.name });
 
     return (
         <section className="relative mx-auto h-[605px] w-full max-w-[1220px] rounded-[80px] bg-[#1A1A1A]">
@@ -280,14 +282,14 @@ export function RadioPlayerSection({ channel, currentProgram: _currentProgram, i
                     <div className="h-[250px] w-[543px]">
                         <div className="relative h-[95px] w-[163px]">
                             <SafeImage
-                                src={channel.hd_logo || channel.logo || "/assets/placeholders/radio_icon_sur_card.png"}
+                                src={SITE_CONFIG.theme.placeholders.logo}
                                 alt={channel.title}
                                 fill
                                 className="object-contain"
                             />
                         </div>
                         <p className="mt-8 h-[123px] w-[543px] text-[14px] leading-[21px] text-[#A4A4A4]">
-                            { "Launching of 2025 Sales and Distribution of Fertilislzer/Agro Chemicals to Farmers at Subsidized Price for Wet Season Farming in the State to be Presided over by His Excellency Ahmed AliyuSokoto, Ph.D, FCIT, FCNA The Executive Governor of Sokoto State on Tuesday 29th July 2025"}
+                            {currentProgram?.program_desc || t("fallback.desc")}
                         </p>
                     </div>
 
@@ -343,7 +345,10 @@ export function RadioPlayerSection({ channel, currentProgram: _currentProgram, i
 
                     {isStreamDead && (
                         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs text-red-200">
-                            <p>{error || (isReplay ? "Le fichier audio ne peut pas être lu pour le moment." : t('status.offlineMessage'))}</p>
+                            <p>
+                                {error ||
+                                    (isReplay ? t("status.replayOfflineMessage") : t("status.offlineMessage"))}
+                            </p>
                             <button onClick={handleRetry} className="mt-2 text-xs font-semibold uppercase text-red-100 underline">
                                 {t('player.retry')}
                             </button>

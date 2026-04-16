@@ -8,6 +8,7 @@ import { ensureAbsoluteUrl } from "../../services/api";
 import { SafeImage } from "../ui/SafeImage";
 import { ShareButton } from "../ui/ShareButton";
 import { SITE_CONFIG } from "@/constants/site-config";
+import { useTranslations } from "next-intl";
 
 interface LivePlayerSectionProps {
     channel: LiveChannel;
@@ -15,6 +16,7 @@ interface LivePlayerSectionProps {
 }
 
 export function LivePlayerSection({ channel, currentProgram }: LivePlayerSectionProps) {
+    const t = useTranslations("common");
     const videoRef = React.useRef<HTMLVideoElement>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -77,14 +79,14 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                 }
 
                 if (!isAborted) {
-                    setError("Impossible de charger le flux en direct.");
+                    setError(t("streamUnavailable"));
                     setIsResolving(false);
                 }
                 return;
             } catch (err: any) {
                 console.error("Live Resolution Error:", err);
                 if (!isAborted) {
-                    setError(err.message || "Erreur de chargement.");
+                    setError(err.message || t("streamUnavailable"));
                     setIsResolving(false);
                 }
             }
@@ -139,7 +141,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                 break;
                             default:
                                 hls.destroy();
-                                setError("Erreur fatale du flux vidéo.");
+                                setError(t("streamUnavailable"));
                                 break;
                         }
                     }
@@ -149,7 +151,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                 videoEl.src = resolvedUrl;
                 videoEl.play().catch(() => setIsResolving(false));
             } else {
-                setError("Votre navigateur ne supporte pas ce format vidéo.");
+                setError(t("streamUnavailable"));
                 setIsResolving(false);
             }
         };
@@ -270,11 +272,11 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
     };
 
     return (
-        <div className="mx-auto grid w-full max-w-[1280px] gap-0 xl:grid-cols-[730px_550px]">
+        <div className="mx-auto grid w-full max-w-[1280px] gap-0 xl:grid-cols-[730px_550px] bg-[#3333331e]">
 
-            <div ref={containerRef} className="w-full overflow-hidden">
+            <div ref={containerRef} className="w-full overflow-hidden ">
                 <div className="w-full overflow-hidden group/player  h-[488px]">
-                    <div className="relative h-[410px] w-full overflow-hidden bg-black">
+                    <div className="relative h-[410px] w-full overflow-hidden">
                         {/* Video Canvas */}
                         <video
                             ref={videoRef}
@@ -293,7 +295,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                     <svg className="w-10 h-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Flux indisponible</h3>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">{t("streamUnavailable")}</h3>
                                     <p className="text-sm text-white/40 max-w-sm mx-auto leading-relaxed">{error}</p>
                                 </div>
                                 <button
@@ -305,7 +307,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                     }}
                                     className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20"
                                 >
-                                    Réessayer
+                                    {t("retry")}
                                 </button>
                             </div>
                         )}
@@ -316,7 +318,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                     <div className="w-16 h-16 border-4 border-red-600/20 rounded-full" />
                                     <div className="absolute inset-0 w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-red-600 animate-pulse">Chargement en cours...</span>
+                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-red-600 animate-pulse">{t("loading")}</span>
                             </div>
                         )}
 
@@ -330,7 +332,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                     </div>
 
                     {/* CONTROLS AREA */}
-                    <div className="relative flex h-[78px] flex-col justify-center border-t border-white/5 bg-[#333333]/10 px-5">
+                    <div className="relative flex h-[78px] flex-col justify-center border-t border-white/5  px-5">
 
                         {/* Progress live bar */}
                         <div className="absolute -top-0.5 left-0 w-full h-1 bg-red-600/20">
@@ -398,19 +400,19 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                         className="flex flex-row items-center justify-center h-[27px] bg-[#1F1E18] rounded-[5px] px-2 sm:px-3 gap-1 sm:gap-[5px] border-none cursor-pointer"
                                     >
                                         <span className="text-[12px] sm:text-[14px] leading-[21px] text-white font-[Roboto]">
-                                            {currentQuality === -1 ? 'Auto' : `${qualities.find(q => q.index === currentQuality)?.height}p`}
+                                            {currentQuality === -1 ? t("auto") : `${qualities.find(q => q.index === currentQuality)?.height}p`}
                                         </span>
                                         <svg width="10" height="6" viewBox="0 0 10 6" fill="#FFFFFF">
                                             <path d="M0 0L5 6L10 0Z" />
                                         </svg>
-                                        <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">HD</span>
+                                        <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">{t("hd")}</span>
                                     </button>
                                     {showQualityMenu && qualities.length > 0 && (
                                         <div className="absolute bottom-full mb-2 right-0 w-36 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
                                             <div className="p-2 space-y-1">
                                                 <button onClick={() => changeQuality(-1)}
                                                     className={`w-full px-4 py-2 text-[9px] font-black uppercase text-left rounded-lg transition-colors ${currentQuality === -1 ? 'bg-red-600/20 text-red-500' : 'text-white/40 hover:bg-white/5'}`}>
-                                                    Auto
+                                                    {t("auto")}
                                                 </button>
                                                 {qualities.map(q => (
                                                     <button key={q.index} onClick={() => changeQuality(q.index)}
@@ -437,7 +439,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
             </div>
 
          
-            <div className="flex h-[488px] w-full flex-col justify-between bg-[#1C1C1C] p-6 sm:p-8">
+            <div className="flex h-[488px] w-full flex-col justify-between  p-6 sm:p-8">
   
   {/* TOP */}
   <div className="flex flex-col gap-6">
@@ -459,9 +461,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-[#F80000] animate-pulse" />
 
-          <span className="b4 font-bold text-white uppercase">
-            LIVE
-          </span>
+          <span className="b4 font-bold text-white uppercase">{t("live")}</span>
 
           <svg width="12" height="24" viewBox="0 0 12 24">
             <path d="M3 8L9 12L3 16" stroke="#F80000" strokeWidth="1.5" strokeLinecap="round" />
@@ -471,15 +471,13 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
             {channel.title}
           </h2>
 
-          <span className="hidden sm:inline b1 font-bold text-[#FF0000] ml-1">
-            EN DIRECT
-          </span>
+          <span className="hidden sm:inline b1 font-bold text-[#FF0000] ml-1">{t("direct")}</span>
         </div>
       </div>
 
       <ShareButton
         title={channel.title}
-        text={`Regardez ${channel.title} en direct sur ${SITE_CONFIG.name} Web`}
+        text={t("shareLiveText", { channel: channel.title, siteName: SITE_CONFIG.name })}
         className="shrink-0"
         iconClassName="w-6 h-6"
       />
@@ -487,18 +485,18 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
 
     {/* Description */}
     <p className="b2 text-[#8E8E8E] max-w-[514px] leading-relaxed">
-      {channel.desc || "Votre Chaîne, au cœur de l'actualité et de la culture."}
+      {channel.desc || t("channelDescriptionFallback")}
     </p>
   </div>
 
   {/* BOTTOM */}
   <div className="flex flex-wrap items-center gap-2">
     <span className="b3 font-bold text-[#FF0000] uppercase">
-      {currentProgram?.program_title || " EN DIRECT"}
+      {currentProgram?.program_title || t("direct")}
     </span>
 
     <span className="b3 font-bold text-[#8E8E8E]">
-      | PRESENTE PAR :
+      | {t("presentedBy")}
     </span>
 
     <span className="b3 font-bold text-white/70 uppercase">

@@ -41,6 +41,15 @@ const ALU_BOOTSTRAP_URL: string | undefined = SITE_CONFIG.singleChannel?.bootstr
 const ALU_YT_CHANNEL_ID: string | undefined = SITE_CONFIG.singleChannel?.youtube?.channelId;
 const ALU_YT_API_KEY_ENV: string | undefined = SITE_CONFIG.singleChannel?.youtube?.apiKeyEnv;
 
+type CacheTtlKey = keyof typeof SITE_CONFIG.api.cache.ttl;
+
+function getRevalidateSeconds(ttlKey?: CacheTtlKey): number {
+    if (!ttlKey) return SITE_CONFIG.api.revalidateTime;
+    const ms = SITE_CONFIG.api.cache.ttl[ttlKey];
+    const seconds = Math.floor(ms / 1000);
+    return Math.max(1, seconds);
+}
+
 function getYouTubeApiKey(): string {
     const envName = ALU_YT_API_KEY_ENV || "YOUTUBE_API_KEY";
     const key = process.env[envName];
@@ -50,11 +59,11 @@ function getYouTubeApiKey(): string {
     return key;
 }
 
-async function getYouTubeRssVideos(maxResults: number = 12): Promise<SliderVideoItem[]> {
+async function getYouTubeRssVideos(maxResults: number = 12, options?: { ttlKey?: CacheTtlKey }): Promise<SliderVideoItem[]> {
     if (!ALU_YT_CHANNEL_ID) return [];
     const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}`;
     const response = await fetch(url, {
-        next: { revalidate: SITE_CONFIG.api.revalidateTime },
+        next: { revalidate: getRevalidateSeconds(options?.ttlKey) },
     });
     if (!response.ok) return [];
     const xml = await response.text();
@@ -128,14 +137,14 @@ export function getSiteAbsoluteUrl(path: string): string {
 /**
  * Generic fetch wrapper with error handling
  */
-async function fetchAPI<T>(endpoint: string): Promise<T> {
+async function fetchAPI<T>(endpoint: string, options?: { ttlKey?: CacheTtlKey }): Promise<T> {
     try {
         const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
         const response = await fetch(url, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
+            next: { revalidate: getRevalidateSeconds(options?.ttlKey) }, // Cache based on config
         });
 
         if (!response.ok) {
@@ -167,10 +176,10 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
     }
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
+async function fetchJson<T>(url: string, options?: { ttlKey?: CacheTtlKey }): Promise<T> {
     const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: SITE_CONFIG.api.revalidateTime },
+        next: { revalidate: getRevalidateSeconds(options?.ttlKey) },
     });
     if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
     return (await response.json()) as T;
@@ -254,6 +263,11 @@ type YouTubePlaylistItem = {
     };
 };
 
+export type YouTubeLatestVideosPage = {
+    items: SliderVideoItem[];
+    nextPageToken: string | null;
+};
+
 function ytThumb(thumbnails?: Record<string, { url: string }>) {
     return thumbnails?.maxres?.url || thumbnails?.high?.url || thumbnails?.medium?.url || thumbnails?.default?.url || "";
 }
@@ -266,11 +280,19 @@ export async function getYouTubePlaylists() {
     return data.items || [];
 }
 
-export async function getYouTubePlaylistItems(playlistId: string) {
+export async function getYouTubePlaylistItems(
+    playlistId: string,
+    options?: { maxResults?: number; pageToken?: string; ttlKey?: CacheTtlKey }
+) {
     const key = getYouTubeApiKey();
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${encodeURIComponent(playlistId)}&key=${encodeURIComponent(key)}`;
-    const data = await fetchJson<{ items: YouTubePlaylistItem[] }>(url);
-    return data.items || [];
+    const maxResults = Math.min(Math.max(options?.maxResults ?? 50, 1), 50);
+    const pageToken = options?.pageToken?.trim();
+    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=${maxResults}&playlistId=${encodeURIComponent(playlistId)}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}&key=${encodeURIComponent(key)}`;
+    const data = await fetchJson<{ items: YouTubePlaylistItem[]; nextPageToken?: string }>(url, { ttlKey: options?.ttlKey });
+    return {
+        items: data.items || [],
+        nextPageToken: data.nextPageToken || null,
+    };
 }
 
 type YouTubeSearchItem = {
@@ -283,46 +305,73 @@ type YouTubeSearchItem = {
     };
 };
 
-export async function getYouTubeLatestVideos(maxResults: number = 12) {
-    if (!ALU_YT_CHANNEL_ID) return [];
+export async function getYouTubeLatestVideos(
+    maxResults: number = 12,
+    options?: { ttlKey?: CacheTtlKey; pageToken?: string }
+) {
+    const page = await getYouTubeLatestVideosPage({ maxResults, ttlKey: options?.ttlKey, pageToken: options?.pageToken });
+    return page.items;
+}
+
+export async function getYouTubeLatestVideosPage(options?: { maxResults?: number; pageToken?: string; ttlKey?: CacheTtlKey }): Promise<YouTubeLatestVideosPage> {
+    const maxResults = Math.min(Math.max(options?.maxResults ?? 12, 1), 50);
+    const pageToken = options?.pageToken?.trim() || undefined;
+    if (!ALU_YT_CHANNEL_ID) {
+        return { items: [], nextPageToken: null };
+    }
     let key = "";
     try {
         key = getYouTubeApiKey();
     } catch {
         // Public fallback without API key
-        return getYouTubeRssVideos(maxResults);
+        return {
+            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
+            nextPageToken: null,
+        };
     }
     // Use channel uploads playlist first (more complete than search).
     const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
     let channelData: { items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> };
     try {
-        channelData = await fetchJson<{ items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> }>(channelUrl);
+        channelData = await fetchJson<{ items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> }>(channelUrl, {
+            ttlKey: options?.ttlKey,
+        });
     } catch {
-        return getYouTubeRssVideos(maxResults);
+        return {
+            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
+            nextPageToken: null,
+        };
     }
     const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 
     if (uploadsId) {
-        const uploadItems = await getYouTubePlaylistItems(uploadsId);
-        const mapped = uploadItems
+        const uploadPage = await getYouTubePlaylistItems(uploadsId, { maxResults, pageToken, ttlKey: options?.ttlKey });
+        const mapped = uploadPage.items
             .map(mapYouTubeItemToReplay)
             .filter(Boolean) as SliderVideoItem[];
         if (mapped.length > 0) {
-            return mapped.slice(0, maxResults);
+            return {
+                items: mapped.slice(0, maxResults),
+                nextPageToken: uploadPage.nextPageToken,
+            };
         }
     }
 
     // Fallback to search if uploads playlist cannot be resolved.
-    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&order=date&type=video&maxResults=${maxResults}&channelId=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
-    let data: { items: YouTubeSearchItem[] };
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&order=date&type=video&maxResults=${maxResults}&channelId=${encodeURIComponent(ALU_YT_CHANNEL_ID)}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ""}&key=${encodeURIComponent(key)}`;
+    let data: { items: YouTubeSearchItem[]; nextPageToken?: string };
     try {
-        data = await fetchJson<{ items: YouTubeSearchItem[] }>(searchUrl);
+        data = await fetchJson<{ items: YouTubeSearchItem[]; nextPageToken?: string }>(searchUrl, { ttlKey: options?.ttlKey });
     } catch {
-        return getYouTubeRssVideos(maxResults);
+        return {
+            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
+            nextPageToken: null,
+        };
     }
     const items = data.items || [];
-    return items
-        .map((it) => {
+    return {
+        items: items
+            .map((it) => {
             const videoId = it.id?.videoId;
             if (!videoId) return null;
             const title = it.snippet?.title || "Video";
@@ -344,7 +393,9 @@ export async function getYouTubeLatestVideos(maxResults: number = 12) {
                 time: "",
             } as SliderVideoItem;
         })
-        .filter(Boolean) as SliderVideoItem[];
+        .filter(Boolean) as SliderVideoItem[],
+        nextPageToken: data.nextPageToken || null,
+    };
 }
 
 export async function getYouTubeShorts(maxResults: number = 12) {
@@ -1137,13 +1188,13 @@ export async function getAffichesByChannel(channelId: string): Promise<AffichesR
 /**
  * Generic fetch wrapper for WordPress API
  */
-async function fetchWordPressAPI<T>(endpoint: string): Promise<T> {
+async function fetchWordPressAPI<T>(endpoint: string, options?: { ttlKey?: CacheTtlKey }): Promise<T> {
     try {
         const response = await fetch(`${WORDPRESS_API_BASE_URL}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            next: { revalidate: SITE_CONFIG.api.revalidateTime }, // Cache based on config
+            next: { revalidate: getRevalidateSeconds(options?.ttlKey) }, // Cache based on config
         });
 
         if (!response.ok) {
@@ -1180,10 +1231,13 @@ export async function getWordPressCategoryBySlug(slug: string): Promise<import('
 export async function getWordPressPosts(
     categoryId: number | string,
     perPage: number = 10,
-    page: number = 1
+    page: number = 1,
+    options?: { ttlKey?: CacheTtlKey }
 ): Promise<import('../types/api').WordPressPost[]> {
+    const ttlKey = options?.ttlKey ?? "standard";
     return fetchWordPressAPI<import('../types/api').WordPressPost[]>(
-        `/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}&categories=${categoryId}`
+        `/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}&categories=${categoryId}`,
+        { ttlKey }
     );
 }
 
@@ -1227,8 +1281,16 @@ export async function getWordPressPost(identifier: string | number): Promise<imp
  * @param perPage - Number of posts to retrieve (default: 10)
  * @param page - Page number (default: 1)
  */
-export async function getWordPressLatestPosts(perPage: number = 10, page: number = 1): Promise<import('../types/api').WordPressPost[]> {
-    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(`/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}`);
+export async function getWordPressLatestPosts(
+    perPage: number = 10,
+    page: number = 1,
+    options?: { ttlKey?: CacheTtlKey }
+): Promise<import('../types/api').WordPressPost[]> {
+    const ttlKey = options?.ttlKey ?? "standard";
+    return fetchWordPressAPI<import('../types/api').WordPressPost[]>(
+        `/posts?_embed=wp:featuredmedia,wp:term&per_page=${perPage}&page=${page}`,
+        { ttlKey }
+    );
 }
 
 

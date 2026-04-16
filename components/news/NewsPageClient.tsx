@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { WordPressPost } from "../../types/api";
 import { NewsHeroShimmer } from "@/components/ui/shimmer/NewsShimmers";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { useWordPressCategories, useWordPressLatestNews, useWordPressNews } from "@/hooks/useData";
 import { decodeHtmlEntities, formatDate, getPostAuthor, parseToDate } from "@/utils/text";
-import { AdBannerH } from "../ui/AdBanner";
+import { AdBannerH, AdBannerH2 } from "../ui/AdBanner";
 import { AdBanV2 } from "../ui/AdBannerV";
 import { SafeImage } from "../ui/SafeImage";
 const TWO_YEARS_MS = 1000 * 60 * 60 * 24 * 365 * 2;
@@ -24,7 +25,8 @@ function getPostImage(post: WordPressPost | null | undefined) {
 }
 
 function isRecentPost(post: WordPressPost | null | undefined) {
-  if (!post?.date) return false;
+  // If WP doesn't provide `date`, don't exclude the post (prevents “empty page” glitches).
+  if (!post?.date) return true;
   const t = new Date(post.date).getTime();
   if (!Number.isFinite(t)) return false;
   return Date.now() - t <= TWO_YEARS_MS;
@@ -104,6 +106,7 @@ function mergeUniqueById(primary: WordPressPost[], secondary: WordPressPost[]) {
 }
 
 export function NewsPageClient() {
+    const t = useTranslations("pages.news");
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: wpCategories = [] } = useWordPressCategories();
@@ -125,13 +128,15 @@ export function NewsPageClient() {
     const activeCategoryId = validIds.includes(requestedCategory) ? requestedCategory : defaultCategoryId;
     const allCategoryIds = validIds.length ? validIds.join(",") : String(activeCategoryId);
 
-    const { data: categoryArticles = [], isLoading: categoryLoading } = useWordPressNews(activeCategoryId, 80);
-    const { data: allArticles = [], isLoading: allLoading } = useWordPressNews(allCategoryIds, 100);
-    const { data: latestArticles = [], isLoading: latestLoading } = useWordPressLatestNews(100, 1);
+    const { data: categoryArticles = [], error: categoryError, isLoading: categoryLoading } = useWordPressNews(activeCategoryId, 80);
+    const { data: allArticles = [], error: allError, isLoading: allLoading } = useWordPressNews(allCategoryIds, 100);
+    const { data: latestArticles = [], error: latestError, isLoading: latestLoading } = useWordPressLatestNews(100, 1);
 
     useEffect(() => {
         if (!validIds.length) return;
-        if (!rawCat || !validIds.includes(Number(rawCat))) {
+        // Only redirect when an explicit (and invalid) category is provided.
+        // Avoid redirect loops when there is no query param (improves responsiveness).
+        if (rawCat && !validIds.includes(Number(rawCat))) {
             router.replace(`/news?cat=${validIds[0]}`);
         }
     }, [rawCat, router, validIds]);
@@ -167,45 +172,97 @@ export function NewsPageClient() {
     const mostPopularItems = takeUnique(orderedPool, 4, used);
     const communicationItems = takeUnique(allRecent, 4, used);
     const isLoading = categoryLoading || allLoading || latestLoading;
+    const hasError = Boolean(categoryError || allError || latestError);
+
+    type Snapshot = {
+        activeCategoryId: number;
+        featured: WordPressPost | null;
+        topRowMainItems: WordPressPost[];
+        secondRowItems: WordPressPost[];
+        moreStoriesHeroItems: WordPressPost[];
+        moreStoriesListItems: WordPressPost[];
+        mostPopularItems: WordPressPost[];
+        communicationItems: WordPressPost[];
+    };
+
+    const computedSnapshot = useMemo<Snapshot>(
+        () => ({
+            activeCategoryId,
+            featured,
+            topRowMainItems,
+            secondRowItems,
+            moreStoriesHeroItems,
+            moreStoriesListItems,
+            mostPopularItems,
+            communicationItems,
+        }),
+        [
+            activeCategoryId,
+            featured,
+            topRowMainItems,
+            secondRowItems,
+            moreStoriesHeroItems,
+            moreStoriesListItems,
+            mostPopularItems,
+            communicationItems,
+        ]
+    );
+
+    const snapshotRef = useRef<Snapshot | null>(null);
+
+    useEffect(() => {
+        // Snapshot update only when we have a stable featured post.
+        // This prevents brief "featured=null" phases during revalidation from blanking the page.
+        if (!isLoading && computedSnapshot.featured?.id) {
+            snapshotRef.current = computedSnapshot;
+        }
+    }, [isLoading, computedSnapshot]);
+
+    const hasSnapshot = Boolean(snapshotRef.current);
+    const usingSnapshot = hasSnapshot && isLoading;
+    const snapshot = usingSnapshot ? snapshotRef.current : computedSnapshot;
+
+    const featuredForView = snapshot?.featured || null;
+    const activeCategoryIdForView = snapshot?.activeCategoryId ?? activeCategoryId;
+    const topRowMainItemsForView = snapshot?.topRowMainItems ?? topRowMainItems;
+    const secondRowItemsForView = snapshot?.secondRowItems ?? secondRowItems;
+    const moreStoriesHeroItemsForView = snapshot?.moreStoriesHeroItems ?? moreStoriesHeroItems;
+    const moreStoriesListItemsForView = snapshot?.moreStoriesListItems ?? moreStoriesListItems;
+    const mostPopularItemsForView = snapshot?.mostPopularItems ?? mostPopularItems;
+    const communicationItemsForView = snapshot?.communicationItems ?? communicationItems;
 
     return (
         <div className="w-full ">
             <div className="mx-auto w-full max-w-[1280px] px-4 pb-8 pt-[16px] xl:px-0">
 
-            {isLoading ? (
-                <div className="mt-10">
-                    <NewsHeroShimmer />
-                </div>
-            ) : !featured ? (
-                <div className="mt-10 text-center text-[var(--fig-text-secondary)]">Aucune actualité recente pour cette categorie.</div>
-            ) : (
+            {featuredForView ? (
                 <>
                     {/* TOP STORIES */}
                     <section className="mt-[24px]">
                         <div className="grid gap-[20px] xl:grid-cols-[566px_694px]">
-                            <Link href={`/news/${featured.slug || featured.id}?cat=${activeCategoryId}`} className="group block rounded-[10px] hover-lift-primary">
+                            <Link href={`/news/${featuredForView.slug || featuredForView.id}?cat=${activeCategoryIdForView}`} className="group block rounded-[10px] hover-lift-primary">
                                 <div className="relative h-[462px] overflow-hidden rounded-[10px]">
                                     <SafeImage
-                                        src={getPostImage(featured)}
-                                        alt={decodeHtmlEntities(featured.title?.rendered || "")}
+                                        src={getPostImage(featuredForView)}
+                                        alt={decodeHtmlEntities(featuredForView.title?.rendered || "")}
                                         className="h-full w-full object-cover"
                                         width={566}
                                         height={462}
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
                                     <div className="absolute bottom-[30px] left-[23px] right-[23px]">
-                                        <h2 className="fig-h10 line-clamp-3 text-[var(--primary-text-light)]">{getTitle(featured, "")}</h2>
+                                        <h2 className="fig-h10 line-clamp-3 text-[var(--primary-text-light)]">{getTitle(featuredForView, "")}</h2>
                                         <div className="mt-[30px] flex items-center justify-between">
-                                            <MetaRow date={featured.date} featured />
-                                            <CategoryPill tone="#059cf4" label={safeCategoryLabel(featured)} featured />
+                                            <MetaRow date={featuredForView.date} featured />
+                                            <CategoryPill tone="#059cf4" label={safeCategoryLabel(featuredForView)} featured />
                                         </div>
                                     </div>
                                 </div>
                             </Link>
 
                             <div className="grid gap-[17px]  sm:grid-cols-2">
-                                {topRowMainItems.map((item, idx) => (
-                                    <Link key={`${item?.id || "top"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryId}` : "#"} className="block rounded-[10px] hover-lift-primary">
+                                {topRowMainItemsForView.map((item, idx) => (
+                                    <Link key={`${item?.id || "top"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryIdForView}` : "#"} className="block rounded-[10px] hover-lift-primary">
                                         <div className="flex flex-col justify-between">
                                         <div className="h-[292px] overflow-hidden rounded-[10px]">
                                             <SafeImage
@@ -230,8 +287,8 @@ export function NewsPageClient() {
                         </div>
 
                         <div className="mt-[25px] grid gap-[25px] sm:grid-cols-2 xl:grid-cols-3">
-                            {secondRowItems.map((item, idx) => (
-                                <Link key={`${item?.id || "row"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryId}` : "#"} className="block rounded-[10px] hover-lift-primary">
+                            {secondRowItemsForView.map((item, idx) => (
+                                <Link key={`${item?.id || "row"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryIdForView}` : "#"} className="block rounded-[10px] hover-lift-primary">
                                     <div className="h-[230px] overflow-hidden rounded-[10px]">
                                         <SafeImage
                                             src={getPostImage(item)}
@@ -254,7 +311,7 @@ export function NewsPageClient() {
                     </section>
 
                     <div className="mt-[43px]">
-                        <AdBannerH className="mx-auto max-w-[1280px]" />
+                        <AdBannerH2 className="mx-auto max-w-[1280px]" />
                     </div>
 
                     {/* MORE STORIES */}
@@ -262,13 +319,13 @@ export function NewsPageClient() {
                         <div className="grid items-center gap-[26px] xl:grid-cols-[789px_465px]">
                             <div>
                                 <div className="flex flex-col gap-[1px]">
-                                    <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">More stories</h2>
+                                    <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">{t("moreStories")}</h2>
                                     <div className="h-0 border-t [border-color:#9A74B7]/60" />
                                 </div>
                                 <div className="mt-[19px] grid gap-[19px] md:grid-cols-2">
-                                    {moreStoriesHeroItems.map((heroItem, col) => (
+                                    {moreStoriesHeroItemsForView.map((heroItem, col) => (
                                         <div key={col} className="flex h-[757px] flex-col gap-[17px]">
-                                            <Link href={heroItem ? `/news/${heroItem.slug || heroItem.id}?cat=${activeCategoryId}` : "#"} className="block rounded-[10px] hover-lift-primary">
+                                            <Link href={heroItem ? `/news/${heroItem.slug || heroItem.id}?cat=${activeCategoryIdForView}` : "#"} className="block rounded-[10px] hover-lift-primary">
                                                 <article className="h-[340px]">
                                                     <div className="h-[225px] w-full overflow-hidden rounded-[10px]">
                                                         <SafeImage
@@ -290,8 +347,8 @@ export function NewsPageClient() {
                                             </Link>
 
                                             <div className="no-scrollbar flex-1 space-y-[17px] overflow-y-auto pr-1">
-                                            {moreStoriesListItems.slice(col * 3, col * 3 + 3).map((item, idx) => (
-                                                <Link key={`${item?.id || "more"}-${col}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryId}` : "#"} className="ml-2 block h-[120px] rounded-[10px]  px-[3px] py-[5px] pl-[5px] hover-lift-primary">
+                                            {moreStoriesListItemsForView.slice(col * 3, col * 3 + 3).map((item, idx) => (
+                                                <Link key={`${item?.id || "more"}-${col}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryIdForView}` : "#"} className="ml-2 block h-[120px] rounded-[10px]  px-[3px] py-[5px] pl-[5px] hover-lift-primary">
                                                     <div className="flex h-[107px] items-end gap-2">
                                                         <div className="h-[107px] w-[103px] overflow-hidden rounded-[10px]">
                                                             <SafeImage
@@ -328,12 +385,12 @@ export function NewsPageClient() {
                     {/* SIMILAR CONTENT */}
                     <section className="mt-[58px] flex flex-col gap-[41px]">
                         <div className="flex flex-col gap-[1px]">
-                            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Most popular</h2>
+                                <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">{t("mostPopular")}</h2>
                             <div className="h-0 border-t [border-color:#9A74B7]/60" />
                         </div>
-                        <div className="no-scrollbar  pt-5 pl-2 flex snap-x snap-mandatory gap-[20px] overflow-x-auto pb-2">
-                            {mostPopularItems.map((item, idx) => (
-                                <Link key={`${item?.id || "popular"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryId}` : "#"} className="flex w-[356px] shrink-0 snap-start flex-col items-center gap-[25px] rounded-[10px] ">
+                        <div className="no-scrollbar  pt-5 pl-2 flex snap-x snap-mandatory gap-[20px] overflow-x-auto pb-2 ">
+                            {mostPopularItemsForView.map((item, idx) => (
+                                <Link key={`${item?.id || "popular"}-${idx}`} href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryIdForView}` : "#"} className="hover-lift-primary  flex w-[356px] shrink-0 snap-start flex-col items-center gap-[25px] rounded-[10px] ">
                                     <div className="h-[200px] w-[356px]  overflow-hidden rounded-[10px]">
                                         <SafeImage
                                             src={getPostImage(item)}
@@ -358,16 +415,16 @@ export function NewsPageClient() {
                     {/* COMMUNICATION ANNOUNCEMENT */}
                     <section className="mt-[90px] flex flex-col gap-[48px]">
                         <div className="flex flex-col gap-[1px]">
-                            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Communication and announcement</h2>
+                            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">{t("communicationAnnouncement")}</h2>
                             <div className="h-0 border-t [border-color:#9A74B7]/60" />
                         </div>
                         <div className="no-scrollbar flex snap-x snap-mandatory gap-[20px] overflow-x-auto pb-2">
-                            {communicationItems.map((item, idx) => (
+                            {communicationItemsForView.map((item, idx) => (
                                 <article key={`${item?.id || "com"}-${idx}`} className="flex h-[218px] hover-lift-primary mt-2 ml-2 w-[366px] shrink-0 snap-start flex-col justify-center rounded-[5px] bg-surface p-[7px]">
-                                    <Link href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryId}` : "#"} className="mx-auto flex h-[174px] w-[345px] flex-col gap-[15px] rounded-[5px] ">
-                                        <h3 className="line-clamp-2 text-[16px] leading-[24px] ">
+                                    <Link href={item ? `/news/${item.slug || item.id}?cat=${activeCategoryIdForView}` : "#"} className="mx-auto flex h-[174px] w-[345px] flex-col gap-[15px] rounded-[5px] ">
+                                        <h2 className="line-clamp-2 text-bold text-unpacase  fig-h11 text-[16px] leading-[24px] ">
                                             {getTitle(item, "")}
-                                        </h3>
+                                        </h2>
                                         <div className="mt-auto flex items-center justify-between">
                                             <MetaRow date={item?.date} compact />
                                             <CategoryPill label={safeCategoryLabel(item)} tone="var(--fig-tag-religion)" />
@@ -378,6 +435,11 @@ export function NewsPageClient() {
                         </div>
                     </section>
                 </>
+            ) : (
+                <div className="mt-10">
+                    {/* Don't show an empty state while revalidating cached data (prevents “arrive vide”). */}
+                    {(isLoading || hasError) ? <NewsHeroShimmer /> : <div className="mt-10 text-center text-[var(--fig-text-secondary)]">{t("noRecentArticles")}</div>}
+                </div>
             )}
         </div>
         </div>

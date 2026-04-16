@@ -16,7 +16,7 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
     <div
       className={`relative mx-auto flex-1 overflow-x-hidden ${
         isMediaDarkRoute
-          ? "min-h-screen w-full max-w-none bg-[#171717] text-[#E8E8E8]"
+          ? "min-h-screen w-full max-w-none bg-[var(--background)] text-[#E8E8E8]"
           : "w-full max-w-[1728px] bg-background"
       }`}
     >
@@ -30,6 +30,8 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
           backgroundRepeat: "no-repeat",
           backgroundPosition: "top center",
           backgroundSize: "100% auto",
+         // backgroundColor:"red",
+         backgroundColor: isMediaDarkRoute ? "#171717" : "var(--background)",
           filter: "var(--pattern-invert) grayscale(1)",
         }}
       />

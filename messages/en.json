@@ -2,8 +2,8 @@
   "nav": {
     "home": "Home",
     "news": "Info",
-    "replay": "Videos",
-    "radio": "Audios",
+    "replay": "TV Replay",
+    "radio": "Radios",
     "live": "Live",
     "corporate": "Corporate news",
     "contact": "Contact us"
@@ -15,6 +15,10 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "languages": {
+      "fr": "French",
+      "en": "English"
     }
   },
   "footer": {
@@ -24,6 +28,13 @@
     "other": "Other",
     "description": "Cameroon Radio Television is Cameroon’s public radio and television broadcaster.",
     "short_description": "Download our apps from",
+    "downloadApp": "Download the app",
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram"
+    },
     "links": {
       "about": "About",
       "crtvCameroon": "CRTV Cameroon",
@@ -49,6 +60,7 @@
     "copyright": "© 2026 CRTV — Design: aCAN GROUP"
   },
   "common": {
+    "replays":"Replay",
     "seeAll": "See all",
     "seeMore": "See more",
     "live": "LIVE",
@@ -74,6 +86,7 @@
     "inProgress": "In progress",
     "loading": "Loading...",
     "loadMore": "Load +",
+    "auto": "Auto",
     "controls": "CONTROLS",
     "previewUnavailable": "Preview unavailable",
     "streamUnavailable": "Stream unavailable",
@@ -92,7 +105,18 @@
     "retrySearch": "Retry search",
     "scheduleUnavailable": "Schedule not available at the moment.",
     "tvSchedule": "TV Schedule",
-    "noDescription": "No description"
+    "noDescription": "No description",
+    "hd": "HD",
+    "cc": "CC",
+    "ccOff": "Off",
+    "timeZero": "00:00",
+    "program": "Program",
+    "unknownTime": "--:--",
+    "presentedBy": "PRESENTED BY:",
+    "channelDescriptionFallback": "Your channel, at the heart of news and culture.",
+    "shareLiveText": "Watch {channel} live on {siteName} Web",
+    "shareReplayText": "Watch {videoTitle} on replay on {siteName} Web",
+    "replayOfShowLabel": "REPLAY I OF THE SHOW:"
   },
   "pages": {
     "home": {
@@ -162,6 +186,7 @@
         "longLoad": "This may take up to 45 seconds...",
         "offlineTitle": "Radio Offline",
         "offlineMessage": "Radio is currently unavailable. The stream might be temporarily offline.",
+        "replayOfflineMessage": "The audio file cannot be played right now.",
         "offline": "Offline",
         "connecting": "Connecting...",
         "ready": "Ready"
@@ -171,6 +196,8 @@
         "presentedBy": "PRESENTED BY:",
         "live": "Live"
       },
+      "shareLiveText": "Listen to {channelTitle} live on {siteName} Web",
+      "shareReplayText": "Listen to this audio: {channelTitle} on {siteName} Web",
       "fallback": {
         "desc": "Your national radio, at the heart of Cameroonian news and culture. Stay tuned for our varied programs.",
         "program": "LIVE NEWS",
@@ -201,7 +228,18 @@
       "moreOf": "more of",
       "newsTitle": "NEWS",
       "loadingNews": "Loading news...",
-      "noArticles": "No articles found in this category for now. We will be back soon with more news!"
+      "noArticles": "No articles found in this category for now. We will be back soon with more news!",
+      "noRecentArticles": "No recent news for this category.",
+      "moreStories": "More stories",
+      "mostPopular": "Most popular",
+      "communicationAnnouncement": "Communication and announcement",
+      "back": "Back",
+      "latestInSameCategory": "Latest in same category",
+      "similarContent": "Similar content",
+      "noArticlesAvailableTitle": "No articles available",
+      "noArticlesAvailableDesc": "There is not yet any published content in this category. Please come back later or explore another section.",
+      "selectAnotherCategoryHint": "Select another category above",
+      "noSubcategory": "No subcategory"
     },
     "contact": {
       "title": "Contact",
@@ -223,6 +261,12 @@
         "phone": "Your phone number",
         "subject": "Subject",
         "message": "What is your message?"
+      }
+      ,
+      "options": {
+        "partnership": "Partnership",
+        "support": "Support",
+        "other": "Other"
       }
     },
     "info": {

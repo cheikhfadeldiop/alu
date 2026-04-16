@@ -59,7 +59,7 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-500 text-white text-xs font-semibold">
                                             <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                            EN DIRECT
+                                            {t("direct")}
                                         </span>
                                         <span className="text-xs text-[color:var(--muted)]">
                                             {currentProgram.start_time} - {currentProgram.end_time}
@@ -76,7 +76,7 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
                 {/* Related Content */}
                 {relatedContent.length > 0 && (
                     <section className="space-y-4">
-                        <SectionTitle title="Contenus associés" title2="" />
+                        <SectionTitle title={t("relatedContent")} title2="" />
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {relatedContent.slice(0, 6).map((item) => (
                                 <MediaCard
@@ -95,7 +95,7 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
 
                 {/* Other Live Channels */}
                 <section className="space-y-4">
-                    <SectionTitle title="Autres chaînes en direct" title2="" />
+                    <SectionTitle title={t("otherLiveChannels")} title2="" />
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {channelsData.allitems
                             .filter((ch) => ch.id !== channelId)
@@ -106,7 +106,7 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
                                     href={`/live/${ch.id}`}
                                     title={ch.title}
                                     imageSrc={ch.logo_url || ch.logo || "/assets/placeholders/live_tv_frame.png"}
-                                    meta="En direct"
+                                    meta={t("direct")}
                                     live
                                     aspect="16/9"
                                 />
