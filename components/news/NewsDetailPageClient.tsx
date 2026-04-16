@@ -1,51 +1,46 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { useWordPressNews, useWordPressPost } from "@/hooks/useData";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { AdBanV } from "../ui/AdBannerV";
-import { decodeHtmlEntities } from "@/utils/text";
+import { decodeHtmlEntities, formatDate, getPostAuthor, parseToDate } from "@/utils/text";
 import { NewsHeroShimmer } from "@/components/ui/shimmer/NewsShimmers";
 import { useRouter } from "@/i18n/navigation";
+import { SafeImage } from "../ui/SafeImage";
+import { useWordPressCategories } from "@/hooks/useData";
+const TWO_YEARS_MS = 1000 * 60 * 60 * 24 * 365 * 2;
 
-const figmaDetailAssets = {
-  featured: "https://www.figma.com/api/mcp/asset/82d805c2-617f-4b20-8331-5446c95a31ed",
-  sim1: "https://www.figma.com/api/mcp/asset/f7c708b5-f853-40d3-bd77-c19972e4123b",
-  sim2: "https://www.figma.com/api/mcp/asset/4cac7e06-6bfd-4ac0-8fd0-e3ea2f2edc46",
-  sim3: "https://www.figma.com/api/mcp/asset/9c3a9e17-5201-4e6d-a6d8-be19d847b6d5",
-  sim4: "https://www.figma.com/api/mcp/asset/5b39e458-42ec-4702-acfb-5cad5b14a309",
-};
+function normalizeImageUrl(url?: string) {
+  if (!url) return "";
+  return url.replace(/^http:\/\//i, "https://");
+}
 
-const fallbackHeadlines = [
-  ". Le JP de Sport de 08h00 du 11 Mars 2024. Le JP de Sport de 08h00 du 11 Mars 2024",
-  "Le JP de Sport de 08h00 du 11 Mars 2024. Le JP de Sport de 08h00 du 11 Mars 2024. Le JP de Sport de 08h00 du 11 Mars 2024",
-  "Politude du 09 Mars 2024. Le JP de Sport de 08h00 du 11 Mars 2024",
-  "Cameroon Calling of March 3, 2024",
-];
+function getPostImage(post: any) {
+  if (!post) return "";
+  return normalizeImageUrl(post.acan_image_url || post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || SITE_CONFIG.theme.placeholders.logo);
+}
 
-function FigmaImage({
-  figmaSrc,
-  fallbackSrc,
-  alt,
-  className
-}: {
-  figmaSrc: string;
-  fallbackSrc?: string;
-  alt: string;
-  className: string;
-}) {
-  return (
-    <img
-      src={figmaSrc}
-      alt={alt}
-      className={className}
-      onError={(e) => {
-        const target = e.currentTarget;
-        if (fallbackSrc && target.src !== fallbackSrc) target.src = fallbackSrc;
-      }}
-    />
-  );
+function isRecentPost(post: any) {
+  if (!post?.date) return false;
+  const t = new Date(post.date).getTime();
+  if (!Number.isFinite(t)) return false;
+  return Date.now() - t <= TWO_YEARS_MS;
+}
+
+function safeCategoryLabel(post: any) {
+  const raw = (getPostAuthor(post) || "").trim();
+  if (!raw) return "News";
+  if (raw.toLowerCase() === "uncategorized") return "News";
+  return raw;
+}
+
+function formatDisplayTime(date?: string) {
+  const parsed = parseToDate(date);
+  if (!parsed) return "--:--";
+  return parsed.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
 function stripHtml(text?: string) {
@@ -53,43 +48,75 @@ function stripHtml(text?: string) {
 }
 
 function getTitle(text: string | undefined, idx = 0) {
-  return decodeHtmlEntities(text || fallbackHeadlines[idx % fallbackHeadlines.length]);
-}
-
-function fillSlots<T>(pool: T[], size: number) {
-  if (!pool.length) return Array.from({ length: size }, () => null as T | null);
-  return Array.from({ length: size }, (_, index) => pool[index % pool.length] || null);
+  return decodeHtmlEntities(text || "");
 }
 
 function MetaRow({ date }: { date?: string }) {
-  const formatted = date
-    ? new Date(date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
-    : "15 juin 2024";
+  const formatted = date ? formatDate(date) : formatDate(new Date());
   return (
     <div className="fig-b3 mt-2 flex items-center gap-2 text-[var(--fig-text-secondary)]">
       <span>{formatted}</span>
       <span className="inline-block h-[4px] w-[4px] rounded-full bg-[var(--fig-text-secondary)]/80" />
-      <span>15:47</span>
+      <span>{formatDisplayTime(date)}</span>
     </div>
   );
 }
 
 export function NewsDetailPageClient({ slug }: { slug: string }) {
   const router = useRouter();
-  const { data: post, isLoading: postLoading } = useWordPressPost(slug);
-  const { data: articles = [], isLoading: listLoading } = useWordPressNews(SITE_CONFIG.categories.news.alaune, 20);
+  const searchParams = useSearchParams();
+  const [activeSlug, setActiveSlug] = useState(slug);
+  useEffect(() => setActiveSlug(slug), [slug]);
+  const { data: post, isLoading: postLoading } = useWordPressPost(activeSlug);
+  const { data: wpCategories = [] } = useWordPressCategories();
+  const validCategories = useMemo(
+    () =>
+      (wpCategories || []).filter(
+        (cat: any) =>
+          Number(cat?.count || 0) > 0 &&
+          String(cat?.name || "").toLowerCase() !== "uncategorized" &&
+          String(cat?.slug || "").toLowerCase() !== "uncategorized"
+      ),
+    [wpCategories]
+  );
+  const defaultCategoryId = Number(validCategories[0]?.id || SITE_CONFIG.categories.news.alaune);
+  const selectedCat = searchParams.get("cat");
+  const activeCategoryId = selectedCat && !Number.isNaN(Number(selectedCat)) ? Number(selectedCat) : defaultCategoryId;
+  const allCategoryIds = validCategories.length
+    ? validCategories.map((c: any) => Number(c.id)).join(",")
+    : String(activeCategoryId);
+  const postCategoryId = post?.categories?.[0] || SITE_CONFIG.categories.news.alaune;
+  const { data: categoryArticles = [], isLoading: categoryLoading } = useWordPressNews(postCategoryId, 40);
+  const { data: latestArticles = [], isLoading: latestLoading } = useWordPressNews(allCategoryIds, 80);
+
+  const categoryRecent = useMemo(() => categoryArticles.filter((item) => isRecentPost(item)), [categoryArticles]);
+  const latestRecent = useMemo(() => latestArticles.filter((item) => isRecentPost(item)), [latestArticles]);
+
+  const sameCategoryPool = useMemo(() => {
+    if (!post) return [];
+    const merged = [...categoryRecent, ...latestRecent];
+    const dedup = new Map<number, any>();
+    for (const item of merged) {
+      if (item?.id && item.id !== post.id && !dedup.has(item.id)) dedup.set(item.id, item);
+    }
+    return Array.from(dedup.values()).sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime());
+  }, [post, categoryRecent, latestRecent]);
 
   const sideItems = useMemo(() => {
     if (!post) return [];
-    return fillSlots(articles.filter((item) => item.id !== post.id), 4);
-  }, [articles, post]);
-
+    const others = sameCategoryPool.slice(0, 4);
+    return [post, ...others];
+  }, [sameCategoryPool, post]);
   const similarItems = useMemo(() => {
-    if (!post) return [];
-    return fillSlots(articles.filter((item) => item.id !== post.id).slice(4), 4);
-  }, [articles, post]);
+    const dedup = new Map<number, any>();
+    for (const item of latestRecent) {
+      if (item?.id && item.id !== post?.id && !dedup.has(item.id)) dedup.set(item.id, item);
+    }
+    const sorted = Array.from(dedup.values()).sort((a, b) => new Date(b?.date || 0).getTime() - new Date(a?.date || 0).getTime());
+    return sorted.slice(0, 4);
+  }, [latestRecent, post?.id]);
 
-  if (postLoading || listLoading || !post) {
+  if (postLoading || categoryLoading || latestLoading || !post) {
     return (
       <div className="mx-auto w-full max-w-[1280px] px-4 py-8 xl:px-0">
         <NewsHeroShimmer />
@@ -98,12 +125,18 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
   }
 
   const articleText = stripHtml(post.content?.rendered || post.excerpt?.rendered);
+  const openDetail = (item: any) => {
+    if (!item) return;
+    const target = String(item.slug || item.id);
+    setActiveSlug(target);
+    router.replace(`/news/${target}?cat=${activeCategoryId}`);
+  };
   const handleBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1) {
       window.history.back();
       return;
     }
-    router.push("/news");
+    router.push(`/news?cat=${activeCategoryId}`);
   };
 
   return (
@@ -123,11 +156,12 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
       <section className="mt-[6px] grid gap-[47px] xl:grid-cols-[781px_465px]">
         <div>
           <div className="h-[445px] overflow-hidden rounded-[10px]">
-            <FigmaImage
-              figmaSrc={figmaDetailAssets.featured}
-              fallbackSrc={post.acan_image_url || SITE_CONFIG.theme.placeholders.news}
+            <SafeImage
+              src={getPostImage(post)}
               alt={decodeHtmlEntities(post.title?.rendered || "News")}
               className="h-full w-full object-cover"
+              width={781}
+              height={445}
             />
           </div>
 
@@ -142,7 +176,7 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
               .filter(Boolean)
               .slice(0, 18)
               .map((p, index) => (
-                <p key={index} className="text-justify text-[20px] leading-[32px] tracking-[-0.05em] text-black">
+                <p key={index} className="text-justify text-[20px] leading-[32px] tracking-[-0.05em] ">
                   {p}
                 </p>
               ))}
@@ -151,19 +185,27 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
 
         <aside>
           <div className="news-section-header">
-            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Communication and announcement</h2>
+            <h2 className="fig-h9 uppercase text-[var(--fig-text-primary)]">Latest in same category</h2>
             <div className="news-section-line" />
           </div>
           <div className="mt-3 space-y-[10px]">
             {sideItems.map((item, idx) => (
-              <Link key={`${item?.id || "side"}-${idx}`} href={item ? `/news/${item.slug || item.id}` : "#"} className="block h-[115px] rounded-[5px] bg-[var(--fig-surface)] p-[7px]">
+              <Link
+                key={`${item?.id || "side"}-${idx}`}
+                href={item ? `/news/${item.slug || item.id}` : "#"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openDetail(item);
+                }}
+                className="block h-[115px] rounded-[5px] bg-[var(--fig-surface)] p-[7px] hover-lift-primary"
+              >
                 <h3 className="line-clamp-2 pt-2 text-[16px] leading-[24px] text-[var(--fig-text-primary)]">
                   {getTitle(item?.title?.rendered, idx)}
                 </h3>
                 <div className="mt-2 flex items-center justify-between">
                   <MetaRow date={item?.date} />
                   <span className="inline-flex h-[15px] items-center rounded-full border px-2 text-[8px] leading-[12px] text-[var(--fig-text-secondary)] [border-color:var(--fig-tag-religion)]">
-                    Religion
+                    {safeCategoryLabel(item)}
                   </span>
                 </div>
               </Link>
@@ -184,13 +226,21 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
         <div className="news-hscroll no-scrollbar pb-2">
           {similarItems.map((item, idx) => (
             <article key={`${item?.id || "similar"}-${idx}`} className="w-[356px]">
-              <Link href={item ? `/news/${item.slug || item.id}` : "#"}>
+              <Link
+                href={item ? `/news/${item.slug || item.id}` : "#"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openDetail(item);
+                }}
+                className="block rounded-[10px] hover-lift-primary"
+              >
                 <div className="h-[200px] overflow-hidden rounded-[10px]">
-                  <FigmaImage
-                    figmaSrc={[figmaDetailAssets.sim1, figmaDetailAssets.sim2, figmaDetailAssets.sim3, figmaDetailAssets.sim4][idx] || figmaDetailAssets.sim1}
-                    fallbackSrc={item?.acan_image_url || SITE_CONFIG.theme.placeholders.news}
+                  <SafeImage
+                    src={getPostImage(item)}
                     alt={getTitle(item?.title?.rendered, idx)}
                     className="h-full w-full object-cover"
+                    width={356}
+                    height={200}
                   />
                 </div>
                 <div className="mt-[25px] w-[345px]">
@@ -200,7 +250,7 @@ export function NewsDetailPageClient({ slug }: { slug: string }) {
                   <div className="mt-[15px] flex items-center justify-between">
                     <MetaRow date={item?.date} />
                     <span className="inline-flex h-[15px] items-center rounded-full border px-2 text-[8px] leading-[12px] text-[var(--fig-text-secondary)] [border-color:var(--fig-tag-religion)]">
-                      Religion
+                      {safeCategoryLabel(item)}
                     </span>
                   </div>
                 </div>

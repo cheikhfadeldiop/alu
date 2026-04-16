@@ -24,67 +24,71 @@ export function SafeImage({
     fill,
     priority,
     ...props
-}: SafeImageProps) {
-    const [imgSrc, setImgSrc] = React.useState(src);
+  }: SafeImageProps) {
     const [isLoading, setIsLoading] = React.useState(true);
     const [hasError, setHasError] = React.useState(false);
-
-    // Identify if we should bypass Next.js optimization for this domain
-    const isProblematicDomain = typeof src === 'string' && (
-        src.includes('actu.crtv.cm') ||
-        src.includes('rtsactu.acan.group')
-    );
-
+  
+    // Domains problématiques (bypass optimisation Next.js)
+    const isProblematicDomain =
+      typeof src === "string" &&
+      [
+        
+        "www.figma.com/api/mcp/asset/"
+      ].some((domain) => src.includes(domain));
+  
     React.useEffect(() => {
-        setImgSrc(src);
-        setHasError(false);
-        if (!src) {
-            setIsLoading(false);
-            setHasError(true);
-            setImgSrc(fallbackSrc);
-        }
-    }, [src, fallbackSrc]);
-
-    const handleLoadingComplete = () => {
+      setHasError(false);
+      setIsLoading(Boolean(src));
+      if (!src) {
         setIsLoading(false);
+      }
+    }, [src]);
+  
+    const handleLoad = () => {
+      setIsLoading(false);
     };
-
+  
     const handleError = () => {
-        setHasError(true);
-        setIsLoading(false);
-        setImgSrc(fallbackSrc);
+      setHasError(true);
+      setIsLoading(false);
     };
 
+    const resolvedSrc = (hasError ? fallbackSrc : (src || fallbackSrc)) as ImageProps["src"];
+  
     return (
-        <div className={`relative overflow-hidden w-full h-full  ${containerClassName || ""}`}>
-            {/* Placeholder Background (always behind the image) */}
-            {(isLoading || hasError) && (
-                <div className="absolute inset-0 flex items-center justify-center p-6 grayscale opacity-20 transition-opacity duration-300">
-                    <Image
-                        src={SITE_CONFIG.theme.placeholders.logo}
-                        alt="Loading..."
-                        width={60}
-                        height={60}
-                        className={`object-contain ${isLoading && !hasError ? 'animate-pulse' : ''}`}
-                    />
-                </div>
-            )}
-
+      <div
+        className={`relative w-full h-full overflow-hidden ${containerClassName || ""}`}
+      >
+        {/* Placeholder */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center p-6 grayscale opacity-20 transition-opacity duration-300">
             <Image
-                {...props}
-                src={imgSrc || fallbackSrc}
-                alt={alt || "CRTV Content"}
-                fill={fill}
-                priority={priority}
-                unoptimized={isProblematicDomain || (props as any).unoptimized}
-                className={[
-                    className,
-                    "transition-opacity duration-500 ease-out",
-                    hasError ? "object-contain p-12 opacity-50" : "opacity-100"
-                ].join(" ")}
-                onLoad={handleLoadingComplete}
-                onError={handleError}
+              src={SITE_CONFIG.theme.placeholders.logo}
+              alt="Loading..."
+              width={60}
+              height={60}
+              className={`object-contain ${
+                isLoading && !hasError ? "animate-pulse" : ""
+              }`}
             />
-        </div>
+          </div>
+        )}
+  
+        <Image
+          {...props}
+          src={resolvedSrc}
+          alt={alt || `${SITE_CONFIG.name} Content`}
+          fill={fill}
+          priority={priority}
+          unoptimized={isProblematicDomain || (props as any).unoptimized}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={[
+            className,
+            "transition-opacity duration-500 ease-out",
+            hasError ? "object-contain p-12 opacity-50" : "opacity-100"
+          ].join(" ")}
+        />
+      </div>
     );
-}
+  }

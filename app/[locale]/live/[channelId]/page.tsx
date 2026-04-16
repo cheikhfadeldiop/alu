@@ -6,7 +6,7 @@ import { VideoPlayer } from "../../../../components/ui/VideoPlayer";
 import { SectionTitle } from "../../../../components/ui/SectionTitle";
 import { MediaCard } from "../../../../components/ui/MediaCard";
 
-import { getDirectPlayback, getLiveChannels, getEPGNowByChannel, getAlauneByChannel } from "../../../../services/api";
+import { getAluLiveTVOnly } from "../../../../services/api";
 
 interface LiveChannelPageProps {
     params: Promise<{
@@ -20,23 +20,16 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
     const t = await getTranslations("common");
 
     try {
-        // Fetch channel playback URL, channel info, EPG, and related content
-        const [playbackData, channelsData, epgData, relatedData] = await Promise.all([
-            getDirectPlayback(channelId),
-            getLiveChannels(),
-            getEPGNowByChannel(channelId).catch(() => ({ allitems: [] })),
-            getAlauneByChannel(channelId).catch(() => ({ allitems: [] })),
-        ]);
-
-        const streamUrl = playbackData.web_url || playbackData.direct_url;
-        const channel = channelsData.allitems.find((ch) => ch.id === channelId);
+        const channelsData = await getAluLiveTVOnly().catch(() => ({ allitems: [] }));
+        const channel = channelsData.allitems.find((ch) => ch.id === channelId) || channelsData.allitems[0];
+        const streamUrl = channel?.stream_url;
 
         if (!channel || !streamUrl) {
             notFound();
         }
 
-        const currentProgram = epgData.allitems?.find((item) => item.is_current);
-        const relatedContent = relatedData.allitems || [];
+        const currentProgram: any = null;
+        const relatedContent: any[] = [];
 
         return (
             <div className="crtv-page-enter space-y-8">
@@ -58,7 +51,7 @@ export default async function LiveChannelPage({ params }: LiveChannelPageProps) 
 
                     <VideoPlayer streamUrl={streamUrl} poster={channel.logo_url} autoplay={true} className="aspect-video" />
 
-                    {/* Current Program Info */}
+                    {/* Current Program Info (EPG not available in ALU mode) */}
                     {currentProgram && (
                         <div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6">
                             <div className="flex items-start justify-between gap-4">

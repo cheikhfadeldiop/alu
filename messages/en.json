@@ -97,6 +97,11 @@
   "pages": {
     "home": {
       "hero": "Top story",
+      "latestNews": "LATEST ADDED",
+      "mostPopular": "MOST POPULAR",
+      "videosSection": "VIDEOS",
+      "shortsSection": "SHORTS VIDEO REELS",
+      "fallbackShortTitle": "Short video coming soon",
       "liveChannels": "Our channels",
       "liveChannelsSuffix": "live",
       "latestEditions": "Latest editions",

@@ -4,45 +4,40 @@ import { Metadata } from "next";
 import { SITE_CONFIG } from "@/constants/site-config";
 import { RadioPageClient } from "@/components/radio/RadioPageClient";
 import {
-  getLiveRadios,
-  getEPGNow,
+  getAluRadiosOnly,
   getSiteAbsoluteUrl,
   ensureAbsoluteUrl
 } from "@/services/api";
 
 async function RadioPageContent() {
-  const [radiosData, epgNowData] = await Promise.all([
-    getLiveRadios().catch(() => ({ allitems: [] })),
-    getEPGNow().catch(() => ({ allitems: [] })),
-  ]);
+  const radiosData = await getAluRadiosOnly().catch(() => ({ allitems: [] }));
 
   const radios = radiosData.allitems || [];
-  const epgNowItems = epgNowData.allitems || [];
 
   return (
     <RadioPageClient
       initialRadios={radios}
-      epgData={epgNowItems}
+      epgData={[]}
     />
   );
 }
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ channel?: string }> }): Promise<Metadata> {
   const { channel } = await searchParams;
-  const radiosData = await getLiveRadios().catch(() => ({ allitems: [] }));
+  const radiosData = await getAluRadiosOnly().catch(() => ({ allitems: [] }));
   const radios = radiosData.allitems || [];
   const selected = (channel ? radios.find(r => (r.id || r.slug) === channel) : null) || radios[0];
 
-  if (!selected) return { title: "Radio - CRTV" };
+  if (!selected) return { title: `Radio - ${SITE_CONFIG.name}` };
 
   const imageUrl = ensureAbsoluteUrl(selected.hd_logo || selected.logo) || getSiteAbsoluteUrl(SITE_CONFIG.theme.placeholders.radio);
 
   return {
-    title: `${selected.title} - Radio CRTV`,
-    description: selected.desc || `Écoutez ${selected.title} en direct sur CRTV Web`,
+    title: `${selected.title} - Radio ${SITE_CONFIG.name}`,
+    description: selected.desc || `Écoutez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
     openGraph: {
       title: selected.title,
-      description: selected.desc || `Écoutez ${selected.title} en direct sur CRTV Web`,
+      description: selected.desc || `Écoutez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
       images: [{
         url: imageUrl,
         width: 1200,
@@ -54,7 +49,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     twitter: {
       card: 'summary_large_image',
       title: selected.title,
-      description: selected.desc || `Écoutez ${selected.title} en direct sur CRTV Web`,
+      description: selected.desc || `Écoutez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
       images: [imageUrl],
     }
   };

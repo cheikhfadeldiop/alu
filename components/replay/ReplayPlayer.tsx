@@ -530,7 +530,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                 </div>
                                 <ShareButton
                                     title={video.title}
-                                    text={`Regardez ${video.title} en replay sur CRTV Web`}
+                                    text={`Regardez ${video.title} en replay sur ${SITE_CONFIG.name} Web`}
                                     className="shrink-0"
                                     iconClassName="w-6 h-6"
                                 />

@@ -288,4 +288,14 @@ input[type=range]::-webkit-slider-thumb {
     scroll-snap-align: start;
     flex-shrink: 0;
   }
+
+  .hover-lift-primary {
+    border: 1px solid transparent;
+    transition: border-color 180ms ease, transform 180ms ease;
+  }
+
+  .hover-lift-primary:hover {
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+    transform: scale(1.01);
+  }
 }

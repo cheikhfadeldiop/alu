@@ -1,13 +1,13 @@
 /**
- * CRTV Site Configuration - MASTER CONFIGURATION FILE
+ * Site Configuration - MASTER CONFIGURATION FILE
  * Centralized constants, URLs, colors, strings, and assets for the entire application.
  * All hardcoded values should be pulled from here.
  */
 
-type SiteMode = 'crtv' | 'rts';
+type SiteMode = 'crtv' | 'rts' | 'alutv';
 
 // CHANGE THIS VALUE TO SWITCH SITES
-const ACTIVE_SITE: SiteMode = 'crtv';
+const ACTIVE_SITE: SiteMode = 'alutv';
 
 const SITE_DEFAULTS = {
     crtv: {
@@ -120,6 +120,67 @@ const SITE_DEFAULTS = {
             { id: '1', slug: 'rts1', name: 'RTS 1', logo: "https://cdn.tve.static.acan.group/images/channel_1.png" },
             { id: '2', slug: 'rts2', name: 'RTS 2', logo: "https://cdn.tve.static.acan.group/images/channel_2.png" },
         ]
+    },
+    alutv: {
+        name: "ALU TV",
+        officialName: "ALU TV Nigeria",
+        tagline: "News, Live & Replay",
+        description: "ALU TV — actualités, direct TV et radio, émissions et replays.",
+        siteUrl: 'https://acangroup.org',
+        api: {
+            // ALU mode: we don't use tveapi for streams/videos.
+            // Keep a stable origin for helpers that build absolute URLs.
+            baseUrl: 'https://acangroup.org',
+            // Temporary: keep CRTV WordPress for news until ALU news API is ready.
+            wordpressBaseUrl: 'https://actu.crtv.cm/wp-json/wp/v2',
+            // Not used by tveapi in ALU mode; kept to avoid breaking config shape.
+            appId: 'alutv',
+        },
+        singleChannel: {
+            bootstrapUrl: "https://acangroup.org/aar/alutv/api.php",
+            youtube: {
+                channelId: "UCAUyALRtbHt_0Uu7xMAp1gg",
+                apiKeyEnv: "YOUTUBE_API_KEY",
+            },
+        },
+        social: {
+            youtube: 'https://www.youtube.com/@AluTv-Nigeria',
+            facebook: '#',
+            twitter: '#',
+            instagram: '#',
+            tiktok: '#',
+            linkedin: '#',
+        },
+        contact: {
+            address: 'No.9 Maixduguri Road Zoo lane Area, Sokoto',
+            phones: '07 06 715 5424 - 07036988610',
+            fax: '',
+            email: 'alutvnig@gmail.com',
+            whatsapp: '',
+            map: { latitude: 9.0765, longitude: 7.3986, zoom: 12 }
+        },
+        theme: {
+            primary: '#8658A8',
+            secondary: '#5F3974',
+            tertiary: '#C8ABD7',
+        },
+        categories: {
+            news: {
+                alaune: 9,
+                trending: 3,
+                regional: 1,
+                matam: 1,
+                agriculture: 5,
+                radioJournals: 9,
+                tvJournals: 9,
+                groups: [
+                    { id: "a-la-une", name: "A LA UNE", matchIds: [9, 3], keywords: ["une", "actualit", "general", "news"] },
+                ]
+            }
+        },
+        channels: [
+            { id: 'alutv', slug: 'alutv', name: 'ALU TV', logo: "https://acangroup.org/aar/logo/assamadiyyahtv.png" },
+        ]
     }
 };
 
@@ -150,6 +211,9 @@ export const SITE_CONFIG = {
     // Social Media Links
     social: current.social,
 
+    // Single-channel config (ALU mode)
+    singleChannel: (current as any).singleChannel,
+
     // Store & Application Links
     apps: {
         googlePlay: '#',
@@ -175,7 +239,7 @@ export const SITE_CONFIG = {
             avatar: "/assets/placeholders/presentateur_336x442.png",
             arrow: "/assets/placeholders/arrow2.png",
             radio: "/assets/placeholders/radio_icon_sur_card.png",
-            logo: "/assets/logo.png",
+            logo: "/assets/logo/logo.png",
         }
     },
 

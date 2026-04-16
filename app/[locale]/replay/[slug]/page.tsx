@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { SafeImage } from "@/components/ui/SafeImage";
 import {
-  getLatestAggregateReplays,
-  getRelatedItems,
-  getVODShows,
-  mapVODToSliderItem,
+  getYouTubePlaylists,
+  getYouTubePlaylistItems,
+  mapYouTubePlaylistToShow,
+  mapYouTubeItemToReplay,
   SliderVideoItem,
 } from "@/services/api";
 import { AdBannerHD } from "@/components/ui/AdBanner";
@@ -26,32 +26,25 @@ function normalizeSlug(value: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   return {
-    title: `Replay Emission - ${slug}`,
+    title: `Replay Emission - ${slug} - ${process.env.NEXT_PUBLIC_SITE_NAME || "ALU TV"}`,
     description: "Details de l'emission et ses derniers replays",
   };
 }
 
 export default async function ReplaySlugPage({ params }: PageProps) {
   const { slug } = await params;
-  const [showsRes, fallbackReplays] = await Promise.all([
-    getVODShows().catch(() => ({ allitems: [] })),
-    getLatestAggregateReplays(16).catch(() => []),
-  ]);
-
-  const shows = showsRes.allitems || [];
+  const playlists = await getYouTubePlaylists().catch(() => []);
+  const shows = playlists.map(mapYouTubePlaylistToShow);
   const selectedShow =
-    shows.find((show) => show.slug === slug || show.id === slug || normalizeSlug(show.title) === slug) ?? shows[0];
+    shows.find((show: any) => show.slug === slug || show.id === slug || normalizeSlug(show.title) === slug) ?? shows[0];
 
-  const showTitle = selectedShow?.title || "CANDELIGHT INITIATIVE";
+  const showTitle = selectedShow?.title || "Program";
   const showImage = selectedShow?.logo_url || selectedShow?.logo || "/assets/placeholders/live_tv_frame.png";
 
-  let relatedReplays: SliderVideoItem[] = [];
-  if (selectedShow?.relatedItems && selectedShow.relatedItems !== "null") {
-    const archives = await getRelatedItems(selectedShow.relatedItems).catch(() => []);
-    relatedReplays = archives.map((item) => mapVODToSliderItem(item, selectedShow.chaine_logo || selectedShow.logo_url));
-  }
-
-  const replayPool = relatedReplays.length ? relatedReplays : fallbackReplays;
+  const playlistId = selectedShow?.id || slug;
+  const ytItems = await getYouTubePlaylistItems(playlistId).catch(() => []);
+  const mapped = ytItems.map(mapYouTubeItemToReplay).filter(Boolean) as SliderVideoItem[];
+  const replayPool = mapped.length ? mapped : [];
   const latestVideos = Array.from({ length: 12 }, (_, i) => replayPool[i % Math.max(replayPool.length, 1)]).filter(Boolean);
 
   return (

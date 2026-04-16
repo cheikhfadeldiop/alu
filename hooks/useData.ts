@@ -23,6 +23,10 @@ const FETCHER_MAP = {
         const [, categoryId, count] = key.split(':');
         return api.getWordPressPosts(categoryId, parseInt(count) || 10);
     },
+    wordpressLatestPosts: (key: string) => {
+        const [, count, page] = key.split(':');
+        return api.getWordPressLatestPosts(parseInt(count) || 50, parseInt(page) || 1);
+    },
     wordpressCategories: api.getWordPressCategories,
     wordpressPost: (key: string) => {
         const [, identifier] = key.split(':');
@@ -50,6 +54,9 @@ export function useData<T>(
             // Special cases for hooks that need multiple arguments from the key array
             if (fetcherKey === 'wordpressPosts' && Array.isArray(key)) {
                 return await api.getWordPressPosts(key[1] as any, key[2] as any);
+            }
+            if (fetcherKey === 'wordpressLatestPosts' && Array.isArray(key)) {
+                return await api.getWordPressLatestPosts(key[1] as any, key[2] as any);
             }
             if (fetcherKey === 'wordpressPost' && Array.isArray(key)) {
                 return await api.getWordPressPost(key[1] as any);
@@ -86,6 +93,10 @@ export function useEPGNow(fallbackData?: import("@/types/api").EPGResponse) {
 
 export function useWordPressNews(categoryId: string | number, count: number = 10, fallbackData?: import("@/types/api").WordPressPost[]) {
     return useData<import("@/types/api").WordPressPost[]>(["wordpressPosts", categoryId, count], "standard", fallbackData);
+}
+
+export function useWordPressLatestNews(count: number = 50, page: number = 1, fallbackData?: import("@/types/api").WordPressPost[]) {
+    return useData<import("@/types/api").WordPressPost[]>(["wordpressLatestPosts", count, page], "standard", fallbackData);
 }
 
 export function useWordPressPost(postId: string | number, fallbackData?: import("@/types/api").WordPressPost) {

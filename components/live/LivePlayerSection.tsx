@@ -7,6 +7,7 @@ import { LiveChannel, EPGItem } from "../../types/api";
 import { ensureAbsoluteUrl } from "../../services/api";
 import { SafeImage } from "../ui/SafeImage";
 import { ShareButton } from "../ui/ShareButton";
+import { SITE_CONFIG } from "@/constants/site-config";
 
 interface LivePlayerSectionProps {
     channel: LiveChannel;
@@ -25,6 +26,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
     const [error, setError] = React.useState<string | null>(null);
     const [resolvedUrl, setResolvedUrl] = React.useState<string | null>(null);
     const [isResolving, setIsResolving] = React.useState(false);
+    const [retryNonce, setRetryNonce] = React.useState(0);
 
     // HLS Features
     const [hlsInstance, setHlsInstance] = React.useState<Hls | null>(null);
@@ -90,7 +92,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
 
         resolve();
         return () => { isAborted = true; };
-    }, [channel.id, channel.feed_url, channel.stream_url]);
+    }, [channel.id, channel.feed_url, channel.stream_url, retryNonce]);
 
     // 2. HLS & Video Initialization
     React.useEffect(() => {
@@ -294,7 +296,17 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                                     <h3 className="text-xl font-black text-white uppercase tracking-tighter">Flux indisponible</h3>
                                     <p className="text-sm text-white/40 max-w-sm mx-auto leading-relaxed">{error}</p>
                                 </div>
-                                <button onClick={() => window.location.reload()} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20">Réessayer</button>
+                                <button
+                                    onClick={() => {
+                                        setError(null);
+                                        setIsResolving(true);
+                                        setResolvedUrl(null);
+                                        setRetryNonce((n) => n + 1);
+                                    }}
+                                    className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20"
+                                >
+                                    Réessayer
+                                </button>
                             </div>
                         )}
 
@@ -437,7 +449,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
         
         <div className="relative w-[95px] h-[42px] shrink-0">
           <SafeImage
-            src={channel.hd_logo || channel.logo}
+            src={ SITE_CONFIG.theme.placeholders.logo}
             alt={channel.title}
             fill
             className="object-contain"
@@ -467,7 +479,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
 
       <ShareButton
         title={channel.title}
-        text={`Regardez ${channel.title} en direct sur CRTV Web`}
+        text={`Regardez ${channel.title} en direct sur ${SITE_CONFIG.name} Web`}
         className="shrink-0"
         iconClassName="w-6 h-6"
       />
@@ -482,7 +494,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
   {/* BOTTOM */}
   <div className="flex flex-wrap items-center gap-2">
     <span className="b3 font-bold text-[#FF0000] uppercase">
-      {currentProgram?.program_title || "JOURNAL EN DIRECT"}
+      {currentProgram?.program_title || " EN DIRECT"}
     </span>
 
     <span className="b3 font-bold text-[#8E8E8E]">

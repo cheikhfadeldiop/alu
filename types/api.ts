@@ -1,5 +1,5 @@
 /**
- * TypeScript type definitions for CRTV API responses
+ * TypeScript type definitions for API responses
  */
 
 // App Configuration Types
@@ -476,4 +476,20 @@ export interface WordPressPost {
 
 export interface WordPressPostsResponse {
     posts: WordPressPost[];
+}
+
+// ---- ALU single-channel bootstrap ----
+export interface AluBootstrapResponse {
+    allitems: AluBootstrapItem[];
+}
+
+export interface AluBootstrapItem {
+    title: string;
+    des: string;
+    type: 'tv' | 'radio' | string;
+    logo: string;
+    stream_url: string;
+    hls_url?: string;
+    api_key?: string;
+    yt_channel_id?: string;
 }

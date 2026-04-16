@@ -19,10 +19,11 @@ export async function generateMetadata({ params }: NewsDetailPageProps): Promise
     const description = decodeHtmlEntities(post.excerpt?.rendered || post.content?.rendered || "")
       .substring(0, 160)
       .replace(/<[^>]*>/g, "");
-    const imageUrl = ensureAbsoluteUrl(post.acan_image_url) || getSiteAbsoluteUrl(SITE_CONFIG.theme.placeholders.news);
+    const rawImage = post.acan_image_url || post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "";
+    const imageUrl = ensureAbsoluteUrl(rawImage).replace(/^http:\/\//i, "https://") || getSiteAbsoluteUrl(SITE_CONFIG.theme.placeholders.news);
 
     return {
-      title: `${title} - CRTV News`,
+      title: `${title} - ${SITE_CONFIG.name} News`,
       description,
       openGraph: {
         title,
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: NewsDetailPageProps): Promise
     };
   } catch {
     return {
-      title: "Actualités - CRTV",
+      title: `Actualités - ${SITE_CONFIG.name}`,
     };
   }
 }

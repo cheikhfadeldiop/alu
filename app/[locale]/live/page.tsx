@@ -3,10 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { LivePageClient } from "@/components/live/LivePageClient";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
-  getLiveChannels,
-  getLiveRadios,
-  getEPGAll,
-  getEPGNow
+  getAluLiveChannels,
+  getYouTubeLatestVideos
 } from "@/services/api";
 import { LivePageShimmer } from "@/components/ui/shimmer/LiveShimmers";
 import { Metadata } from "next";
@@ -14,24 +12,16 @@ import { SITE_CONFIG } from "@/constants/site-config";
 import { getSiteAbsoluteUrl, ensureAbsoluteUrl } from "@/services/api";
 
 async function LivePageContent() {
-  const [liveTVData, liveRadioData, fullEpgData, epgNowData] = await Promise.all([
-    getLiveChannels().catch(() => ({ allitems: [] })),
-    getLiveRadios().catch(() => ({ allitems: [] })),
-    getEPGAll().catch(() => []),
-    getEPGNow().catch(() => ({ allitems: [] })),
-  ]);
-
-  const liveTV = liveTVData.allitems || [];
-  const liveRadios = liveRadioData.allitems || [];
-  const allChannels = [...liveTV, ...liveRadios];
-  const fullEpg = fullEpgData || [];
-  const epgNowItems = epgNowData.allitems || [];
+  const allChannelsRes = await getAluLiveChannels().catch(() => ({ allitems: [] }));
+  const allChannels = allChannelsRes.allitems || [];
+  const channelVideos = await getYouTubeLatestVideos(48).catch(() => []);
 
   return (
     <LivePageClient
       initialChannels={allChannels}
-      epgData={epgNowItems}
-      fullEpg={fullEpg}
+      initialChannelVideos={channelVideos}
+      epgData={[]}
+      fullEpg={[]}
       aodItems={[]}
     />
   );
@@ -39,20 +29,20 @@ async function LivePageContent() {
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ channel?: string }> }): Promise<Metadata> {
   const { channel } = await searchParams;
-  const liveTVData = await getLiveChannels().catch(() => ({ allitems: [] }));
-  const channels = liveTVData.allitems || [];
+  const liveTVData = await getAluLiveChannels().catch(() => ({ allitems: [] }));
+  const channels = (liveTVData.allitems || []).filter((c) => c.type === "TV");
   const selected = (channel ? channels.find(c => c.id === channel) : null) || channels[0];
 
-  if (!selected) return { title: "Direct TV - CRTV" };
+  if (!selected) return { title: `Direct TV - ${SITE_CONFIG.name}` };
 
   const imageUrl = ensureAbsoluteUrl(selected.hd_logo || selected.logo) || getSiteAbsoluteUrl(SITE_CONFIG.theme.placeholders.video);
 
   return {
-    title: `${selected.title} - Direct TV CRTV`,
-    description: selected.desc || `Regardez ${selected.title} en direct sur CRTV Web`,
+    title: `${selected.title} - Direct TV ${SITE_CONFIG.name}`,
+    description: selected.desc || `Regardez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
     openGraph: {
       title: selected.title,
-      description: selected.desc || `Regardez ${selected.title} en direct sur CRTV Web`,
+      description: selected.desc || `Regardez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
       images: [{
         url: imageUrl,
         width: 1200,
@@ -64,7 +54,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     twitter: {
       card: 'summary_large_image',
       title: selected.title,
-      description: selected.desc || `Regardez ${selected.title} en direct sur CRTV Web`,
+      description: selected.desc || `Regardez ${selected.title} en direct sur ${SITE_CONFIG.name} Web`,
       images: [imageUrl],
     }
   };

@@ -25,6 +25,8 @@ import type {
     SliderVideoItem,
     PlaylistResponse,
     AODItem,
+    AluBootstrapResponse,
+    AluBootstrapItem,
 } from '../types/api';
 
 export type { SliderVideoItem } from '../types/api';
@@ -34,6 +36,54 @@ import { SITE_CONFIG } from '../constants/site-config';
 const API_BASE_URL = SITE_CONFIG.api.baseUrl;
 const WORDPRESS_API_BASE_URL = SITE_CONFIG.api.wordpressBaseUrl;
 const APP_ID = SITE_CONFIG.api.appId;
+
+const ALU_BOOTSTRAP_URL: string | undefined = SITE_CONFIG.singleChannel?.bootstrapUrl;
+const ALU_YT_CHANNEL_ID: string | undefined = SITE_CONFIG.singleChannel?.youtube?.channelId;
+const ALU_YT_API_KEY_ENV: string | undefined = SITE_CONFIG.singleChannel?.youtube?.apiKeyEnv;
+
+function getYouTubeApiKey(): string {
+    const envName = ALU_YT_API_KEY_ENV || "YOUTUBE_API_KEY";
+    const key = process.env[envName];
+    if (!key) {
+        throw new Error(`Missing YouTube API key. Please set ${envName} in environment variables.`);
+    }
+    return key;
+}
+
+async function getYouTubeRssVideos(maxResults: number = 12): Promise<SliderVideoItem[]> {
+    if (!ALU_YT_CHANNEL_ID) return [];
+    const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}`;
+    const response = await fetch(url, {
+        next: { revalidate: SITE_CONFIG.api.revalidateTime },
+    });
+    if (!response.ok) return [];
+    const xml = await response.text();
+
+    const entries = xml.split("<entry>").slice(1);
+    const mapped = entries.map((entry, idx) => {
+        const id = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1] || "";
+        const title = entry.match(/<title>([^<]+)<\/title>/)?.[1] || `Video ${idx + 1}`;
+        const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] || "";
+        if (!id) return null;
+        return {
+            id,
+            slug: id,
+            title,
+            desc: "",
+            type: "youtube",
+            views: "0",
+            logo: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+            logo_url: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+            video_url: `https://www.youtube.com/watch?v=${id}`,
+            relatedItems: "",
+            feed_url: "",
+            date: published,
+            time: "",
+        } as SliderVideoItem;
+    }).filter(Boolean) as SliderVideoItem[];
+
+    return mapped.slice(0, maxResults);
+}
 
 /**
  * Map a raw VOD item or Slider item to a consistent SliderVideoItem structure
@@ -115,6 +165,263 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
         console.error(`Failed to fetch ${endpoint}:`, error);
         throw error;
     }
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+    const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        next: { revalidate: SITE_CONFIG.api.revalidateTime },
+    });
+    if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    return (await response.json()) as T;
+}
+
+// -----------------------------------------------------------------------------
+// ALU single-channel: bootstrap + live/radio mapping
+// -----------------------------------------------------------------------------
+
+export async function getAluBootstrap(): Promise<AluBootstrapResponse> {
+    if (!ALU_BOOTSTRAP_URL) return { allitems: [] };
+    return fetchJson<AluBootstrapResponse>(ALU_BOOTSTRAP_URL);
+}
+
+function toLiveChannelFromAlu(item: AluBootstrapItem) {
+    const id = (item.type || "tv") === "radio" ? "alu-radio" : "alu-tv";
+    const slug = id;
+    const stream = item.hls_url || item.stream_url;
+    return {
+        id,
+        title: item.title || "ALU",
+        desc: item.des || "",
+        logo: item.logo || "",
+        logo_url: item.logo || "",
+        type: (item.type || "tv").toLowerCase() === "radio" ? ("RADIO" as const) : ("TV" as const),
+        feed_url: "",
+        alaune_feed: "",
+        vod_feed: "",
+        slug,
+        guidetvnow: "",
+        stream_url: stream || "",
+        affiche_url: item.logo || "",
+        start_time: "",
+        end_time: "",
+        duration: "",
+        list_channels_by_category: "",
+        list_pubs: "",
+        hd_logo: item.logo || "",
+        sd_logo: item.logo || "",
+    };
+}
+
+export async function getAluLiveChannels() {
+    const boot = await getAluBootstrap().catch(() => ({ allitems: [] }));
+    const tv = boot.allitems?.find((i) => (i.type || "").toLowerCase() === "tv");
+    const radio = boot.allitems?.find((i) => (i.type || "").toLowerCase() === "radio");
+    const mapped = [tv, radio].filter(Boolean).map((i) => toLiveChannelFromAlu(i as AluBootstrapItem));
+    return { allitems: mapped };
+}
+
+export async function getAluLiveTVOnly() {
+    const res = await getAluLiveChannels();
+    return { allitems: (res.allitems || []).filter((c) => c.type === "TV") };
+}
+
+export async function getAluRadiosOnly() {
+    const res = await getAluLiveChannels();
+    return { allitems: (res.allitems || []).filter((c) => c.type === "RADIO") };
+}
+
+// -----------------------------------------------------------------------------
+// YouTube Data API helpers (server-side only)
+// -----------------------------------------------------------------------------
+
+type YouTubePlaylist = {
+    id: string;
+    snippet?: {
+        title?: string;
+        description?: string;
+        thumbnails?: Record<string, { url: string }>;
+    };
+};
+
+type YouTubePlaylistItem = {
+    snippet?: {
+        title?: string;
+        description?: string;
+        thumbnails?: Record<string, { url: string }>;
+        resourceId?: { videoId?: string };
+        publishedAt?: string;
+    };
+};
+
+function ytThumb(thumbnails?: Record<string, { url: string }>) {
+    return thumbnails?.maxres?.url || thumbnails?.high?.url || thumbnails?.medium?.url || thumbnails?.default?.url || "";
+}
+
+export async function getYouTubePlaylists() {
+    if (!ALU_YT_CHANNEL_ID) return [];
+    const key = getYouTubeApiKey();
+    const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&maxResults=50&channelId=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
+    const data = await fetchJson<{ items: YouTubePlaylist[] }>(url);
+    return data.items || [];
+}
+
+export async function getYouTubePlaylistItems(playlistId: string) {
+    const key = getYouTubeApiKey();
+    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${encodeURIComponent(playlistId)}&key=${encodeURIComponent(key)}`;
+    const data = await fetchJson<{ items: YouTubePlaylistItem[] }>(url);
+    return data.items || [];
+}
+
+type YouTubeSearchItem = {
+    id?: { videoId?: string };
+    snippet?: {
+        title?: string;
+        description?: string;
+        thumbnails?: Record<string, { url: string }>;
+        publishedAt?: string;
+    };
+};
+
+export async function getYouTubeLatestVideos(maxResults: number = 12) {
+    if (!ALU_YT_CHANNEL_ID) return [];
+    let key = "";
+    try {
+        key = getYouTubeApiKey();
+    } catch {
+        // Public fallback without API key
+        return getYouTubeRssVideos(maxResults);
+    }
+    // Use channel uploads playlist first (more complete than search).
+    const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
+    let channelData: { items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> };
+    try {
+        channelData = await fetchJson<{ items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> }>(channelUrl);
+    } catch {
+        return getYouTubeRssVideos(maxResults);
+    }
+    const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+
+    if (uploadsId) {
+        const uploadItems = await getYouTubePlaylistItems(uploadsId);
+        const mapped = uploadItems
+            .map(mapYouTubeItemToReplay)
+            .filter(Boolean) as SliderVideoItem[];
+        if (mapped.length > 0) {
+            return mapped.slice(0, maxResults);
+        }
+    }
+
+    // Fallback to search if uploads playlist cannot be resolved.
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&order=date&type=video&maxResults=${maxResults}&channelId=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
+    let data: { items: YouTubeSearchItem[] };
+    try {
+        data = await fetchJson<{ items: YouTubeSearchItem[] }>(searchUrl);
+    } catch {
+        return getYouTubeRssVideos(maxResults);
+    }
+    const items = data.items || [];
+    return items
+        .map((it) => {
+            const videoId = it.id?.videoId;
+            if (!videoId) return null;
+            const title = it.snippet?.title || "Video";
+            const thumb = ytThumb(it.snippet?.thumbnails);
+            const publishedAt = it.snippet?.publishedAt || "";
+            return {
+                id: videoId,
+                slug: videoId,
+                title,
+                desc: it.snippet?.description || "",
+                type: "youtube",
+                views: "0",
+                logo: thumb,
+                logo_url: thumb,
+                video_url: `https://www.youtube.com/watch?v=${videoId}`,
+                relatedItems: "",
+                feed_url: "",
+                date: publishedAt,
+                time: "",
+            } as SliderVideoItem;
+        })
+        .filter(Boolean) as SliderVideoItem[];
+}
+
+export async function getYouTubeShorts(maxResults: number = 12) {
+    if (!ALU_YT_CHANNEL_ID) return [];
+    let key = "";
+    try {
+        key = getYouTubeApiKey();
+    } catch {
+        // Let UI fallback to fictive shorts as requested.
+        return [];
+    }
+    // Best-effort: YouTube doesn't have an official "isShort" filter in Data API v3.
+    // We approximate with videoDuration=short and a 'shorts' query.
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&order=date&type=video&videoDuration=short&maxResults=${maxResults}&q=${encodeURIComponent("shorts")}&channelId=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
+    const data = await fetchJson<{ items: YouTubeSearchItem[] }>(url);
+    const items = data.items || [];
+    return items
+        .map((it) => {
+            const videoId = it.id?.videoId;
+            if (!videoId) return null;
+            const title = it.snippet?.title || "Short";
+            const thumb = ytThumb(it.snippet?.thumbnails);
+            const publishedAt = it.snippet?.publishedAt || "";
+            return {
+                id: videoId,
+                slug: videoId,
+                title,
+                desc: it.snippet?.description || "",
+                type: "youtube",
+                views: "0",
+                logo: thumb,
+                logo_url: thumb,
+                video_url: `https://www.youtube.com/watch?v=${videoId}`,
+                relatedItems: "",
+                feed_url: "",
+                date: publishedAt,
+                time: "",
+            } as SliderVideoItem;
+        })
+        .filter(Boolean) as SliderVideoItem[];
+}
+
+export function mapYouTubePlaylistToShow(pl: YouTubePlaylist) {
+    const title = pl.snippet?.title || "Program";
+    const thumb = ytThumb(pl.snippet?.thumbnails);
+    return {
+        id: pl.id,
+        slug: pl.id,
+        title,
+        desc: pl.snippet?.description || "",
+        logo: thumb,
+        logo_url: thumb,
+        relatedItems: "",
+    };
+}
+
+export function mapYouTubeItemToReplay(item: YouTubePlaylistItem): SliderVideoItem | null {
+    const videoId = item.snippet?.resourceId?.videoId;
+    if (!videoId) return null;
+    const title = item.snippet?.title || "Video";
+    const thumb = ytThumb(item.snippet?.thumbnails);
+    const publishedAt = item.snippet?.publishedAt || "";
+    return {
+        id: videoId,
+        slug: videoId,
+        title,
+        desc: item.snippet?.description || "",
+        type: "youtube",
+        views: "0",
+        logo: thumb,
+        logo_url: thumb,
+        video_url: `https://www.youtube.com/watch?v=${videoId}`,
+        relatedItems: "",
+        feed_url: "",
+        date: publishedAt,
+        time: "",
+    };
 }
 
 /**

@@ -9,8 +9,7 @@ export function Footer() {
   const isDarkMediaRoute =
     pathname.includes("/live") ||
     pathname.includes("/replay") ||
-    pathname.includes("/radio") ||
-    pathname.includes("/playback");
+    pathname.includes("/radio");
 
   return (
     <footer className={`w-full px-4 pb-[50px] ${isDarkMediaRoute ? "mt-0 bg-[#171717]" : "mt-[50px]"}`}>

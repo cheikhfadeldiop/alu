@@ -10,8 +10,7 @@ export function MainBackground({ children }: { children: React.ReactNode }) {
   const isMediaDarkRoute =
     pathname.includes("/live") ||
     pathname.includes("/replay") ||
-    pathname.includes("/radio") ||
-    pathname.includes("/playback");
+    pathname.includes("/radio");
 
   return (
     <div

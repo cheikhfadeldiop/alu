@@ -99,6 +99,11 @@
   "pages": {
     "home": {
       "hero": "À la une",
+      "latestNews": "DERNIERS AJOUTS",
+      "mostPopular": "LES PLUS POPULAIRES",
+      "videosSection": "VIDÉOS",
+      "shortsSection": "SHORTS VIDÉOS REELS",
+      "fallbackShortTitle": "Short vidéo à venir",
       "liveChannels": "Nos chaînes",
       "liveChannelsSuffix": "en direct",
       "latestEditions": "Dernières éditions",

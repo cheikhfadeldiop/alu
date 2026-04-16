@@ -1,7 +1,7 @@
 import { ReplayPlayerWrapper } from "@/components/replay/ReplayPlayerWrapper";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { Link } from "@/i18n/navigation";
-import { findReplay, getLatestAggregateReplays, SliderVideoItem } from "@/services/api";
+import { getYouTubePlaylistItems, mapYouTubeItemToReplay, SliderVideoItem } from "@/services/api";
 
 interface ReplayVideoPageProps {
   params: Promise<{ slug: string; videoSlug: string }>;
@@ -11,14 +11,13 @@ export default async function ReplayVideoPage({ params }: ReplayVideoPageProps) 
   const { slug, videoSlug } = await params;
   const decodedVideoSlug = decodeURIComponent(videoSlug);
 
-  const [selectedReplay, latestReplays] = await Promise.all([
-    findReplay(decodedVideoSlug),
-    getLatestAggregateReplays(8).catch(() => []),
-  ]);
+  const ytItems = await getYouTubePlaylistItems(slug).catch(() => []);
+  const mapped = ytItems.map(mapYouTubeItemToReplay).filter(Boolean) as SliderVideoItem[];
+  const selectedReplay = mapped.find((v) => v.slug === decodedVideoSlug || v.id === decodedVideoSlug) || null;
 
   const replay =
     selectedReplay ??
-    latestReplays[0] ??
+    mapped[0] ??
     ({
       id: "fallback-replay",
       slug: "fallback-replay",
@@ -35,7 +34,7 @@ export default async function ReplayVideoPage({ params }: ReplayVideoPageProps) 
       time: "",
     } as SliderVideoItem);
 
-  const suggestions = latestReplays.length ? latestReplays : [replay];
+  const suggestions = mapped.length ? mapped.slice(0, 8) : [replay];
 
   return (
     <div className="crtv-page-enter mx-auto w-full max-w-[1280px] space-y-10 py-8 text-white">

@@ -4,8 +4,8 @@ import { NewsHeroShimmer } from "@/components/ui/shimmer/NewsShimmers";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Actualités - CRTV",
-  description: "Suivez toute l'actualité du Cameroun et du monde sur CRTV Web",
+  title: "Actualités",
+  description: "Suivez toute l'actualité sur ALU TV Web",
 };
 
 export default function NewsPage() {

@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { SWRProvider } from "../components/providers/SWRProvider";
+import { SITE_CONFIG } from "@/constants/site-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CRTV",
-  description: "CRTV Web",
+  title: SITE_CONFIG.name,
+  description: `${SITE_CONFIG.name} Web`,
 };
 
 export default async function RootLayout({
