@@ -42,24 +42,6 @@ const SITE_DEFAULTS = {
             secondary: '#009e49',
             tertiary: '#fcd116',
         },
-        categories: {
-            news: {
-                alaune: 9,
-                trending: 3,
-                regional: 1,
-                matam: 1,
-                agriculture: 5,
-                radioJournals: 9,
-                tvJournals: 9,
-                groups: [
-                    { id: "a-la-une", name: "A LA UNE", matchIds: [9, 3], keywords: ["une", "actualit", "general", "news"] },
-                    { id: "regions", name: "RÉGIONS", matchIds: [1, 9], keywords: ["cameroun", "region", "douala", "yaounde"] },
-                    { id: "economie", name: "ECONOMIE", matchIds: [7], keywords: ["economie", "finance", "business"] },
-                    { id: "societe-politique", name: "SOCIÉTÉ & POLITIQUE", matchIds: [9], keywords: ["politique", "societe", "justice"] },
-                    { id: "technologie", name: "TECHNOLOGIE", matchIds: [14], keywords: ["tech", "innovation", "digital"] },
-                ]
-            }
-        },
         channels: [
             { id: '50004', slug: 'crtv', name: 'CRTV', logo: "https://cdn.tve.static.acan.group/images/channel_1731344652.png" },
             { id: '50005', slug: 'crtv-news', name: 'CRTV NEWS', logo: "https://cdn.tve.static.acan.group/images/channel_1731344640.png" },
@@ -98,24 +80,6 @@ const SITE_DEFAULTS = {
             secondary: '#d1121f',
             tertiary: '#fcd116',
         },
-        categories: {
-            news: {
-                alaune: 121,
-                trending: 141,
-                regional: 145,
-                matam: 133,
-                agriculture: 153,
-                radioJournals: 141,
-                tvJournals: 121,
-                groups: [
-                    { id: "a-la-une", name: "A LA UNE", matchIds: [121], keywords: ["une", "actualit", "general"] },
-                    { id: "regions", name: "RÉGIONS", matchIds: [145], keywords: ["dakar", "matam", "region", "saint-louis", "louga", "tambacounda", "diourbel", "kaolack", "fatick", "kolda", "ziguinchor", "sedhiou", "kedougou", "kaffrine"] },
-                    { id: "international", name: "INTERNATIONAL", matchIds: [128], keywords: ["monde", "world", "afrique", "europe", "asie", "amerique"] },
-                    { id: "societe-politique", name: "SOCIÉTÉ & POLITIQUE", matchIds: [136, 132, 151, 123, 129], keywords: ["politique", "economie", "sante", "education", "societe", "justice", "gouvernance"] },
-                    { id: "loisirs-tech", name: "LOISIRS & TECH", matchIds: [125, 612, 148, 116], keywords: ["sport", "culture", "tech", "musique", "cinema", "loisirs", "variet"] },
-                ]
-            }
-        },
         channels: [
             { id: '1', slug: 'rts1', name: 'RTS 1', logo: "https://cdn.tve.static.acan.group/images/channel_1.png" },
             { id: '2', slug: 'rts2', name: 'RTS 2', logo: "https://cdn.tve.static.acan.group/images/channel_2.png" },
@@ -125,7 +89,7 @@ const SITE_DEFAULTS = {
         name: "ALU TV",
         officialName: "ALU TV Nigeria",
         tagline: "News, Live & Replay",
-        description: "ALU TV — actualités, direct TV et radio, émissions et replays.",
+        description: "ALU TV — Votre portail complet d'actualités : Direct TV et Radio, émissions exclusives et replays. Suivez en temps réel l'info nationale et internationale, revivez vos programmes favoris et écoutez nos débats en podcast, 24h/24.",
         siteUrl: 'https://acangroup.org',
         api: {
             // ALU mode: we don't use tveapi for streams/videos.
@@ -163,20 +127,6 @@ const SITE_DEFAULTS = {
             primary: '#8658A8',
             secondary: '#5F3974',
             tertiary: '#C8ABD7',
-        },
-        categories: {
-            news: {
-                alaune: 9,
-                trending: 3,
-                regional: 1,
-                matam: 1,
-                agriculture: 5,
-                radioJournals: 9,
-                tvJournals: 9,
-                groups: [
-                    { id: "a-la-une", name: "A LA UNE", matchIds: [9, 3], keywords: ["une", "actualit", "general", "news"] },
-                ]
-            }
         },
         channels: [
             { id: 'alutv', slug: 'alutv', name: 'ALU TV', logo: "https://acangroup.org/aar/logo/assamadiyyahtv.png" },
@@ -244,7 +194,7 @@ export const SITE_CONFIG = {
     },
 
     // Content Organization & Logic
-    categories: current.categories,
+    cacheLimit: 5,
 
     // Default Fallback Strings
     strings: {
@@ -297,7 +247,6 @@ Ou plus simple :
 Sur GitHub → bouton “Sync fork”
     
     */}
-
 
 
 

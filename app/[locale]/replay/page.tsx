@@ -3,7 +3,7 @@ import { AdBannerHD } from "@/components/ui/AdBanner";
 import { ReplayProgramsSection } from "@/components/replay/ReplayProgramsSection";
 
 export default async function ReplayPage() {
-  const { items: videos, nextPageToken } = await getYouTubeLatestVideosPage({ maxResults: 24, ttlKey: "dynamic" }).catch(() => ({
+  const { items: videos, nextPageToken } = await getYouTubeLatestVideosPage({ maxResults: 12, ttlKey: "dynamic" }).catch(() => ({
     items: [],
     nextPageToken: null,
   }));

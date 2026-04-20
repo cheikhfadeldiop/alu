@@ -293,6 +293,7 @@ input[type=range]::-webkit-slider-thumb {
   .hover-lift-primary {
     border: 1px solid transparent;
     transition: border-color 180ms ease, transform 180ms ease;
+    padding: 2px;
   }
 
   .hover-lift-primary:hover {

@@ -34,6 +34,26 @@ function uniqVideos(items: SliderVideoItem[]) {
     });
 }
 
+async function fetchMoreVideoRows(nextToken: string, loadedVideos: SliderVideoItem[], minimumCount: number) {
+    let token: string | null = nextToken;
+    let merged = loadedVideos;
+
+    while (token && merged.length < minimumCount) {
+        const response = await fetch(
+            `/api/youtube/latest-videos?maxResults=${LIVE_FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(token)}`
+        );
+        if (!response.ok) {
+            throw new Error("Failed to fetch more videos");
+        }
+
+        const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
+        merged = uniqVideos([...(merged || []), ...((data.items || []) as SliderVideoItem[])]);
+        token = data.nextPageToken || null;
+    }
+
+    return { merged, nextPageToken: token };
+}
+
 function displayTime(date?: string, fallbackTime?: string) {
     if (fallbackTime && fallbackTime.trim()) return fallbackTime;
     const parsed = parseToDate(date);
@@ -90,19 +110,15 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
         try {
             // Si on a une prochaine page, on la fetch toujours (append/déduplique).
             if (nextPageToken) {
-                const response = await fetch(
-                    `/api/youtube/latest-videos?maxResults=${LIVE_FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(nextPageToken)}`
+                const data = await fetchMoreVideoRows(
+                    nextPageToken,
+                    latestVideos,
+                    visibleLatestCount + LIVE_GRID_ROW_SIZE * 2
                 );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch more videos");
-                }
 
-                const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
-                const nextItems = uniqVideos([...(latestVideos || []), ...((data.items || []) as SliderVideoItem[])]);
-
-                setLoadedLatestVideos(nextItems);
-                setNextPageToken(data.nextPageToken || null);
-                setVisibleLatestCount((prev) => Math.min(prev + LIVE_GRID_ROW_SIZE * 2, nextItems.length));
+                setLoadedLatestVideos(data.merged);
+                setNextPageToken(data.nextPageToken);
+                setVisibleLatestCount((prev) => Math.min(prev + LIVE_GRID_ROW_SIZE * 2, data.merged.length));
                 return;
             }
         } finally {
@@ -123,10 +139,10 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
                     <h2 className="fig-h9 uppercase text-white">{t("latestVideos")}</h2>
                     <div className="news-section-line" />
                 </div>
-                <div className="grid gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-[15px] grid-cols-2 sm:grid-cols-2 xl:grid-cols-4">
                     {visibleLatestVideos.map((video, index) => (
                         <Link key={`${video.id}-${index}`} href={`/replay/${video.slug || video.id}`} className="block space-y-2 rounded-[10px] hover-lift-primary">
-                            <div className="h-[172px] overflow-hidden rounded-[10px]">
+                            <div className="h-[100px] md:h-[172px] overflow-hidden rounded-[10px]">
                                 <SafeImage
                                     src={video.logo_url || video.logo || SITE_CONFIG.theme.placeholders.video}
                                     alt={getVideoTitle(video)}
@@ -135,13 +151,13 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
                                     className="h-full w-full object-cover"
                                 />
                             </div>
-                            <div className="px-2">
-                            <h3 className="line-clamp-3 text-[16px] leading-[24px] text-white">
+                            <div className="px-1 md:px-2">
+                            <h3 className="line-clamp-2 text-[13px] md:text-[16px] leading-tight md:leading-[24px] text-white font-medium">
                                 {getVideoTitle(video)}
                             </h3>
-                            <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+                            <div className="mt-1 flex flex-wrap items-center gap-[5px] md:gap-[10px] text-[10px] md:text-[12px] leading-[18px] text-[#8E8E8E]">
                                 <span>{video.date ? formatDate(video.date) : formatDate(new Date())}</span>
-                                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+                                <span className="hidden md:inline-block h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
                                 <span>{displayTime(video.date, video.time)}</span>
                             </div>
                             </div>
@@ -151,14 +167,15 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
                         <>
                             {Array.from({ length: 2 }, (_, idx) => (
                                 <article key={`latest-shimmer-${idx}`} className="space-y-2 animate-pulse">
-                                    <div className="h-[172px] overflow-hidden rounded-[10px] bg-[#2a2a2a]" />
-                                    <div className="h-5 w-4/5 rounded bg-[#2a2a2a]" />
-                                    <div className="h-4 w-2/3 rounded bg-[#2a2a2a]" />
+                                    <div className="h-[100px] md:h-[172px] overflow-hidden rounded-[10px] bg-[#2a2a2a]" />
+                                    <div className="h-4 md:h-5 w-4/5 rounded bg-[#2a2a2a]" />
+                                    <div className="h-3 md:h-4 w-2/3 rounded bg-[#2a2a2a]" />
                                 </article>
                             ))}
                         </>
                     )}
                 </div>
+
                 {hasMoreLatestVideos && (
                     <div className="flex justify-center">
                         <button
@@ -182,10 +199,10 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
                     <h2 className="fig-h9 uppercase text-white">{t("tvSchedule")}</h2>
                     <div className="news-section-line" />
                 </div>
-                <div className="grid gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-[15px] grid-cols-2 sm:grid-cols-2 xl:grid-cols-4">
                     {programs.map((program, idx) => (
-                        <Link key={`${program.id}-${idx}`} href={`/replay/${program.slug || program.id}`} className="block space-y-4 rounded-[12px] hover-lift-primary">
-                            <div className="h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
+                        <Link key={`${program.id}-${idx}`} href={`/replay/${program.slug || program.id}`} className="block space-y-3 rounded-[12px] hover-lift-primary">
+                            <div className="h-[240px] md:h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
                                 <SafeImage
                                     src={program.logo_url || program.logo || "/assets/placeholders/live_tv_frame.png"}
                                     alt={getVideoTitle(program)}
@@ -194,17 +211,18 @@ export function LivePageClient({ initialChannels, initialChannelVideos, initialN
                                     className="h-full w-full object-cover"
                                 />
                             </div>
-                            <div className="px-2">
-                            <h3 className="fig-h9 uppercase text-white line-clamp-2">{getVideoTitle(program)}</h3>
-                            <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+                            <div className="px-1 md:px-2 pb-2">
+                            <h3 className="text-[13px] md:fig-h9 uppercase text-white line-clamp-2 font-medium leading-tight">{getVideoTitle(program)}</h3>
+                            <div className="mt-2 flex flex-wrap items-center gap-[5px] md:gap-[10px] text-[10px] md:text-[12px] text-[#8E8E8E]">
                                 <span>{program.date ? formatDate(program.date) : formatDate(new Date())}</span>
-                                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+                                <span className="hidden md:inline-block h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
                                 <span>{displayTime(program.date, program.time)}</span>
                             </div>
                             </div>
                         </Link>
                     ))}
                 </div>
+
             </section>
         </div>
     );

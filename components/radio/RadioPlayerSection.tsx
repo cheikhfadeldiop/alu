@@ -252,15 +252,17 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
         : t("shareLiveText", { channelTitle: channel.title, siteName: SITE_CONFIG.name });
 
     return (
-        <section className="relative mx-auto h-[605px] w-full max-w-[1220px] rounded-[80px] bg-[#1A1A1A]">
-            <div className="absolute left-1/2 top-1/2 flex h-[484px] w-[1126px] -translate-x-1/2 -translate-y-1/2 flex-row items-center gap-[79px]">
-                <div className="relative h-[484px] w-[504px] overflow-hidden ">
-                    <div className="absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2">
+        <section className="relative mx-auto h-auto md:h-[605px] w-full max-w-[1220px] rounded-[30px] md:rounded-[80px] bg-[#1A1A1A] overflow-hidden py-8 md:py-0">
+            <div className="relative md:absolute md:left-1/2 md:top-1/2 flex h-auto md:h-[484px] w-full max-w-[1126px] md:-translate-x-1/2 md:-translate-y-1/2 flex-col md:flex-row items-center justify-center gap-8 md:gap-[79px] px-6 md:px-0">
+                
+                <div className="relative h-[300px] w-[300px] md:h-[484px] md:w-[504px] overflow-hidden flex-shrink-0">
+                    <div className="absolute left-1/2 top-1/2 h-[260px] w-[260px] md:h-[360px] md:w-[360px] -translate-x-1/2 -translate-y-1/2">
                         {Array.from({ length: 84 }).map((_, index) => {
                             const angle = (index / 84) * Math.PI * 2;
-                            const radius = 162;
-                            const x = 180 + Math.cos(angle) * radius;
-                            const y = 180 + Math.sin(angle) * radius;
+                            const radius = typeof window !== 'undefined' && window.innerWidth < 768 ? 120 : 162;
+                            const center = typeof window !== 'undefined' && window.innerWidth < 768 ? 130 : 180;
+                            const x = center + Math.cos(angle) * radius;
+                            const y = center + Math.sin(angle) * radius;
 
                             return (
                                 <span
@@ -278,9 +280,9 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                     </div>
                 </div>
 
-                <div className="flex h-[359px] w-[543px] flex-col items-start gap-[24px]">
-                    <div className="h-[250px] w-[543px]">
-                        <div className="relative h-[95px] w-[163px]">
+                <div className="flex h-auto md:h-[359px] w-full md:w-[543px] flex-col items-center md:items-start gap-6 md:gap-[24px]">
+                    <div className="h-auto md:h-[250px] w-full text-center md:text-left">
+                        <div className="relative h-[60px] md:h-[95px] w-[100px] md:w-[163px] mx-auto md:mx-0">
                             <SafeImage
                                 src={SITE_CONFIG.theme.placeholders.logo}
                                 alt={channel.title}
@@ -288,19 +290,19 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                                 className="object-contain"
                             />
                         </div>
-                        <p className="mt-8 h-[123px] w-[543px] text-[14px] leading-[21px] text-[#A4A4A4]">
+                        <p className="mt-6 md:mt-8 text-[13px] md:text-[14px] leading-relaxed text-[#A4A4A4] line-clamp-4 md:line-clamp-none">
                             {currentProgram?.program_desc || t("fallback.desc")}
                         </p>
                     </div>
 
-                    <div className="flex h-[85px] w-[282px] items-center justify-center rounded-[110px] bg-[#333333] p-[10px]">
-                        <div className="flex h-[66px] w-[259px] items-center justify-center gap-[37px]">
+                    <div className="flex h-[75px] md:h-[85px] w-[260px] md:w-[282px] items-center justify-center rounded-[110px] bg-[#333333] p-[10px]">
+                        <div className="flex h-full w-full items-center justify-center gap-[30px] md:gap-[37px]">
                             <ShareButton title={channel.title} text={shareText}>
                                 <button
                                     type="button"
-                                    className="flex h-[50px] w-[50px] items-center justify-center rounded-full border border-[#4A4A4A]"
+                                    className="flex h-[44px] w-[44px] md:h-[50px] md:w-[50px] items-center justify-center rounded-full border border-[#4A4A4A]"
                                 >
-                                    <svg className="h-6 w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="h-5 w-5 md:h-6 md:w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                     </svg>
                                 </button>
@@ -309,17 +311,17 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                             <button
                                 onClick={handlePlayPause}
                                 disabled={loading || isStreamDead}
-                                className="flex h-[66px] w-[66px] items-center justify-center rounded-full border border-white"
+                                className="flex h-[56px] w-[56px] md:h-[66px] md:w-[66px] items-center justify-center rounded-full border border-white"
                             >
                                 {loading && !isStreamDead ? (
                                     <div className="h-6 w-6 rounded-full border-2 border-white border-t-transparent animate-spin" />
                                 ) : isPlaying ? (
-                                    <div className="flex flex-row items-center gap-[5px]">
-                                        <div className="h-[20px] border-l-[4px] border-[#F7F7F4]" />
-                                        <div className="h-[20px] border-l-[4px] border-[#F7F7F4]" />
+                                    <div className="flex flex-row items-center gap-[4px] md:gap-[5px]">
+                                        <div className="h-[18px] md:h-[20px] border-l-[4px] border-[#F7F7F4]" />
+                                        <div className="h-[18px] md:h-[20px] border-l-[4px] border-[#F7F7F4]" />
                                     </div>
                                 ) : (
-                                    <svg width="18" height="24" viewBox="0 0 18 24" fill="#F7F7F4">
+                                    <svg viewBox="0 0 18 24" fill="#F7F7F4" className="h-[20px] w-[15px] md:h-[24px] md:w-[18px]">
                                         <path d="M0 0L18 12L0 24V0Z" />
                                     </svg>
                                 )}
@@ -328,14 +330,14 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                             <button
                                 onClick={toggleMute}
                                 type="button"
-                                className="flex h-[50px] w-[50px] items-center justify-center rounded-full border border-[#4A4A4A]"
+                                className="flex h-[44px] w-[44px] md:h-[50px] md:w-[50px] items-center justify-center rounded-full border border-[#4A4A4A]"
                             >
                                 {isMuted ? (
-                                    <svg className="h-6 w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="h-5 w-5 md:h-6 md:w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z m11.414-1l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                                     </svg>
                                 ) : (
-                                    <svg className="h-6 w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="h-5 w-5 md:h-6 md:w-6 fill-none stroke-[#BBBBBB]" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                     </svg>
                                 )}
@@ -344,7 +346,7 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                     </div>
 
                     {isStreamDead && (
-                        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs text-red-200">
+                        <div className="w-full rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs text-red-200 text-center">
                             <p>
                                 {error ||
                                     (isReplay ? t("status.replayOfflineMessage") : t("status.offlineMessage"))}
@@ -391,6 +393,7 @@ export function RadioPlayerSection({ channel, currentProgram, isReplay = false }
                 }
             `}</style>
         </section>
+
 
     );
 }

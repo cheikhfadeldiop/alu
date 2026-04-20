@@ -46,11 +46,11 @@ export function NewsTopBar({ tabs, activeTab, onTabClick, className = "" }: News
           <div ref={navRef} className="no-scrollbar flex items-center gap-[85px] overflow-x-auto whitespace-nowrap">
             {tabs.map((tab) => (
               <button
-                key={tab.key}
+                key={`${tab.key}-${tab.id}`}
                 type="button"
                 onClick={() => onTabClick(tab)}
                 className={`h-[30px] border-b text-[20px] font-medium leading-[30px] transition-colors ${
-                  activeTab === tab.key ? "border-[#c7382b] text-[#c7382b]" : "border-transparent text-[#4a4a4a]"
+                  activeTab === String(tab.id) ? "border-[#c7382b] text-[#c7382b]" : "border-transparent text-[#4a4a4a]"
                 }`}
               >
                 {tab.label}

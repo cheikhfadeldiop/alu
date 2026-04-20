@@ -2,6 +2,8 @@
  * Utility functions for text processing
  */
 
+import { SITE_CONFIG } from "@/constants/site-config";
+
 /**
  * Decodes HTML entities like &eacute; into their character equivalent
  * This is useful for WordPress metadata which often contains encoded entities
@@ -59,12 +61,63 @@ export function getPostAuthor(post: any): string {
     if (!post) return '';
 
     // 1. Try to get category name from WordPress embedded terms
-    // Check all term groups (categories are usually in the first group)
     const terms = post._embedded?.['wp:term'];
     if (Array.isArray(terms)) {
-        for (const termGroup of terms) {
-            if (Array.isArray(termGroup)) {
-                for (const term of termGroup) {
+        // Collect all available categories
+        const categories: any[] = [];
+        for (const group of terms) {
+            if (Array.isArray(group)) {
+                for (const term of group) {
+                    if (term && term.name && term.taxonomy === 'category') {
+                        categories.push(term);
+                    }
+                }
+            }
+        }
+
+        if (categories.length > 0) {
+            // Find common "Top Level" or "Meta" category to de-prioritize
+            // We use the ID from config
+            // Calculate "apparent depth" for each category to pick the most specific one
+            const scoredCategories = categories.map(cat => {
+                let depth = 0;
+                let current = cat;
+                
+                // Trace up the hierarchy if possible within the embedded terms
+                const visited = new Set();
+                while (current && current.parent !== 0 && !visited.has(current.id)) {
+                    visited.add(current.id);
+                    depth++;
+                    const parent = categories.find(c => c.id === current.parent);
+                    if (parent) {
+                        current = parent;
+                    } else {
+                        // Parent is outside the embedded set, but we know it's deeper than root
+                        break;
+                    }
+                }
+                
+                // Penalty for being the "Main/Alaune" category if others exist
+                let score = depth * 10;
+                const lowPrioritySlugs = ['a-la-une', 'featured', 'une', 'general', 'uncategorized'];
+                const isLowPriority = lowPrioritySlugs.some(s => cat.slug?.toLowerCase().includes(s)) || cat.name?.toLowerCase().includes('une');
+                
+                if (isLowPriority) {
+                    score -= 5;
+                }
+
+                return { name: cat.name, score };
+            });
+
+            // Sort by score descending (highest depth/relevance first)
+            scoredCategories.sort((a, b) => b.score - a.score);
+            return scoredCategories[0].name;
+        }
+
+        // Fallback to tags or any other term if no categories
+        for (const group of terms) {
+            if (Array.isArray(group)) {
+                for (const term of group) {
                     if (term && term.name) return term.name;
                 }
             }
@@ -72,15 +125,14 @@ export function getPostAuthor(post: any): string {
     }
 
     // 2. Try to get category name from common custom fields
-    if (post.category) return post.category;
+    if (post.category && typeof post.category === 'string') return post.category;
     if (post.category_name) return post.category_name;
 
     // 3. Try to get channel name for VOD items/Replays
     if (post.chaine_name) return post.chaine_name;
     if (post.channel_name) return post.channel_name;
 
-    // 4. Fallback to nothing if not found, let the UI handle defaults if necessary
-    // but avoid hardcoded "La rédaction" as requested
+    // 4. Final fallback
     return "";
 }
 
