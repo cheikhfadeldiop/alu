@@ -306,10 +306,10 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
     const youtubeId = resolvedUrl ? getYoutubeId(resolvedUrl) : null;
 
     return (
-        <div ref={containerRef} className="mx-auto bg-[#333333]/10 grid w-full max-w-[1280px] gap-0 overflow-hidden group/player mb-12 xl:grid-cols-[730px_550px]">
+        <div ref={containerRef} className="mx-auto bg-[#333333]/10 grid w-full max-w-[1280px] gap-0 overflow-hidden group/player mb-12 lg:grid-cols-[1fr_400px] xl:grid-cols-[730px_550px]">
             <div className="w-full">
                 <div className="w-full flex flex-col relative overflow-hidden group/screen ">
-                    <div className="relative h-[410px] overflow-hidden flex items-center justify-center bg-black">
+                    <div className="relative aspect-video md:h-[410px] overflow-hidden flex items-center justify-center bg-black">
                         {youtubeId ? (
                             <iframe src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`} className="w-full h-full border-0" allowFullScreen />
                         ) : (
@@ -331,8 +331,8 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                     <svg className="w-10 h-10 text-[color:var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-white uppercase">{t("previewUnavailable")}</h3>
-                                    <p className="text-sm text-white/40">{error || SITE_CONFIG.strings.unavailabilityMsg}</p>
+                                    <h3 className="text-lg md:text-xl font-black text-white uppercase">{t("previewUnavailable")}</h3>
+                                    <p className="text-xs md:text-sm text-white/40">{error || SITE_CONFIG.strings.unavailabilityMsg}</p>
                                 </div>
                                 <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[color:var(--accent)] rounded-full text-[10px] font-black uppercase">{t("retry")}</button>
                             </div>
@@ -355,10 +355,10 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                     </div>
 
                     {!youtubeId && (
-                        <div className="border-t border-white/5 flex flex-col justify-center relative group/controls bg-[#333333]/10 px-5 h-[78px]">
+                        <div className="border-t border-white/5 flex flex-col justify-center relative group/controls bg-[#333333]/10 px-4 md:px-5 h-[60px] md:h-[78px]">
 
                             {/* Progress bar */}
-                            <div className="absolute -top-1 left-0 w-full h-1.5 bg-accent/20 cursor-pointer group/progress">
+                            <div className="absolute -top-1 left-0 w-full h-1 md:h-1.5 bg-accent/20 cursor-pointer group/progress">
                                 <div className="h-full bg-accent shadow-[0_0_10px_rgba(209,56,45,0.5)] transition-all"
                                     style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }} />
                                 <input
@@ -391,13 +391,12 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         </button>
 
 
-                                        <div className="hidden sm:flex relative items-center w-[114px] h-[20px]">
-                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0 border-t-4 border-[#989896]" />
+                                        <div className="hidden sm:flex relative items-center w-[60px] md:w-[114px] h-[20px]">
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0 border-t-2 border-[#989896]" />
                                             <div
-                                                className="absolute left-0 top-1/2 -translate-y-1/2 h-0 border-t-4 border-[#F7F7F4] transition-[width] duration-75"
-                                                style={{ width: `${volume * 114}px` }}
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 h-0 border-t-2 border-[#F7F7F4] transition-[width] duration-75"
+                                                style={{ width: `${volume * 100}%` }}
                                             />
-                                            <div className="absolute left-[112px] top-1/2 -translate-y-1/2 h-2.5 border-l-2 border-[#F7F7F4]" />
                                             <input
                                                 type="range"
                                                 min={0} max={1} step={0.02}
@@ -411,37 +410,36 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                 {/* Play/Pause */}
                                 <button
                                     onClick={togglePlay}
-                                    className="flex flex-row items-center justify-center p-0 border-none bg-none cursor-pointer mx-4"
+                                    className="flex flex-row items-center justify-center p-0 border-none bg-none cursor-pointer mx-2 md:mx-4"
                                 >
                                     {isPlaying ? (
-                                        <div className="flex flex-row items-center gap-[5px]">
-                                            <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
-                                            <div className="h-[28px] border-l-[5px] border-[#F7F7F4]" />
+                                        <div className="flex flex-row items-center gap-[4px] md:gap-[5px]">
+                                            <div className="h-[20px] md:h-[28px] border-l-[4px] md:border-l-[5px] border-[#F7F7F4]" />
+                                            <div className="h-[20px] md:h-[28px] border-l-[4px] md:border-l-[5px] border-[#F7F7F4]" />
                                         </div>
                                     ) : (
-                                        <svg width="15" height="28" viewBox="0 0 15 28" fill="#F7F7F4">
+                                        <svg viewBox="0 0 15 28" fill="#F7F7F4" className="h-[24px] w-[12px] md:h-[28px] md:w-[15px]">
                                             <path d="M0 0L15 14L0 28V0Z" />
                                         </svg>
                                     )}
                                 </button>
 
                                 {/* RIGHT: Quality + CC + Fullscreen */}
-                                <div className="flex flex-row items-center gap-2 sm:gap-3">
+                                <div className="flex flex-row items-center gap-1.5 md:gap-3">
 
                                     {/* Quality */}
                                     <div className="relative">
                                         <button
                                             onClick={() => setShowQualityMenu(!showQualityMenu)}
-                                            className="flex flex-row items-center justify-center h-[27px] bg-[#1F1E18] rounded-[5px] px-2 sm:px-3 gap-1 sm:gap-[5px] border-none cursor-pointer"
+                                            className="flex flex-row items-center justify-center h-[24px] md:h-[27px] bg-[#1F1E18] rounded-[5px] px-2 md:px-3 gap-1 md:gap-[5px] border-none cursor-pointer"
                                         >
-                                            <div className="flex flex-row items-center gap-1 sm:gap-[5px]">
-                                                <span className="text-[12px] sm:text-[14px] leading-[21px] text-white font-[Roboto]">
+                                            <div className="flex flex-row items-center gap-1 md:gap-[5px]">
+                                                <span className="text-[11px] md:text-[14px] leading-none text-white font-[Roboto]">
                                                     {currentQuality === -1 ? t("auto") : `${qualities.find(q => q.index === currentQuality)?.height}p`}
                                                 </span>
-                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="#FFFFFF" className={`transition-transform ${showQualityMenu ? 'rotate-180' : ''}`}>
+                                                <svg viewBox="0 0 10 6" fill="#FFFFFF" className={`h-[5px] w-[8px] md:h-[6px] md:w-[10px] transition-transform ${showQualityMenu ? 'rotate-180' : ''}`}>
                                                     <path d="M0 0L5 6L10 0Z" />
                                                 </svg>
-                                                <span className="hidden sm:inline text-[14px] leading-[21px] text-white font-[Roboto]">{t("hd")}</span>
                                             </div>
                                         </button>
                                         {showQualityMenu && qualities.length > 0 && (
@@ -466,9 +464,9 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                     <div className="relative">
                                         <button
                                             onClick={() => setShowTrackMenu(!showTrackMenu)}
-                                            className="flex justify-center items-center w-[27px] h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer"
+                                            className="flex justify-center items-center w-[24px] h-[24px] md:w-[27px] md:h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer"
                                         >
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <svg viewBox="0 0 24 24" fill="none" className="h-[20px] w-[20px] md:h-[24px] md:w-[24px]">
                                                 <rect x="3" y="4" width="18" height="16" rx="2" fill="#FFFFFF" />
                                                 <text x="5" y="16" fontSize="8" fontWeight="bold" fill="#1F1E18">{t("cc")}</text>
                                             </svg>
@@ -492,8 +490,8 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                     </div>
 
                                     {/* Fullscreen */}
-                                    <button onClick={toggleFullscreen} className="flex justify-center items-center w-[27px] h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <button onClick={toggleFullscreen} className="flex justify-center items-center w-[24px] h-[24px] md:w-[27px] md:h-[27px] bg-[#1F1E18] rounded-[5px] border-none cursor-pointer">
+                                        <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]">
                                             <path d="M4 8V4H8M16 4H20V8M20 16V20H16M8 20H4V16"
                                                 stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
                                         </svg>
@@ -506,12 +504,12 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
             </div>
 
             {/* Info Container */}
-            <div className="h-[488px] w-full px-[20px] py-[40px]">
+            <div className="h-auto w-full px-4 md:px-[20px] py-8 md:py-[40px]">
                     <div className="flex h-full flex-col justify-between">
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
+                        <div className="space-y-4 md:space-y-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-[13px]">
-                                    <div className="relative h-[42px] w-[95px]">
+                                    <div className="relative h-[30px] w-[70px] md:h-[42px] md:w-[95px]">
                                         <SafeImage
                                             src={video.channel_logo || video.logo || "/assets/placeholders/radio_icon_sur_card.png"}
                                             alt={video.title}
@@ -523,7 +521,7 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                         <svg width="12" height="24" viewBox="0 0 12 24" fill="none">
                                             <path d="M3 8L9 12L3 16" stroke="#E3211F" strokeWidth="1.5" strokeLinecap="round" />
                                         </svg>
-                                        <span className="text-[16px] font-bold text-[#BBBBBB] line-clamp-1">
+                                        <span className="text-[14px] md:text-[16px] font-bold text-[#BBBBBB] line-clamp-1">
                                             {video.title}
                                         </span>
                                     </div>
@@ -531,18 +529,19 @@ export function ReplayPlayer({ video: initialVideo }: ReplayPlayerProps) {
                                 <ShareButton
                                     title={video.title}
                                     text={t("shareReplayText", { videoTitle: video.title, siteName: SITE_CONFIG.name })}
-                                    className="shrink-0"
-                                    iconClassName="w-6 h-6"
+                                    className="shrink-0 self-end md:self-auto"
+                                    iconClassName="w-5 h-5 md:w-6 md:h-6"
                                 />
                             </div>
-                            <p className="text-[14px] leading-[21px] text-[#A4A4A4]">
+                            <p className="text-[13px] md:text-[14px] leading-relaxed text-[#A4A4A4]">
                                 {video.desc || t("channelDescriptionFallback")}
                             </p>
                         </div>
-                        
+
                     </div>
             </div>
         </div>
+
 
     );
 }

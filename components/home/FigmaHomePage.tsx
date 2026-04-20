@@ -68,9 +68,11 @@ function CardMeta({ date, time, small = false }: { date?: string; time?: string;
   const d = date ? formatDate(date) : formatDate(new Date());
   const t = formatDisplayTime(date, time);
   return (
-    <p className={`${small ? "fig-b4" : "fig-b3"} mt-2 text-[var(--fig-text-secondary)]`}>
-      {d} <span className="mx-1">•</span> {t}
-    </p>
+    <div className={`${small ? "fig-b4" : "fig-b3"} inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-[var(--fig-text-secondary)]`}>
+      <span className={small ? "text-[10px] leading-none" : "text-[12px] leading-none"}>{d}</span>
+      <span className="inline-block h-[4px] w-[4px] shrink-0 rounded-full bg-[var(--fig-text-secondary)]/70" />
+      <span className={small ? "text-[10px] leading-none" : "text-[12px] leading-none"}>{t}</span>
+    </div>
   );
 }
 
@@ -132,298 +134,294 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
     ? shorts
     : normalizedVideos.length
       ? normalizedVideos
-    : [
-      { id: "short-fb-1", slug: "short-fb-1", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
-      { id: "short-fb-2", slug: "short-fb-2", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
-      { id: "short-fb-3", slug: "short-fb-3", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
-      { id: "short-fb-4", slug: "short-fb-4", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
-      { id: "short-fb-5", slug: "short-fb-5", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
-    ] as SliderVideoItem[];
+      : [
+        { id: "short-fb-1", slug: "short-fb-1", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
+        { id: "short-fb-2", slug: "short-fb-2", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
+        { id: "short-fb-3", slug: "short-fb-3", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
+        { id: "short-fb-4", slug: "short-fb-4", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
+        { id: "short-fb-5", slug: "short-fb-5", title: labels.fallbackShortTitle, logo: logoPlaceholder, logo_url: logoPlaceholder, date: new Date().toISOString(), time: "", type: "youtube", views: "0", desc: "", video_url: "", relatedItems: "", feed_url: "" },
+      ] as SliderVideoItem[];
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] space-y-12 bg-[var(--fig-bg)] px-4 py-8 text-[var(--fig-text-primary)] xl:px-0">
+    <div className="mx-auto w-full max-w-[1280px] space-y-8 md:space-y-12 bg-[var(--fig-bg)] px-4 py-6 md:py-8 text-[var(--fig-text-primary)] xl:px-0">
       <AdBannerH className="mx-auto max-w-[1280px]" />
 
-      <section className="grid gap-[15px] lg:grid-cols-[369px_515px_366px]">
+      <section className="flex flex-col gap-[15px] lg:grid lg:grid-cols-[369px_1fr_366px]">
         <Link href={wpHref(heroLeft)} className="block rounded-[10px] hover-lift-primary">
-        <article className="space-y-2">
-          <SafeImage alt={wpTitle(heroLeft, "Article")} className="h-[321px] w-full rounded-[10px] object-cover" src={wpImage(heroLeft)} width={369} height={321} />
-          <div className="h-[161px]  px-2 ">
-            <h3 className="text-[20px] font-medium leading-[30px]">
-              {wpTitle(heroLeft, "Actualité")}
-            </h3>
-            <div className="mt-2 flex items-center justify-between">
-              <CardMeta date={heroLeft?.date} />
-              <CategoryTag label={getPostAuthor(heroLeft) || "News"} color="var(--fig-tag-news)" />
+          <article className="space-y-2">
+            <SafeImage alt={wpTitle(heroLeft, "Article")} className="h-[240px] md:h-[321px] w-full rounded-[10px] object-cover" src={wpImage(heroLeft)} width={369} height={321} />
+            <div className="md:h-[161px] px-2">
+              <h3 className="text-[18px] md:text-[20px] font-medium leading-tight md:leading-[30px] line-clamp-2">
+                {wpTitle(heroLeft, "Actualité")}
+              </h3>
+              <div className="mt-2 flex items-center justify-between">
+                <CardMeta date={heroLeft?.date} />
+                <CategoryTag label={getPostAuthor(heroLeft) || "News"} color="var(--fig-tag-news)" />
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
         </Link>
 
-        <Link href={wpHref(heroCenter)} className="block rounded-[10px] hover-lift-primary">
-        <article className="relative">
-  <SafeImage
-    alt={wpTitle(heroCenter, "Article")}
-    className="h-[490px] w-full rounded-[10px] object-cover"
-    src={wpImage(heroCenter)}
-    width={515}
-    height={490}
-  />
+        <Link href={wpHref(heroCenter)} className="block rounded-[10px] hover-lift-primary order-first lg:order-none">
+          <article className="relative">
+            <SafeImage
+              alt={wpTitle(heroCenter, "Article")}
+              className="h-[300px] md:h-[490px] w-full rounded-[10px] object-cover"
+              src={wpImage(heroCenter)}
+              width={515}
+              height={490}
+            />
 
-  {/* Gradient */}
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[35%] rounded-b-[10px] bg-gradient-to-t from-black/70 to-transparent" />
+            {/* Gradient */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] rounded-b-[10px] bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-  {/* Content */}
-  <div className="absolute bottom-0 z-10 flex w-full flex-col gap-2 p-4">
-    <h3 className="fig-h9 uppercase text-white ">
-      {wpTitle(heroCenter, "Actualité")}
-    </h3>
+            {/* Content */}
+            <div className="absolute bottom-0 z-10 flex w-full flex-col gap-1 md:gap-2 p-4">
+              <h3 className="text-[20px] md:fig-h9 uppercase text-white line-clamp-2 md:line-clamp-none">
+                {wpTitle(heroCenter, "Actualité")}
+              </h3>
 
-    <div className="flex items-center gap-2 text-sm text-gray-300 justify-between">
-      <div>
-      <span>{heroCenter?.date ? formatDate(heroCenter.date) : nowLabel}</span>
-      <Dot/>
-      <span>{formatDisplayTime(heroCenter?.date)}</span>
-      </div>
-      <div>
-      <span
-      className="inline-flex h-[15px] items-center justify-center text-white rounded-full border border-[var(--fig-tag-religion)] px-[8px] text-[8px] leading-[12px] text-[var(--fig-text-secondary)]"
-      
-    >{getPostAuthor(heroCenter) || "News"}</span>
-      </div>
-    </div>
-  </div>
-</article>
+              <div className="flex items-center justify-between gap-3 text-xs md:text-sm text-gray-300">
+                <div className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap">
+                  <span className="leading-none">{heroCenter?.date ? formatDate(heroCenter.date) : nowLabel}</span>
+                  <Dot />
+                  <span className="leading-none">{formatDisplayTime(heroCenter?.date)}</span>
+                </div>
+                <span className="inline-flex h-[15px] shrink-0 items-center justify-center rounded-full border border-[var(--fig-tag-religion)] px-[8px] text-[8px] leading-[12px] ">
+                  {getPostAuthor(heroCenter) || "News"}
+                </span>
+              </div>
+            </div>
+          </article>
         </Link>
 
-        <div className="h-[490px]   rounded-[10px]  ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 rounded-[10px]">
           {Array.from({ length: 4 }, (_, i) => sideList[i] || null).map((post, i) => (
             <Link
               key={stableItemKey(post || {}, `side-${i}`)}
               href={wpHref(post)}
-              className="block rounded-[5px] mb-2 hover-lift-primary"
+              className="block rounded-[5px] hover-lift-primary"
             >
-            <article className=" h-[115px] flex  justify-between  ">
-              <div className="flex flex-col bg-surface pb-3 w-full p-2  px-2 rounded-md justify-between">
-              <h4 className="text-[16px] font-medium leading-[24px]">
-                {wpTitle(post, "Actualité")}
-              </h4>
-              <div className="mt-1 flex items-center  justify-between">
-                <CardMeta date={post?.date} small />
-                <CategoryTag label={getPostAuthor(post) || "News"} color="var(--fig-tag-news)" />
-              </div>
-              </div>
-            </article>
+              <article className="h-auto md:h-[115px] flex justify-between">
+                <div className="flex flex-col bg-surface pb-3 w-full p-2 px-3 rounded-md justify-between border border-[var(--fig-border-soft)] md:border-none">
+                  <h4 className="text-[14px] md:text-[16px] font-medium leading-snug md:leading-[24px] line-clamp-2">
+                    {wpTitle(post, "Actualité")}
+                  </h4>
+                  <div className="mt-2 md:mt-1 flex items-center justify-between">
+                    <CardMeta date={post?.date} small />
+                    <CategoryTag label={getPostAuthor(post) || "News"} color="var(--fig-tag-news)" />
+                  </div>
+                </div>
+              </article>
             </Link>
           ))}
         </div>
       </section>
 
+
       <section>
         <div className=" pt-10 grid gap-[22px] lg:grid-cols-[789px_469px] ">
           <div className="flex flex-col">
-          <SectionTitle>{labels.mostPopular}</SectionTitle>
-          <div className="grid gap-[19px] md:grid-cols-2">
-            {[0, 1].map((col) => (
-             <div key={col} className="space-y-[17px]">
-  {/* Grand article */}
-  <Link href={wpHref(mostPopular[col])} className="block rounded-[10px] hover-lift-primary">
-    <article>
-      <SafeImage
-        alt={wpTitle(mostPopular[col], "Grande actualité")}
-        className="h-[235px] w-full rounded-[10px] object-cover"
-        src={wpImage(mostPopular[col])}
-        width={380}
-        height={235}
-      />
-      <div className="px-5 pt-[13px] pb-3">
-        <h4 className="text-[20px] line-clamp-2 font-medium leading-[30px]">
-          {wpTitle(mostPopular[col], "Actualité")}
-        </h4>
-        <div className="mt-1 flex items-center justify-between">
-          <CardMeta date={mostPopular[col]?.date} />
-          <CategoryTag
-            label={getPostAuthor(mostPopular[col]) || "News"}
-            color="var(--fig-tag-news)"
-          />
-        </div>
-      </div>
-    </article>
-  </Link>
+            <SectionTitle>{labels.mostPopular}</SectionTitle>
+            <div className="grid gap-[19px] grid-cols-1 md:grid-cols-2">
+              {[0, 1].map((col) => (
+                <div key={col} className="space-y-[17px]">
+                  {/* Grand article */}
+                  <Link href={wpHref(mostPopular[col])} className="block rounded-[10px] hover-lift-primary">
+                    <article>
+                      <SafeImage
+                        alt={wpTitle(mostPopular[col], "Grande actualité")}
+                        className="h-[200px] md:h-[235px] w-full rounded-[10px] object-cover"
+                        src={wpImage(mostPopular[col])}
+                        width={380}
+                        height={235}
+                      />
+                      <div className="px-3 md:px-5 pt-[13px] pb-3">
+                        <h4 className="text-[18px] md:text-[20px] line-clamp-2 font-medium leading-tight md:leading-[30px]">
+                          {wpTitle(mostPopular[col], "Actualité")}
+                        </h4>
+                        <div className="mt-2 md:mt-1 flex items-center justify-between">
+                          <CardMeta date={mostPopular[col]?.date} />
+                          <CategoryTag
+                            label={getPostAuthor(mostPopular[col]) || "News"}
+                            color="var(--fig-tag-news)"
+                          />
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
 
-  {/* Petits articles */}
-  {smallCards.slice(col * 4, col * 4 + 3).map((post, idx) => (
-    <Link
-      key={stableItemKey(post || {}, `popular-small-${col}-${idx}`)}
-      href={wpHref(post)}
-      className="block rounded-[10px] hover-lift-primary"
-    >
-    <article className="flex h-[120px] items-start gap-3 rounded-[10px] bg-surface px-[5px] py-[6.5px]">
-      <div className="h-[107px] w-[103px] shrink-0 overflow-hidden rounded-[10px]"><SafeImage
-        alt={stableItemKey(post || {}, `popular-small-${col}-${idx}`)}
-        className={`h-full w-full rounded-[10px] ${hasRealWpImage(post) ? "object-cover" : "object-contain bg-black/20 p-2"}`}
-        src={wpImage(post)}
-        width={103}
-        height={107}
-      /></div>
+                  {/* Petits articles en grid de 2 sur mobile */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-[17px]">
+                    {smallCards.slice(col * 4, col * 4 + 3).map((post, idx) => (
+                      <Link
+                        key={stableItemKey(post || {}, `popular-small-${col}-${idx}`)}
+                        href={wpHref(post)}
+                        className="block rounded-[10px] hover-lift-primary"
+                      >
+                        <article className="flex h-[110px] md:h-[120px] items-start gap-3 rounded-[10px] bg-surface px-[5px] py-[6.5px] border border-[var(--fig-border-soft)] md:border-none">
+                          <div className="h-[95px] w-[90px] md:h-[107px] md:w-[103px] shrink-0 overflow-hidden rounded-[10px]">
+                            <SafeImage
+                              alt={stableItemKey(post || {}, `popular-small-${col}-${idx}`)}
+                              className={`h-full w-full rounded-[10px] ${hasRealWpImage(post) ? "object-cover" : "object-contain bg-black/20 p-2"}`}
+                              src={wpImage(post)}
+                              width={103}
+                              height={107}
+                            />
+                          </div>
 
-      <div className="flex min-w-0 w-full flex-col justify-between pt-2">
-        <h4 className="text-[13px] font-medium leading-[20px] line-clamp-2">
-          {wpTitle(post, "Actualité")}
-        </h4>
+                          <div className="flex min-w-0 w-full flex-col justify-between pt-1 md:pt-2">
+                            <h4 className="text-[12px] md:text-[13px] font-medium leading-tight md:leading-[20px] line-clamp-2">
+                              {wpTitle(post, "Actualité")}
+                            </h4>
 
-        <div className="mt-1 flex items-center justify-between">
-          <CardMeta date={post?.date} small />
-          <CategoryTag
-            label={getPostAuthor(post) || "News"}
-            color="var(--fig-tag-news)"
-          />
-        </div>
-      </div>
-    </article>
-    </Link>
-  ))}
-</div>
-            ))}
-          </div>
+                            <div className="mt-1 flex items-center justify-between">
+                              <CardMeta date={post?.date} small />
+                              <CategoryTag
+                                label={getPostAuthor(post) || "News"}
+                                color="var(--fig-tag-news)"
+                              />
+                            </div>
+                          </div>
+                        </article>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
           </div>
           <AdBanV className="h-full" />
         </div>
       </section>
 
       <section>
-  <SectionTitle>{labels.latestNews}</SectionTitle>
+        <SectionTitle>{labels.latestNews}</SectionTitle>
 
-  <div className="pt-6 pl-2 pb-10 overflow-x-auto no-scrollbar">
-    <div className="flex gap-[20px]">
-      
-      {safePosts.slice(0, 4).map((post, i) => (
-        <Link
-          key={stableItemKey(post || {}, `latest-${i}`)}
-          href={wpHref(post)}
-          className="block w-[356px] shrink-0 rounded-[10px] hover-lift-primary"
-        >
-          <article className="rounded-[10px] h-[290px] flex flex-col overflow-hidden">
-            
-            {/* Image */}
-            <SafeImage
-              alt={wpTitle(post, "Article")}
-              className="h-[200px] w-full object-cover rounded-[10px]"
-              src={wpImage(post)}
-              width={356}
-              height={200}
-            />
+        <div className="pt-6 pl-2 pb-10 overflow-x-auto no-scrollbar">
+          <div className="flex gap-[20px]">
 
-            {/* Content */}
-            <div className="px-[10px]  pt-[1px] pb-2 h-[100px] flex flex-col justify-between">
-              
-              <h4 className="fig-h11 font-medium leading-[20px] line-clamp-2">
-                {wpTitle(post, "Actualité")}
-              </h4>
+            {safePosts.slice(0, 4).map((post, i) => (
+              <Link
+                key={stableItemKey(post || {}, `latest-${i}`)}
+                href={wpHref(post)}
+                className="block w-[280px] md:w-[356px] shrink-0 rounded-[10px] hover-lift-primary"
+              >
+                <article className="rounded-[10px] h-[260px] md:h-[290px] flex flex-col overflow-hidden border border-[var(--fig-border-soft)] md:border-none">
+                  <SafeImage
+                    alt={wpTitle(post, "Article")}
+                    className="h-[160px] md:h-[200px] w-full object-cover rounded-[10px]"
+                    src={wpImage(post)}
+                    width={356}
+                    height={200}
+                  />
+                  <div className="px-3 pt-2 pb-2 h-full flex flex-col justify-between">
+                    <h4 className="text-[14px] md:fig-h11 font-medium leading-tight md:leading-[20px] line-clamp-2">
+                      {wpTitle(post, "Actualité")}
+                    </h4>
+                    <div className="flex items-center justify-between">
+                      <CardMeta date={post?.date} small />
+                      <CategoryTag
+                        label={getPostAuthor(post) || "News"}
+                        color="var(--fig-tag-news)"
+                      />
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            ))}
 
-              <div className="flex items-center justify-between">
-                <CardMeta date={post?.date} small />
-                <CategoryTag
-                  label={getPostAuthor(post) || "News"}
-                  color="var(--fig-tag-news)"
-                />
-              </div>
 
-            </div>
-
-          </article>
-        </Link>
-      ))}
-
-    </div>
-  </div>
-</section>
+          </div>
+        </div>
+      </section>
       <AdBannerH2 className="mx-auto max-w-[1280px] pb-6" />
 
       <section>
-      <SectionTitle>{labels.videos}</SectionTitle>
-      <div className="mt-10 flex flex-col gap-[45px]">
+        <SectionTitle>{labels.videos}</SectionTitle>
+        <div className="mt-10 flex flex-col gap-[45px]">
           <div className="flex flex-wrap gap-[25px] xl:flex-nowrap">
             <Link
               href={primaryVideo ? `/replay/${primaryVideo.slug}` : "/replay"}
               className="block rounded-[10px] hover-lift-primary"
             >
-            <article className="relative h-[419px] w-full overflow-hidden rounded-[10px] xl:w-[730px]">
-              <SafeImage alt={primaryVideo?.title || "Video en vedette"} className="h-full w-full object-cover" src={primaryVideo?.logo_url || assets.featuredVideo} width={730} height={419} />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
-              <div className="absolute bottom-[18px] left-[24px] right-[24px] flex gap-[10px]">
-                <img src={assets.playLg} alt="" className="h-[55px] w-[55px] shrink-0" />
-                <div className="flex flex-col justify-center">
-                  <h3 className="fig-h9 uppercase text-[var(--primary-text-light)]">
-                    {primaryVideo?.title || "Video"}
-                  </h3>
-                  <div className="mt-[10px] flex items-center gap-[10px] text-[16px] text-[#bbb]">
-                    <span>{primaryVideo?.date ? formatDate(primaryVideo.date) : nowLabel}</span>
-                    <Dot />
-                    <span>{formatDisplayTime(primaryVideo?.date, primaryVideo?.time)}</span>
+              <article className="relative h-[419px] w-full overflow-hidden rounded-[10px] xl:w-[730px]">
+                <SafeImage alt={primaryVideo?.title || "Video en vedette"} className="h-full w-full object-cover" src={primaryVideo?.logo_url || assets.featuredVideo} width={730} height={419} />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
+                <div className="absolute bottom-[18px] left-[24px] right-[24px] flex gap-[10px]">
+                  <img src={assets.playLg} alt="" className="h-[55px] w-[55px] shrink-0" />
+                  <div className="flex flex-col justify-center">
+                    <h3 className="fig-h9 uppercase text-[var(--primary-text-light)]">
+                      {primaryVideo?.title || "Video"}
+                    </h3>
+                    <div className="mt-[10px] flex items-center gap-[10px] text-[16px] text-[#bbb]">
+                      <span>{primaryVideo?.date ? formatDate(primaryVideo.date) : nowLabel}</span>
+                      <Dot />
+                      <span>{formatDisplayTime(primaryVideo?.date, primaryVideo?.time)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
+              </article>
             </Link>
 
             <Link
               href={secondaryVideo ? `/replay/${secondaryVideo.slug}` : "/replay"}
               className="block rounded-[10px] hover-lift-primary"
             >
-            <article className="w-full xl:w-[526px]">
-              <SafeImage alt={secondaryVideo?.title || "Video secondaire"} className="h-[278px] w-full rounded-[10px] object-cover xl:w-[524px]" src={secondaryVideo?.logo_url || assets.secondVideo} width={524} height={278} />
-              <div className="mt-[10px] flex gap-[10px]">
-                <img src={assets.playMd} alt="" className="h-[55px] w-[55px] shrink-0" />
-                <div>
-                  <h3 className="fig-h10 text-[var(--fig-text-primary)]">
-                    {secondaryVideo?.title || "Video"}
-                  </h3>
-                  <div className="mt-[10px] flex items-center gap-[10px] text-[16px] text-[var(--fig-text-secondary)]">
-                    <span>{secondaryVideo?.date ? formatDate(secondaryVideo.date) : nowLabel}</span>
-                    <Dot />
-                    <span>{formatDisplayTime(secondaryVideo?.date, secondaryVideo?.time)}</span>
+              <article className="w-full xl:w-[526px]">
+                <SafeImage alt={secondaryVideo?.title || "Video secondaire"} className="h-[278px] w-full rounded-[10px] object-cover xl:w-[524px]" src={secondaryVideo?.logo_url || assets.secondVideo} width={524} height={278} />
+                <div className="mt-[10px] flex gap-[10px]">
+                  <img src={assets.playMd} alt="" className="h-[55px] w-[55px] shrink-0" />
+                  <div>
+                    <h3 className="fig-h10 text-[var(--fig-text-primary)]">
+                      {secondaryVideo?.title || "Video"}
+                    </h3>
+                    <div className="mt-[10px] flex items-center gap-[10px] text-[16px] text-[var(--fig-text-secondary)]">
+                      <span>{secondaryVideo?.date ? formatDate(secondaryVideo.date) : nowLabel}</span>
+                      <Dot />
+                      <span>{formatDisplayTime(secondaryVideo?.date, secondaryVideo?.time)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
+              </article>
             </Link>
           </div>
 
           <div className="flex flex-col gap-[18px]">
             {[videoGrid.slice(0, 4), videoGrid.slice(4)].map((row, rowIdx) => (
-              <div key={rowIdx} className="grid gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+              <div key={rowIdx} className="grid gap-[18px] grid-cols-2 sm:grid-cols-2 xl:grid-cols-4">
                 {row.map((video, i) => (
                   <Link
                     key={stableItemKey(video, `video-${rowIdx}-${i}`)}
                     href={`/replay/${video.slug || video.id}`}
                     className="block rounded-[10px] hover-lift-primary"
                   >
-                  <article className="w-full">
-                    <div className="relative h-[172px] overflow-hidden rounded-[10px]">
-                      <SafeImage alt={video.title || "Video"} className="h-full w-full object-cover" src={video.logo_url || video.logo} width={306} height={172} />
-                      <img src={rowIdx === 1 && i === row.length - 1 ? assets.playSmAlt : assets.playSm} alt="" className="absolute left-[13px] top-[17px] h-[34px] w-[34px]" />
-                    </div>
-                    <div className="mt-2 px-2 pb-5">
-                      <h4 className="text-[16px] leading-[24px] text-[var(--fig-text-primary)]">
-                        {video.title || "Video"}
-                      </h4>
-                      <div className="mt-[10px] flex items-center gap-[10px]">
-                        <CardMeta date={video.date} />
-                       
+                    <article className="w-full">
+                      <div className="relative h-[120px] md:h-[172px] overflow-hidden rounded-[10px]">
+                        <SafeImage alt={video.title || "Video"} className="h-full w-full object-cover" src={video.logo_url || video.logo} width={306} height={172} />
+                        <img src={rowIdx === 1 && i === row.length - 1 ? assets.playSmAlt : assets.playSm} alt="" className="absolute left-[8px] top-[10px] md:left-[13px] md:top-[17px] h-6 w-6 md:h-[34px] md:w-[34px]" />
                       </div>
-                    </div>
-                  </article>
+                      <div className="mt-2 px-1 md:px-2 pb-2 md:pb-5">
+                        <h4 className="text-[13px] md:text-[16px] leading-tight md:leading-[24px] text-[var(--fig-text-primary)] line-clamp-2">
+                          {video.title || "Video"}
+                        </h4>
+                        <div className="mt-2 md:mt-[10px] flex items-center gap-[10px]">
+                          <CardMeta date={video.date} small />
+                        </div>
+                      </div>
+                    </article>
                   </Link>
                 ))}
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
       <section>
-      <SectionTitle>{labels.shorts}</SectionTitle>
+        <SectionTitle>{labels.shorts}</SectionTitle>
 
         <div className="mt-[25px] pt-5 flex gap-[25px] overflow-x-auto no-scrollbar pb-2">
           {shortsPool.slice(0, 10).map((video, i) => (
@@ -432,23 +430,23 @@ export function FigmaHomePage({ posts, popularPosts, videos, shorts, labels }: F
               href={`/replay/${video.slug || video.id}`}
               className="block rounded-[10px] hover-lift-primary"
             >
-            <article className="relative h-[370px] w-[282px] shrink-0 overflow-hidden rounded-[10px]">
-              <SafeImage alt={video.title || "Short reel"} className="h-full w-full object-cover" src={video.logo_url || video.logo} width={282} height={370} />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/90" />
-              <div className="absolute left-[5px] top-[16px]">
-                <img src={assets.playShort} alt="" className="h-[44px] w-[44px]" />
-              </div>
-              <div className="absolute bottom-4 left-[9px] right-[9px]">
-                <p className="text-[16px] leading-[24px] text-white">
-                  {video.title || "Short"}
-                </p>
-                <div className="mt-[10px] flex items-center gap-[10px] text-[12px] leading-[18px] text-[#a4a4a4]">
-                  <span>{video.date ? formatDate(video.date) : nowLabel}</span>
-                  <span className="inline-block h-[4px] w-[4px] rounded-full bg-[#a4a4a4]" />
-                  <span>{formatDisplayTime(video.date, video.time)}</span>
+              <article className="relative h-[370px] w-[282px] shrink-0 overflow-hidden rounded-[10px] ">
+                <SafeImage alt={video.title || "Short reel"} className="h-full w-full object-cover scale-[1.6]" src={video.logo_url || video.logo} width={282} height={370} />
+                <div className="absolute inset-0 bg-gradient-to-b aspect-9/16 from-transparent to-black/90 w-[282px] h-[370px]" />
+                <div className="absolute left-[5px] top-[16px]">
+                  <img src={assets.playShort} alt="" className="h-[44px] w-[44px] object-contain" />
                 </div>
-              </div>
-            </article>
+                <div className="absolute bottom-4 left-[9px] right-[9px]">
+                  <p className="text-[16px] leading-[24px] text-white">
+                    {video.title || "Short"}
+                  </p>
+                  <div className="mt-[10px] flex items-center gap-[10px] text-[12px] leading-[18px] text-[#a4a4a4]">
+                    <span>{video.date ? formatDate(video.date) : nowLabel}</span>
+                    <span className="inline-block h-[4px] w-[4px] rounded-full bg-[#a4a4a4]" />
+                    <span>{formatDisplayTime(video.date, video.time)}</span>
+                  </div>
+                </div>
+              </article>
             </Link>
           ))}
         </div>

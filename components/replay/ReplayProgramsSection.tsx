@@ -27,6 +27,26 @@ function uniqVideos(items: SliderVideoItem[]) {
   });
 }
 
+async function fetchMoreVideoRows(nextToken: string, loadedVideos: SliderVideoItem[], minimumCount: number) {
+  let token: string | null = nextToken;
+  let merged = loadedVideos;
+
+  while (token && merged.length < minimumCount) {
+    const response = await fetch(
+      `/api/youtube/latest-videos?maxResults=${FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(token)}`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch more videos");
+    }
+
+    const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
+    merged = uniqVideos([...(merged || []), ...((data.items || []) as SliderVideoItem[])]);
+    token = data.nextPageToken || null;
+  }
+
+  return { merged, nextPageToken: token };
+}
+
 function displayTime(date?: string, fallbackTime?: string, unknownTime: string = "--:--") {
   if (fallbackTime && fallbackTime.trim()) return fallbackTime;
   const parsed = parseToDate(date);
@@ -56,19 +76,15 @@ export function ReplayProgramsSection({ videos, initialNextPageToken }: ReplayPr
     setIsLoadingMore(true);
 
     try {
-      const response = await fetch(
-        `/api/youtube/latest-videos?maxResults=${FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(nextPageToken)}`
+      const data = await fetchMoreVideoRows(
+        nextPageToken,
+        loadedVideos,
+        visibleCount + LOAD_MORE_INCREMENT
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch more videos");
-      }
 
-      const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
-      const nextItems = uniqVideos([...(loadedVideos || []), ...((data.items || []) as SliderVideoItem[])]);
-
-      setLoadedVideos(nextItems);
-      setNextPageToken(data.nextPageToken || null);
-      setVisibleCount((prev) => Math.min(prev + LOAD_MORE_INCREMENT, nextItems.length));
+      setLoadedVideos(data.merged);
+      setNextPageToken(data.nextPageToken);
+      setVisibleCount((prev) => Math.min(prev + LOAD_MORE_INCREMENT, data.merged.length));
     } finally {
       setIsLoadingMore(false);
     }
@@ -81,23 +97,25 @@ export function ReplayProgramsSection({ videos, initialNextPageToken }: ReplayPr
         <div className="news-section-line" />
       </div>
 
-      <div className="grid gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-[15px] grid-cols-2 sm:grid-cols-2 xl:grid-cols-4">
         {visibleVideos.map((video, idx) => (
-          <Link key={`${video.id}-${idx}`} href={`/replay/${video.slug || video.id}`} className="block space-y-4 rounded-[12px] hover-lift-primary">
-            <div className="h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
+          <Link key={`${video.id}-${idx}`} href={`/replay/${video.slug || video.id}`} className="block space-y-3 rounded-[12px] hover-lift-primary">
+            <div className="h-[240px] md:h-[440px] overflow-hidden rounded-[15px] bg-[#333333]">
               <SafeImage
                 src={video.logo_url || video.logo || "/assets/placeholders/live_tv_frame.png"}
                 alt={video.title || t("program")}
                 width={343}
                 height={440}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover scale-[1.6]"
               />
             </div>
-            <h3 className="fig-h9 line-clamp-2 uppercase text-white">{video.title || t("program")}</h3>
-            <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
-              <span>{video.date ? formatDate(video.date) : formatDate(new Date())}</span>
-              <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
-              <span>{displayTime(video.date, video.time, t("unknownTime"))}</span>
+            <div className="px-1 md:pl-3 pb-2">
+              <h3 className="text-[13px] md:fig-h9 line-clamp-2 uppercase text-white font-medium leading-tight">{video.title || t("program")}</h3>
+              <div className="mt-2 flex flex-wrap items-center gap-[5px] md:gap-[10px] text-[10px] md:text-[12px] text-[#8E8E8E]">
+                <span>{video.date ? formatDate(video.date) : formatDate(new Date())}</span>
+                <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E] hidden md:inline-block" />
+                <span>{displayTime(video.date, video.time, t("unknownTime"))}</span>
+              </div>
             </div>
           </Link>
         ))}
@@ -106,14 +124,15 @@ export function ReplayProgramsSection({ videos, initialNextPageToken }: ReplayPr
           <>
             {Array.from({ length: 2 }, (_, idx) => (
               <article key={`replay-program-shimmer-${idx}`} className="space-y-4 animate-pulse">
-                <div className="h-[440px] overflow-hidden rounded-[15px] bg-[#2a2a2a]" />
-                <div className="h-6 w-4/5 rounded bg-[#2a2a2a]" />
-                <div className="h-4 w-2/3 rounded bg-[#2a2a2a]" />
+                <div className="h-[240px] md:h-[440px] overflow-hidden rounded-[15px] bg-[#2a2a2a]" />
+                <div className="h-4 md:h-6 w-4/5 rounded bg-[#2a2a2a]" />
+                <div className="h-3 md:h-4 w-2/3 rounded bg-[#2a2a2a]" />
               </article>
             ))}
           </>
         )}
       </div>
+
 
       {hasMore && (
         <div className="flex justify-center">
@@ -130,4 +149,3 @@ export function ReplayProgramsSection({ videos, initialNextPageToken }: ReplayPr
     </section>
   );
 }
-

@@ -53,7 +53,17 @@ export function SafeImage({
       setIsLoading(false);
     };
 
-    const resolvedSrc = (hasError ? fallbackSrc : (src || fallbackSrc)) as ImageProps["src"];
+    const sanitizeImageSrc = (value: ImageProps["src"]) => {
+      if (typeof value !== "string") return value;
+
+      const trimmed = value.trim();
+      const firstCandidate = trimmed.split(",")[0]?.trim() || trimmed;
+      const withoutDescriptor = firstCandidate.replace(/\s+\d+w$/i, "");
+
+      return withoutDescriptor || fallbackSrc;
+    };
+
+    const resolvedSrc = sanitizeImageSrc((hasError ? fallbackSrc : (src || fallbackSrc)) as ImageProps["src"]);
   
     return (
       <div

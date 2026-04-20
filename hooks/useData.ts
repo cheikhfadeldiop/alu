@@ -4,6 +4,46 @@ import useSWR from "swr";
 import { SITE_CONFIG } from "@/constants/site-config";
 import * as api from "@/services/api";
 
+async function fetchWordPressNewsBundleData(
+    activeCategoryId: string | number,
+    prioritizedCategoryIdsCsv: string,
+    categoryCount: number,
+    fillCount: number,
+    latestCount: number,
+    latestPage: number
+) {
+    const prioritizedCategoryIds = prioritizedCategoryIdsCsv
+        .split(",")
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id));
+
+    const categoryArticlesPromise = api.getWordPressPosts(activeCategoryId, categoryCount);
+    const prioritizedArticlesPromise = Promise.all(
+        prioritizedCategoryIds.map((id) => api.getWordPressPosts(id, fillCount))
+    );
+    const latestArticlesPromise = api.getWordPressLatestPosts(latestCount, latestPage);
+
+    const [categoryArticles, prioritizedArticles, latestArticles] = await Promise.all([
+        categoryArticlesPromise,
+        prioritizedArticlesPromise,
+        latestArticlesPromise,
+    ]);
+
+    const dedupedArticles = new Map<number, import("@/types/api").WordPressPost>();
+
+    prioritizedArticles.flat().forEach((item) => {
+        if (!item?.id || dedupedArticles.has(item.id)) return;
+        dedupedArticles.set(item.id, item);
+    });
+
+    return {
+        activeCategoryId: Number(activeCategoryId),
+        categoryArticles,
+        allArticles: Array.from(dedupedArticles.values()),
+        latestArticles,
+    };
+}
+
 /**
  * Robust Refresh Controller Logic
  * Uses the settings defined in SITE_CONFIG.api.cache.ttl
@@ -26,6 +66,17 @@ const FETCHER_MAP = {
     wordpressLatestPosts: (key: string) => {
         const [, count, page] = key.split(':');
         return api.getWordPressLatestPosts(parseInt(count) || 50, parseInt(page) || 1);
+    },
+    wordpressNewsBundle: (key: string) => {
+        const [, activeCategoryId, allCategoryIds, categoryCount, allCount, latestCount, latestPage] = key.split(':');
+        return fetchWordPressNewsBundleData(
+            activeCategoryId,
+            allCategoryIds,
+            parseInt(categoryCount) || 20,
+            parseInt(allCount) || 20,
+            parseInt(latestCount) || 20,
+            parseInt(latestPage) || 1
+        );
     },
     wordpressCategories: api.getWordPressCategories,
     wordpressPost: (key: string) => {
@@ -98,6 +149,44 @@ export function useWordPressNews(categoryId: string | number, count: number = 10
 export function useWordPressLatestNews(count: number = 50, page: number = 1, fallbackData?: import("@/types/api").WordPressPost[]) {
     return useData<import("@/types/api").WordPressPost[]>(["wordpressLatestPosts", count, page], "standard", fallbackData);
 }
+
+export function useWordPressNewsBundle(
+    activeCategoryId: string | number,
+    allCategoryIds: string | number,
+    counts?: {
+        categoryCount?: number;
+        allCount?: number;
+        latestCount?: number;
+        latestPage?: number;
+    },
+    fallbackData?: {
+        activeCategoryId: number;
+        categoryArticles: import("@/types/api").WordPressPost[];
+        allArticles: import("@/types/api").WordPressPost[];
+        latestArticles: import("@/types/api").WordPressPost[];
+    }
+) {
+    return useData<{
+        activeCategoryId: number;
+        categoryArticles: import("@/types/api").WordPressPost[];
+        allArticles: import("@/types/api").WordPressPost[];
+        latestArticles: import("@/types/api").WordPressPost[];
+    }>(
+        [
+            "wordpressNewsBundle",
+            activeCategoryId,
+            allCategoryIds,
+            counts?.categoryCount ?? 80,
+            counts?.allCount ?? 100,
+            counts?.latestCount ?? 100,
+            counts?.latestPage ?? 1,
+        ],
+        "standard",
+        fallbackData
+    );
+}
+
+export { fetchWordPressNewsBundleData };
 
 export function useWordPressPost(postId: string | number, fallbackData?: import("@/types/api").WordPressPost) {
     return useData<import("@/types/api").WordPressPost>(["wordpressPost", postId], "standard", fallbackData);

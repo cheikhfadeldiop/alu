@@ -14,7 +14,7 @@ import { getSiteAbsoluteUrl, ensureAbsoluteUrl } from "@/services/api";
 async function LivePageContent() {
   const allChannelsRes = await getAluLiveChannels().catch(() => ({ allitems: [] }));
   const allChannels = allChannelsRes.allitems || [];
-  const { items: channelVideos, nextPageToken } = await getYouTubeLatestVideosPage({ maxResults: 24, ttlKey: "realtime" }).catch(() => ({
+  const { items: channelVideos, nextPageToken } = await getYouTubeLatestVideosPage({ maxResults: 12, ttlKey: "realtime" }).catch(() => ({
     items: [],
     nextPageToken: null,
   }));

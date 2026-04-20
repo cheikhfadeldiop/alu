@@ -1,7 +1,7 @@
 import { ReplayPlayerWrapper } from "@/components/replay/ReplayPlayerWrapper";
 import { Link } from "@/i18n/navigation";
 import { LatestVideosLoadMoreGrid } from "@/components/replay/LatestVideosLoadMoreGrid";
-import { findReplay, getYouTubeLatestVideosPage, SliderVideoItem } from "@/services/api";
+import { getYouTubeLatestVideosPage, SliderVideoItem } from "@/services/api";
 import { getTranslations } from "next-intl/server";
 
 interface ReplayVideoPageProps {
@@ -15,16 +15,16 @@ export default async function ReplayVideoPage({ params }: ReplayVideoPageProps) 
   const t = await getTranslations("common");
   const replayTag = t("replayTag");
 
-  const latestPage = await getYouTubeLatestVideosPage({ maxResults: 24, ttlKey: "dynamic" }).catch(() => ({
+  const latestPage = await getYouTubeLatestVideosPage({ maxResults: 12, ttlKey: "dynamic" }).catch(() => ({
     items: [],
     nextPageToken: null,
   }));
 
   const latestVideos = latestPage.items;
   const nextPageToken = latestPage.nextPageToken;
-  const selectedReplay =
-    latestVideos.find((video) => video.slug === decodedVideoSlug || video.id === decodedVideoSlug) ||
-    (await findReplay(decodedVideoSlug).catch(() => null));
+  const selectedReplay = latestVideos.find(
+    (video) => video.slug === decodedVideoSlug || video.id === decodedVideoSlug
+  );
 
   const replay =
     selectedReplay ??

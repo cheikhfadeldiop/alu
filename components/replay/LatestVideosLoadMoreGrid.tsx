@@ -49,6 +49,24 @@ function uniqVideos(items: SliderVideoItem[]) {
   });
 }
 
+async function fetchMoreVideoRows(nextToken: string, loadedVideos: SliderVideoItem[], minimumCount: number) {
+  let token: string | null = nextToken;
+  let merged = loadedVideos;
+
+  while (token && merged.length < minimumCount) {
+    const response = await fetch(
+      `/api/youtube/latest-videos?maxResults=${FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(token)}`,
+    );
+    if (!response.ok) throw new Error("Failed to fetch more videos");
+
+    const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
+    merged = uniqVideos([...(merged || []), ...((data.items || []) as SliderVideoItem[])]);
+    token = data.nextPageToken || null;
+  }
+
+  return { merged, nextPageToken: token };
+}
+
 export function LatestVideosLoadMoreGrid({
   selectedReplay,
   initialVideos,
@@ -78,17 +96,15 @@ export function LatestVideosLoadMoreGrid({
     if (nextPageToken) {
       setIsLoadingMore(true);
       try {
-        const response = await fetch(
-          `/api/youtube/latest-videos?maxResults=${FETCH_BATCH_SIZE}&pageToken=${encodeURIComponent(nextPageToken)}`,
+        const data = await fetchMoreVideoRows(
+          nextPageToken,
+          loadedVideos,
+          visibleCount + LOAD_MORE_INCREMENT
         );
-        if (!response.ok) throw new Error("Failed to fetch more videos");
 
-        const data = (await response.json()) as { items?: SliderVideoItem[]; nextPageToken?: string | null };
-        const merged = uniqVideos([...(loadedVideos || []), ...((data.items || []) as SliderVideoItem[])]);
-
-        setLoadedVideos(merged);
-        setNextPageToken(data.nextPageToken || null);
-        setVisibleCount((prev) => Math.min(prev + LOAD_MORE_INCREMENT, merged.length));
+        setLoadedVideos(data.merged);
+        setNextPageToken(data.nextPageToken);
+        setVisibleCount((prev) => Math.min(prev + LOAD_MORE_INCREMENT, data.merged.length));
       } catch {
         // If fetching fails, stop showing the button.
         setNextPageToken(null);
@@ -108,39 +124,39 @@ export function LatestVideosLoadMoreGrid({
 
   return (
     <>
-      <div className="grid gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-[15px] grid-cols-2 sm:grid-cols-2 xl:grid-cols-4">
         {loadedVideos.slice(0, visibleCount).map((video, index) => (
-          
-          
+
+
           <Link
             key={`${video.slug || video.id}-${index}`}
             href={`/replay/${video.slug || video.id}`}
             className="space-y-2 hover-lift-primary rounded-[10px]"
           >
-            <div className="h-[172px] overflow-hidden rounded-[10px]">
+            <div className="h-[100px] md:h-[172px] overflow-hidden rounded-[10px]">
               <SafeImage
                 src={video.logo_url || video.logo || "/assets/placeholders/live_tv_frame.png"}
                 alt={video.title || t("replays")}
                 width={306}
                 height={172}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover "
               />
             </div>
-            <div className="px-2">
-            <h3 className="line-clamp-2 text-[16px] leading-[24px] text-white">
+            <div className="px-1 md:px-2">
+            <h3 className="line-clamp-2 text-[13px] md:text-[16px] leading-tight md:leading-[24px] text-white font-medium">
             {video.title}
           </h3>
 
-          <div className="flex items-center gap-[10px] text-[12px] leading-[18px] text-[#8E8E8E]">
+          <div className="mt-1 md:mt-0 flex flex-wrap items-center gap-[5px] md:gap-[10px] text-[10px] md:text-[12px] leading-[18px] text-[#8E8E8E]">
             <span>
               {new Date(video.date).toLocaleDateString("fr-FR", {
                 day: "numeric",
-                month: "long",
+                month: "short",
                 year: "numeric",
               })}
             </span>
 
-            <span className="h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
+            <span className="hidden md:inline-block h-[3.86px] w-[3.86px] rounded-full bg-[#8E8E8E]" />
 
             <span>
               {new Date(video.date).toLocaleTimeString("fr-FR", {
@@ -156,12 +172,13 @@ export function LatestVideosLoadMoreGrid({
         {isLoadingMore &&
           Array.from({ length: SKELETON_CARD_COUNT }, (_, idx) => (
             <article key={`latest-shimmer-${idx}`} className="space-y-2 animate-pulse">
-              <div className="h-[172px] overflow-hidden rounded-[10px] bg-[#2a2a2a]" />
-              <div className="h-5 w-4/5 rounded bg-[#2a2a2a]" />
-              <div className="h-4 w-2/3 rounded bg-[#2a2a2a]" />
+              <div className="h-[100px] md:h-[172px] overflow-hidden rounded-[10px] bg-[#2a2a2a]" />
+              <div className="h-4 md:h-5 w-4/5 rounded bg-[#2a2a2a]" />
+              <div className="h-3 md:h-4 w-2/3 rounded bg-[#2a2a2a]" />
             </article>
           ))}
       </div>
+
 
       {hasMore && (
         <div className="flex justify-center pt-8">
@@ -178,4 +195,3 @@ export function LatestVideosLoadMoreGrid({
     </>
   );
 }
-

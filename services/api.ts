@@ -59,13 +59,16 @@ function getYouTubeApiKey(): string {
     return key;
 }
 
-async function getYouTubeRssVideos(maxResults: number = 12, options?: { ttlKey?: CacheTtlKey }): Promise<SliderVideoItem[]> {
-    if (!ALU_YT_CHANNEL_ID) return [];
+async function getYouTubeRssVideosPage(
+    maxResults: number = 12,
+    options?: { ttlKey?: CacheTtlKey; offset?: number }
+): Promise<YouTubeLatestVideosPage> {
+    if (!ALU_YT_CHANNEL_ID) return { items: [], nextPageToken: null };
     const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}`;
     const response = await fetch(url, {
         next: { revalidate: getRevalidateSeconds(options?.ttlKey) },
     });
-    if (!response.ok) return [];
+    if (!response.ok) return { items: [], nextPageToken: null };
     const xml = await response.text();
 
     const entries = xml.split("<entry>").slice(1);
@@ -91,7 +94,19 @@ async function getYouTubeRssVideos(maxResults: number = 12, options?: { ttlKey?:
         } as SliderVideoItem;
     }).filter(Boolean) as SliderVideoItem[];
 
-    return mapped.slice(0, maxResults);
+    const offset = Math.max(0, options?.offset || 0);
+    const items = mapped.slice(offset, offset + maxResults);
+    const nextOffset = offset + items.length;
+
+    return {
+        items,
+        nextPageToken: nextOffset < mapped.length ? `rss:${nextOffset}` : null,
+    };
+}
+
+async function getYouTubeRssVideos(maxResults: number = 12, options?: { ttlKey?: CacheTtlKey; offset?: number }): Promise<SliderVideoItem[]> {
+    const page = await getYouTubeRssVideosPage(maxResults, options);
+    return page.items;
 }
 
 /**
@@ -316,18 +331,19 @@ export async function getYouTubeLatestVideos(
 export async function getYouTubeLatestVideosPage(options?: { maxResults?: number; pageToken?: string; ttlKey?: CacheTtlKey }): Promise<YouTubeLatestVideosPage> {
     const maxResults = Math.min(Math.max(options?.maxResults ?? 12, 1), 50);
     const pageToken = options?.pageToken?.trim() || undefined;
+    const rssOffset = pageToken?.startsWith("rss:") ? Number(pageToken.slice(4)) || 0 : 0;
     if (!ALU_YT_CHANNEL_ID) {
         return { items: [], nextPageToken: null };
+    }
+    if (pageToken?.startsWith("rss:")) {
+        return getYouTubeRssVideosPage(maxResults, { ttlKey: options?.ttlKey, offset: rssOffset });
     }
     let key = "";
     try {
         key = getYouTubeApiKey();
     } catch {
         // Public fallback without API key
-        return {
-            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
-            nextPageToken: null,
-        };
+        return getYouTubeRssVideosPage(maxResults, { ttlKey: options?.ttlKey, offset: rssOffset });
     }
     // Use channel uploads playlist first (more complete than search).
     const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${encodeURIComponent(ALU_YT_CHANNEL_ID)}&key=${encodeURIComponent(key)}`;
@@ -337,10 +353,7 @@ export async function getYouTubeLatestVideosPage(options?: { maxResults?: number
             ttlKey: options?.ttlKey,
         });
     } catch {
-        return {
-            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
-            nextPageToken: null,
-        };
+        return getYouTubeRssVideosPage(maxResults, { ttlKey: options?.ttlKey, offset: rssOffset });
     }
     const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 
@@ -363,10 +376,7 @@ export async function getYouTubeLatestVideosPage(options?: { maxResults?: number
     try {
         data = await fetchJson<{ items: YouTubeSearchItem[]; nextPageToken?: string }>(searchUrl, { ttlKey: options?.ttlKey });
     } catch {
-        return {
-            items: await getYouTubeRssVideos(maxResults, { ttlKey: options?.ttlKey }),
-            nextPageToken: null,
-        };
+        return getYouTubeRssVideosPage(maxResults, { ttlKey: options?.ttlKey, offset: rssOffset });
     }
     const items = data.items || [];
     return {
@@ -816,7 +826,7 @@ export async function findReplay(identifier: string): Promise<SliderVideoItem | 
         if (found) return found;
 
         // 2. Try matching a SHOW (Category) directly
-        const showsRes = await getVODShows();
+        const showsRes = await getVODShows().catch(() => ({ allitems: [] as SliderVideoItem[] }));
         const shows = showsRes.allitems || [];
         const showMatch = shows.find(s => s.slug === identifier || s.id === identifier);
         if (showMatch) {
@@ -830,7 +840,7 @@ export async function findReplay(identifier: string): Promise<SliderVideoItem | 
         }
 
         // 3. Try searching through ALL channels
-        const channelsRes = await getLiveChannels();
+        const channelsRes = await getLiveChannels().catch(() => ({ allitems: [] as import('../types/api').LiveChannel[] }));
         const allChannels = channelsRes.allitems || [];
 
         for (const channel of allChannels) {
@@ -1295,6 +1305,16 @@ export async function getWordPressLatestPosts(
 
 
 export async function getWordPressAlaunePost(): Promise<import('../types/api').WordPressPost[]> {
-    // Category ID from config
-    return getWordPressPosts(SITE_CONFIG.categories.news.alaune, 20);
+    try {
+        // Try to find the category ID dynamically by slug first
+        const cats = await getWordPressCategoryBySlug('a-la-une');
+        if (cats && cats.length > 0) {
+            return getWordPressPosts(cats[0].id, 20);
+        }
+        
+        // Ultimate fallback: return latest posts if 'a-la-une' doesn't exist
+        return getWordPressLatestPosts(20);
+    } catch (e) {
+        return getWordPressLatestPosts(20);
+    }
 }

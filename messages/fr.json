@@ -90,6 +90,7 @@
     "controls": "CONTRÔLES",
     "previewUnavailable": "Aperçu non disponible",
     "streamUnavailable": "Flux indisponible",
+    "streamTimeoutError": "Le flux est inaccessible pour le moment. Veuillez réessayer plus tard.",
     "liveDescription": "Suivez votre chaîne préférée en direct sur le portail CRTV.",
     "itinerary": "Obtenir l'itinéraire",
     "copyCoords": "Copier les coordonnées",
