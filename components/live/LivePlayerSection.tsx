@@ -109,33 +109,42 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
 
     // 2. HLS & Video Initialization
     const hlsRef = React.useRef<Hls | null>(null);
+    const lastUrlRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
         const videoEl = videoRef.current;
         if (!videoEl || !resolvedUrl) return;
 
-        // Cleanup existing HLS if it's different
+        // If URL is the same as last time, don't re-init (unless it was destroyed)
+        if (lastUrlRef.current === resolvedUrl && hlsRef.current) {
+            return;
+        }
+
+        // Cleanup previous instance
         if (hlsRef.current) {
             hlsRef.current.destroy();
             hlsRef.current = null;
         }
 
-        let hls: Hls;
+        lastUrlRef.current = resolvedUrl;
+        setIsResolving(true);
 
         const initPlayer = () => {
-            setIsResolving(true);
             videoEl.muted = isMuted;
             videoEl.volume = volume;
 
             if (Hls.isSupported()) {
-                hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    backBufferLength: 90,
+                const hls = new Hls({
+                    // Simple config to avoid 403 or header issues
+                    autoStartLoad: true,
                 });
+                
                 hlsRef.current = hls;
-                hls.loadSource(resolvedUrl);
                 hls.attachMedia(videoEl);
+
+                hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                    hls.loadSource(resolvedUrl);
+                });
 
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     const levels = hls.levels.map((level, index) => ({
@@ -144,9 +153,9 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                     })).sort((a, b) => b.height - a.height);
                     setQualities(levels);
                     setIsResolving(false);
-
-                    videoEl.play().catch((err) => {
-                        console.warn("Autoplay blocked or failed:", err);
+                    
+                    videoEl.play().catch(() => {
+                        // Likely autoplay block; user will click play
                     });
                 });
 
@@ -170,10 +179,12 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
                 setHlsInstance(hls);
             } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
                 videoEl.src = resolvedUrl;
-                videoEl.addEventListener('loadedmetadata', () => {
+                const onLoaded = () => {
                     setIsResolving(false);
-                    videoEl.play().catch(console.warn);
-                });
+                    videoEl.play().catch(() => {});
+                    videoEl.removeEventListener('loadedmetadata', onLoaded);
+                };
+                videoEl.addEventListener('loadedmetadata', onLoaded);
             } else {
                 setError(t("streamUnavailable"));
                 setIsResolving(false);
@@ -189,6 +200,7 @@ export function LivePlayerSection({ channel, currentProgram }: LivePlayerSection
             }
         };
     }, [resolvedUrl]);
+
 
 
     // 3. Controls Handlers
